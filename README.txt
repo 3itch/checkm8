@@ -26,8 +26,20 @@
         Today we'll dig into the `verify_integrity()` function among
     others that Intel's TBoot uses for integrity checking and why they're 
     not very efficient and how they can easily be exploited.
-                
-                
+
+        Our method involves the use of --oprom firmware-- a coreboot shim*
+    which gets measured by Intel TXT into the MLE, which we modify.
+        We then "pass" the MLE ( we load TBoot into memory using our shim )
+    onto TBoot which we load @ 0x1000000
+
+        After TBoot gets loaded, we then find the offset of the
+    verify_integrity() function located @ 0x80af10
+
+        We then obviously hook into this function.
+
+        Anyways i'll pass it onto the next section.
+
+
                 ┌────────────────────────────────────────────┐
                 │   2.0 TBoot                                │
                 └────────────────────────────────────────────┘
@@ -106,7 +118,7 @@
     launches the MLE??? ".
         The simple answer is no. we cannot. we can however directly modify the
     software-defined functions in TBoot via patching using firmware on the side.
-                                                        ( like our oprom firmware )
+                                                        ( like our coreboot shim )
 
         Complete rest l8r... ZzzZzZZzz
 
@@ -163,7 +175,7 @@
 
                 - Chipset > SINIT ACM ( should point to the ACM .bin file
                                         f.eg RKLS_SINIT_v1_14_46_20220819_REL_NT_O1.PW_signed.bin )
-                - Payload > payload path ( set to `../shim.bin` )
+                - Payload > payload path ( set to `../shim.elf` )
                 - CBFS > files in CBFS ( should list tboot.gz ( ../tboot.gz ) | type should be raw )
 
                 Save & Exit

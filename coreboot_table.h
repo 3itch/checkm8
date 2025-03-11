@@ -30,7 +30,7 @@ void *find_cbfs_base_addr() {
     struct coreboot_tb_header *hdr = ( struct coreboot_tb_header * )addr;
     if ( hdr->magic == COREBOOT_TB_MAGIC ) {
       serial_print("coreboot_table:  found coreboot tables @ ");
-      serial_print_hex((uint32_t)hdr);
+      serial_print_hex( (uint32_t)hdr );
       serial_print("\n");
 
       uint32_t i;
@@ -40,12 +40,12 @@ void *find_cbfs_base_addr() {
         if ( entry->tag == COREBOOT_TB_CBFS ) {
           void *cbfs_base = *(void **)(entry + 1);
           serial_print("coreboot_table:    found CBFS base @ ");
-          serial_print_hex((uint32_t)cbfs_base);
+          serial_print_hex( (uint32_t)cbfs_base );
           serial_print("\n");
 
           return cbfs_base;
         }
-        entry_ptr = (void *)((uintptr_t)entry_ptr + entry->size);
+        entry_ptr = (void *)( (uintptr_t)entry_ptr + entry->size );
       }
     }
   }
