@@ -1,0 +1,13 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_SUPERMICRO_X11SSH_TF
+	bool "X11SSH-TF"
+
+config BOARD_SUPERMICRO_X11SSM_F
+	bool "X11SSM-F"
+
+config BOARD_SUPERMICRO_X11SSH_F
+	bool "X11SSH-F/LN4F"
+
+config BOARD_SUPERMICRO_X11SSW_F
+	bool "X11SSW-F"

@@ -1,0 +1,38 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_ASROCK_H110M_DVS
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOARD_ROMSIZE_KB_8192
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select HAVE_CMOS_DEFAULT
+	select INTEL_GMA_HAVE_VBT
+	select INTEL_INT15
+	select SOC_INTEL_KABYLAKE
+	select SKYLAKE_SOC_PCH_H
+	select SUPERIO_NUVOTON_COMMON_COM_A
+	select SUPERIO_NUVOTON_NCT6791D
+	select REALTEK_8168_RESET
+	select RT8168_SET_LED_MODE
+	select MEMORY_MAPPED_TPM
+
+config DISABLE_HECI1_AT_PRE_BOOT
+	default y
+
+config MAINBOARD_DIR
+	default "asrock/h110m"
+
+config MAINBOARD_PART_NUMBER
+	default "H110M"
+
+config PRERAM_CBMEM_CONSOLE_SIZE
+	hex
+	default 0xd00
+
+config DIMM_SPD_SIZE
+	default 512 #DDR4
+
+endif

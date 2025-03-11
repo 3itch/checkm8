@@ -1,0 +1,16 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_ASUS_P5QC
+	bool "P5QC"
+
+config BOARD_ASUS_P5Q_PRO
+	bool "P5Q PRO"
+
+config BOARD_ASUS_P5QL_PRO
+	bool "P5QL PRO"
+
+config BOARD_ASUS_P5Q_SE
+	bool "P5Q SE"
+
+config BOARD_ASUS_P5Q
+	bool "P5Q"

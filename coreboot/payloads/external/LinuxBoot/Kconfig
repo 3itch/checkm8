@@ -1,0 +1,332 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if PAYLOAD_LINUXBOOT
+
+choice
+	prompt "Architecture"
+	depends on LINUXBOOT_COMPILE_KERNEL || LINUXBOOT_BUILD_INITRAMFS
+	default LINUXBOOT_X86_64
+
+config LINUXBOOT_X86_64
+	bool "x86_64"
+	depends on ARCH_X86
+	help
+	  AMD64 kernel and initramfs
+
+config LINUXBOOT_X86
+	bool "x86"
+	depends on ARCH_X86
+	help
+	  X86 kernel and initramfs
+
+config LINUXBOOT_ARM
+	bool "arm64"
+	depends on ARCH_ARM
+	select PAYLOAD_FIT_SUPPORT
+	help
+	  arm kernel and initramfs
+
+config LINUXBOOT_ARM64
+	bool "arm64"
+	depends on ARCH_ARM64
+	select PAYLOAD_FIT_SUPPORT
+	help
+	  AARCH64 kernel and initramfs
+
+config LINUXBOOT_RISCV_RV32
+	bool "RISC-V"
+	depends on ARCH_RISCV_RV32
+	select PAYLOAD_FIT_SUPPORT
+	help
+	  RISC-V kernel and initramfs
+
+config LINUXBOOT_RISCV_RV64
+	bool "RISC-V"
+	depends on ARCH_RISCV_RV64
+	select PAYLOAD_FIT_SUPPORT
+	help
+	  RISC-V kernel and initramfs
+
+endchoice
+
+comment "Linux kernel"
+
+config LINUXBOOT_COMPILE_KERNEL
+	bool "Compile kernel"
+	default n
+
+config LINUXBOOT_KERNEL_PATH
+	string "Path to kernel"
+	default ""
+	depends on !LINUXBOOT_COMPILE_KERNEL
+	help
+	  The kernel path is either and absolute path or relative to the
+	  LinuxBoot directory
+
+if LINUXBOOT_COMPILE_KERNEL
+
+config LINUXBOOT_CROSS_COMPILE
+	bool "cross compiler"
+	default n if LINUXBOOT_X86_64 # currently coreboots cross toolchain cannot build Linux
+	default y
+	help
+	  Enable this option if you want to compile Linux using a cross compiler.
+	  The coreboot toolchain also counts as a cross toolchain.
+
+config LINUXBOOT_CROSS_COMPILE_PATH
+	string "cross compiler"
+	depends on LINUXBOOT_CROSS_COMPILE
+	default "" # e.g. "aarch64-linux-gnu-"
+	help
+	  Choose a custom cross compiler toolchain to use.
+	  The cross toolchain of coreboot will be used if this option is left empty.
+	  If not left empty, it should contain a path to a cross toolchain that is
+	  capable of compiling Linux. It can be useful if you don't want to use the
+	  coreboot toolchain or experience problems using it for building Linux.
+
+config LINUXBOOT_KERNEL_VERSION
+	string "kernel version"
+	default "6.3"
+	help
+	  Choose the Linux kernel version number. (x.x.x)
+	  Release candidate kernels (rc) are currently are not supported.
+
+config LINUXBOOT_KERNEL_CONFIGFILE
+	string "Config file path"
+	default "i386/defconfig"     if LINUXBOOT_X86
+	default "x86_64/defconfig"   if LINUXBOOT_X86_64
+	default "arm64/defconfig"    if LINUXBOOT_ARM64
+	default "riscv/defconfig-32" if LINUXBOOT_RISCV_RV32
+	default "riscv/defconfig-64" if LINUXBOOT_RISCV_RV64
+	help
+	  Path to the kernel configuration file.
+
+	  Note: this can be a defconfig file or a complete .config file.
+
+choice
+	prompt "Kernel binary format"
+	default LINUXBOOT_KERNEL_BZIMAGE if LINUXBOOT_X86 || LINUXBOOT_X86_64
+	default LINUXBOOT_KERNEL_UIMAGE if LINUXBOOT_ARM64 || LINUXBOOT_RISCV_RV32 || LINUXBOOT_RISCV_RV64
+
+config LINUXBOOT_KERNEL_BZIMAGE
+	bool "bzImage"
+	depends on LINUXBOOT_X86 || LINUXBOOT_X86_64
+
+config LINUXBOOT_KERNEL_UIMAGE
+	bool "uImage"
+	depends on LINUXBOOT_ARM64 || LINUXBOOT_RISCV_RV32 || LINUXBOOT_RISCV_RV64
+
+endchoice
+
+config LINUXBOOT_DTS_FILE
+	string "Compiled devicetree file"
+	depends on LINUXBOOT_ARM64 || LINUXBOOT_RISCV_RV32 || LINUXBOOT_RISCV_RV64
+	default "empty.dts"
+
+endif #LINUXBOOT_COMPILE_KERNEL
+
+config LINUX_COMMAND_LINE
+	string "Kernel command-line"
+	default ""
+	help
+	  Add your own kernel command-line arguments.
+
+config PAYLOAD_FILE
+	default "payloads/external/LinuxBoot/build/Image"
+
+comment "Linux initramfs"
+
+config LINUXBOOT_BUILD_INITRAMFS
+	bool "Build initramfs"
+	default n
+
+config LINUXBOOT_INITRAMFS_PATH
+	string "Path to initramfs"
+	default "payloads/external/LinuxBoot/build/initramfs" if LINUXBOOT_UROOT
+
+if LINUXBOOT_BUILD_INITRAMFS
+
+choice
+	prompt "Initramfs"
+	default LINUXBOOT_UROOT
+
+config LINUXBOOT_UROOT
+	bool "u-root"
+	depends on !LINUXBOOT_RISCV_RV32 # not supported by u-root
+	help
+	  Enable u-root linuxboot mode.
+	  See http://u-root.tk/ for more information.
+
+endchoice
+
+if LINUXBOOT_UROOT
+
+choice
+	prompt "U-root version"
+	default LINUXBOOT_UROOT_MAIN
+
+config LINUXBOOT_UROOT_CUSTOM
+	bool "custom"
+	help
+	  choose a custom u-root branch
+
+config LINUXBOOT_UROOT_MAIN
+	bool "main"
+	help
+	  Latest u-root version
+
+config LINUXBOOT_UROOT_V7_0_0
+	bool "v7.0.0"
+
+config LINUXBOOT_UROOT_V6_0_0
+	bool "v6.0.0"
+
+config LINUXBOOT_UROOT_V5_0_0
+	bool "v5.0.0"
+
+config LINUXBOOT_UROOT_V4_0_0
+	bool "v4.0.0"
+
+config LINUXBOOT_UROOT_V3_0_0
+	bool "v3.0.0"
+
+config LINUXBOOT_UROOT_V2_0_0
+	bool "v2.0.0"
+
+config LINUXBOOT_UROOT_V1_0_0
+	bool "v1.0.0"
+
+endchoice
+
+config LINUXBOOT_UROOT_CHECKOUT
+	string "U-root custom branch"
+	depends on LINUXBOOT_UROOT_CUSTOM
+
+config LINUXBOOT_UROOT_VERSION
+	string
+	default LINUXBOOT_UROOT_CHECKOUT if LINUXBOOT_UROOT_CUSTOM
+	default "main" if LINUXBOOT_UROOT_MAIN
+	default "v7.0.0" if LINUXBOOT_UROOT_V7_0_0
+	default "v6.0.0" if LINUXBOOT_UROOT_V6_0_0
+	default "v5.0.0" if LINUXBOOT_UROOT_V5_0_0
+	default "v4.0.0" if LINUXBOOT_UROOT_V4_0_0
+	default "v3.0.0" if LINUXBOOT_UROOT_V3_0_0
+	default "v2.0.0" if LINUXBOOT_UROOT_V2_0_0
+	default "v1.0.0" if LINUXBOOT_UROOT_V1_0_0
+
+choice
+	prompt "Build format"
+	default LINUXBOOT_UROOT_BB
+	help
+	  u-root build format (e.g. bb or source). (default "bb")
+
+config LINUXBOOT_UROOT_BB
+	bool "bb"
+
+config LINUXBOOT_UROOT_SOURCE
+	bool "source (experimental)"
+
+endchoice
+
+config LINUXBOOT_UROOT_FORMAT
+	string
+	default "bb" if LINUXBOOT_UROOT_BB
+	default "source" if LINUXBOOT_UROOT_SOURCE
+
+config LINUXBOOT_UROOT_FILES
+	string "Add files to u-root base"
+	help
+	  Additional files, directories, and binaries (with their ldd dependencies) to add to archive.
+	  Can be speficified multiple times.
+
+config LINUXBOOT_UROOT_INITCMD
+	string "Init target"
+	default "init"
+	help
+	  Symlink target for /init.
+	  Can be an absolute path or a u-root command name. (default "init")
+
+config LINUXBOOT_UROOT_SHELL
+	string "default shell"
+	default "gosh"
+	help
+	  Default shell.
+	  Can be an absolute path or a u-root command name. (default "elvish")
+
+config LINUXBOOT_UROOT_COMMANDS
+	string "U-root commands"
+	default "boot coreboot-app"
+	help
+	  List of additional modules to include,
+	  separated by space. (default "boot coreboot-app")
+
+if LINUXBOOT_UROOT_MAIN
+
+choice
+	prompt "Choose a specific bootloader"
+	default SPECIFIC_BOOTLOADER_BOOT
+	help
+	  Specify a bootloader which starts after u-root init. It will be a symlink
+	  to /bin/uinit. Default: boot
+
+config SPECIFIC_BOOTLOADER_NONE
+	bool "none"
+	help
+	  Leave u-root to decide which bootloaders to load first after init, if
+	  any at all. Most likely u-root will start into the defined u-root shell.
+
+config SPECIFIC_BOOTLOADER_BOOT
+	bool "boot"
+
+config SPECIFIC_BOOTLOADER_PXEBOOT
+	bool "pxeboot"
+
+config SPECIFIC_BOOTLOADER_FITBOOT
+	bool "fitboot"
+
+config SPECIFIC_BOOTLOADER_CUSTOM
+	bool "custom"
+
+endchoice
+
+config SPECIFIC_BOOTLOADER_CUSTOM_CMD
+	string "Specify a custom program to start"
+	depends on SPECIFIC_BOOTLOADER_CUSTOM
+	help
+	  This option will symlink the input to /bin/unit which will set it as the
+	  first boot program after the u-root init. Program flags are not
+	  symlinkable.
+
+config LINUXBOOT_UROOT_UINITCMD
+	string
+	default "" if SPECIFIC_BOOTLOADER_NONE
+	default "boot" if SPECIFIC_BOOTLOADER_BOOT
+	default "pxeboot" if SPECIFIC_BOOTLOADER_PXEBOOT
+	default "fitboot" if SPECIFIC_BOOTLOADER_FITBOOT
+	default SPECIFIC_BOOTLOADER_CUSTOM_CMD if SPECIFIC_BOOTLOADER_CUSTOM
+
+endif #LINUXBOOT_UROOT_MAIN
+
+endif #LINUXBOOT_UROOT
+
+endif #LINUXBOOT_BUILD_INITRAMFS
+
+choice
+	prompt "Initramfs compression format"
+	default LINUXBOOT_INITRAMFS_COMPRESSION_XZ
+
+config LINUXBOOT_INITRAMFS_COMPRESSION_NONE
+	bool "none"
+
+config LINUXBOOT_INITRAMFS_COMPRESSION_XZ
+	bool "xz compression"
+	depends on LINUXBOOT_BUILD_INITRAMFS
+
+endchoice
+
+config LINUXBOOT_INITRAMFS_SUFFIX
+	string
+	default "" if LINUXBOOT_INITRAMFS_COMPRESSION_NONE
+	default ".xz" if LINUXBOOT_INITRAMFS_COMPRESSION_XZ
+
+endif #PAYLOAD_LINUXBOOT

@@ -1,0 +1,56 @@
+## SPDX-License-Identifier: GPL-2.0-or-later
+
+chip northbridge/intel/sandybridge
+	device domain 0 on
+		subsystemid 0x1043 0x844d inherit
+		chip southbridge/intel/bd82x6x
+			register "gen1_dec" = "0x000c0291"
+
+			device ref pcie_rp1 on  end
+			device ref pcie_rp2 off end
+			device ref pcie_rp3 off end
+			device ref pcie_rp4 on  end	# PCIEX1_1
+			device ref pcie_rp5 on  end	# PCIEX1_2
+			device ref pcie_rp6 on  end	# RTL8111 GbE NIC
+			device ref pcie_rp7 off end
+			device ref pcie_rp8 off end
+
+			device ref lpc on
+				chip superio/nuvoton/nct6779d
+					device pnp 2e.1   off end	# Parallel
+					device pnp 2e.2   off end	# UART A
+					device pnp 2e.3   off end	# UART B, IR
+					device pnp 2e.5   on		# Keyboard
+						io  0x60 = 0x0060
+						io  0x62 = 0x0064
+						irq 0x70 = 1
+						irq 0x72 = 12
+					end
+					device pnp 2e.6   off end	# CIR
+					device pnp 2e.7   off end	# GPIO6-8
+					device pnp 2e.8   off end	# WDT1, GPIO0, GPIO1
+					device pnp 2e.108 on  end	# GPIO0
+					device pnp 2e.9   off end	# GPIO1-8
+					device pnp 2e.109 off end	# GPIO1
+					device pnp 2e.209 off end	# GPIO2
+					device pnp 2e.309 off end	# GPIO3
+					device pnp 2e.409 off end	# GPIO4
+					device pnp 2e.509 on  end	# GPIO5
+					device pnp 2e.609 off end	# GPIO6
+					device pnp 2e.709 off end	# GPIO7
+					device pnp 2e.a   on  end	# ACPI
+					device pnp 2e.b   on		# H/W Monitor, FP LED
+						io  0x60 = 0x0290
+						io  0x62 = 0
+						irq 0x70 = 0
+					end
+					device pnp 2e.d   off end	# WDT1
+					device pnp 2e.e   off end	# CIR WAKE-UP
+					device pnp 2e.f   off end	# Push-pull/Open-drain
+					device pnp 2e.14  off end	# PORT80 UART
+					device pnp 2e.16  off end	# Deep Sleep
+				end
+			end
+		end
+	end
+end

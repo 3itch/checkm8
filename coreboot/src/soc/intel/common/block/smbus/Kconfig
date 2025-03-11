@@ -1,0 +1,21 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_SMBUS
+	bool
+	select SOUTHBRIDGE_INTEL_COMMON_SMBUS
+	help
+	  Intel Processor common SMBus support
+
+config FIXED_SMBUS_IO_BASE
+	default 0xefa0
+
+config SOC_INTEL_COMMON_BLOCK_TCO
+	bool
+	help
+	  Intel Processor common TCO support
+
+config SOC_INTEL_COMMON_BLOCK_TCO_ENABLE_THROUGH_SMBUS
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK_TCO
+	help
+	  Select this config to enable TCO BAR through SMBUS

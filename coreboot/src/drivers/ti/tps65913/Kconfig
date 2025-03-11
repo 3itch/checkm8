@@ -1,0 +1,16 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVERS_TI_TPS65913_RTC
+	bool
+	default n
+	select RTC
+
+config DRIVERS_TI_TPS65913_RTC_BUS
+	int "TI TPS65913 RTC bus"
+	depends on DRIVERS_TI_TPS65913_RTC
+	default 0
+
+config DRIVERS_TI_TPS65913_RTC_ADDR
+	hex "TI TPS65913 RTC chip address"
+	depends on DRIVERS_TI_TPS65913_RTC
+	default 0x00

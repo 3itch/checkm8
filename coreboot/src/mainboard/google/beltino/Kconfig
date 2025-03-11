@@ -1,0 +1,79 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_BASEBOARD_BELTINO
+	def_bool n
+	select BOARD_ROMSIZE_KB_8192
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select INTEL_GMA_HAVE_VBT
+	select INTEL_LYNXPOINT_LP
+	select MAINBOARD_HAS_CHROMEOS
+	select MAINBOARD_HAS_LIBGFXINIT
+	select MEMORY_MAPPED_TPM
+	select MAINBOARD_HAS_TPM1
+	select NORTHBRIDGE_INTEL_HASWELL
+	select SOUTHBRIDGE_INTEL_LYNXPOINT
+	select SUPERIO_ITE_IT8772F
+
+config BOARD_GOOGLE_MCCLOUD
+	select BOARD_GOOGLE_BASEBOARD_BELTINO
+
+config BOARD_GOOGLE_MONROE
+	select BOARD_GOOGLE_BASEBOARD_BELTINO
+
+config BOARD_GOOGLE_PANTHER
+	select BOARD_GOOGLE_BASEBOARD_BELTINO
+
+config BOARD_GOOGLE_TRICKY
+	select BOARD_GOOGLE_BASEBOARD_BELTINO
+
+config BOARD_GOOGLE_ZAKO
+	select BOARD_GOOGLE_BASEBOARD_BELTINO
+
+if BOARD_GOOGLE_BASEBOARD_BELTINO
+
+config VBOOT
+	select VBOOT_VBNV_CMOS
+
+config MAINBOARD_DIR
+	default "google/beltino"
+
+config VARIANT_DIR
+	default "mccloud" if BOARD_GOOGLE_MCCLOUD
+	default "monroe" if BOARD_GOOGLE_MONROE
+	default "panther" if BOARD_GOOGLE_PANTHER
+	default "tricky" if BOARD_GOOGLE_TRICKY
+	default "zako" if BOARD_GOOGLE_ZAKO
+
+config MAINBOARD_PART_NUMBER
+	default "Mccloud" if BOARD_GOOGLE_MCCLOUD
+	default "Monroe" if BOARD_GOOGLE_MONROE
+	default "Panther" if BOARD_GOOGLE_PANTHER
+	default "Tricky" if BOARD_GOOGLE_TRICKY
+	default "Zako" if BOARD_GOOGLE_ZAKO
+
+config MAINBOARD_FAMILY
+	string
+	default "Google_Beltino"
+
+# Override the default variant behavior, since the data.vbt is the same
+# for all variants except monroe
+config INTEL_GMA_VBT_FILE
+	default "src/mainboard/\$(MAINBOARDDIR)/data.vbt" if !BOARD_GOOGLE_MONROE
+
+config MAINBOARD_SMBIOS_MANUFACTURER
+	string
+	default "GOOGLE"
+
+config ENABLE_DDR_2X_REFRESH
+	default y
+
+config PCIEXP_AER
+	def_bool n
+
+config EDK2_BOOT_TIMEOUT
+	int
+	default 5
+
+endif # BOARD_GOOGLE_BASEBOARD_BELTINO

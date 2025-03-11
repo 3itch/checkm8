@@ -1,0 +1,123 @@
+chip soc/intel/skylake
+
+	# GPE configuration
+	register "gpe0_dw0" = "GPP_C"
+
+	# FSP Configuration
+	register "DspEnable" = "1"
+
+	# VR Settings Configuration for 4 Domains
+	#+----------------+-------+-------+-------+-------+
+	#| Domain/Setting |  SA   |  IA   | GTUS  |  GTS  |
+	#+----------------+-------+-------+-------+-------+
+	#| Psi1Threshold  | 20A   | 20A   | 20A   | 20A   |
+	#| Psi2Threshold  | 5A    | 5A    | 5A    | 5A    |
+	#| Psi3Threshold  | 1A    | 1A    | 1A    | 1A    |
+	#| Psi3Enable     | 1     | 1     | 1     | 1     |
+	#| Psi4Enable     | 1     | 1     | 1     | 1     |
+	#| ImonSlope      | 0     | 0     | 0     | 0     |
+	#| ImonOffset     | 0     | 0     | 0     | 0     |
+	#| IccMax         | 7A    | 34A   | 35A   | 35A   |
+	#| VrVoltageLimit | 1.52V | 1.52V | 1.52V | 1.52V |
+	#+----------------+-------+-------+-------+-------+
+	register "domain_vr_config[VR_SYSTEM_AGENT]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0,
+		.imon_offset = 0,
+		.icc_max = VR_CFG_AMP(7),
+		.voltage_limit = 1520
+	}"
+
+	# Must leave UART0 enabled or SD/eMMC will not work as PCI
+	register "SerialIoDevMode" = "{
+		[PchSerialIoIndexI2C0]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C1]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C2]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C3]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C4]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C5]  = PchSerialIoDisabled,
+		[PchSerialIoIndexSpi0]  = PchSerialIoDisabled,
+		[PchSerialIoIndexSpi1]  = PchSerialIoDisabled,
+		[PchSerialIoIndexUart0] = PchSerialIoPci,
+		[PchSerialIoIndexUart1] = PchSerialIoDisabled,
+		[PchSerialIoIndexUart2] = PchSerialIoSkipInit,
+	}"
+
+	device domain 0 on
+		device ref south_xhci on
+			register "SsicPortEnable" = "1" # Enable SSIC for WWAN
+
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_MAX(OC0),	/* TYPE-A Port */
+				[1] = USB2_PORT_MAX(OC2),	/* TYPE-A Port */
+				[2] = USB2_PORT_MAX(OC_SKIP),	/* Bluetooth */
+				[4] = USB2_PORT_MAX(OC_SKIP),	/* Type-A Port */
+				[5] = USB2_PORT_MAX(OC2),	/* TYPE-A Port */
+				[6] = USB2_PORT_MAX(OC_SKIP),	/* TYPE-A Port */
+				[7] = USB2_PORT_MAX(OC_SKIP),	/* TYPE-A Port */
+				[8] = USB2_PORT_MAX(OC_SKIP),	/* TYPE-A Port */
+				[9] = USB2_PORT_MAX(OC1),	/* TYPE-A Port */
+				[10] = USB2_PORT_MAX(OC_SKIP),	/* TYPE-A Port */
+				[11] = USB2_PORT_MAX(OC_SKIP),	/* TYPE-A Port */
+			}"
+
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC0),		/* TYPE-A Port */
+				[1] = USB3_PORT_DEFAULT(OC_SKIP),	/* TYPE-A Port */
+				[2] = USB3_PORT_DEFAULT(OC_SKIP),	/* TYPE-A Port */
+				[3] = USB3_PORT_DEFAULT(OC1),		/* TYPE-A Port */
+			}"
+		end
+		device ref imgu		on  end
+		device ref cio		on  end
+		device ref pcie_rp1	on
+			# PCIE x4 -> SLOT1
+			register "PcieRpEnable[0]" = "1"
+			register "PcieRpClkReqSupport[0]" = "1"
+			register "PcieRpClkReqNumber[0]" = "2"
+			register "PcieRpClkSrcNumber[0]" = "2"
+		end
+		device ref pcie_rp5	on
+			# PCIE x1 -> SLOT2/LAN
+			register "PcieRpEnable[4]" = "1"
+			register "PcieRpClkReqSupport[4]" = "1"
+			register "PcieRpClkReqNumber[4]" = "3"
+			register "PcieRpClkSrcNumber[4]" = "3"
+		end
+		device ref pcie_rp6	on
+			# PCIE x1 -> SLOT3
+			register "PcieRpEnable[5]" = "1"
+			register "PcieRpClkReqSupport[5]" = "1"
+			register "PcieRpClkReqNumber[5]" = "1"
+			register "PcieRpClkSrcNumber[5]" = "1"
+		end
+		device ref pcie_rp9	on
+			# PCIE x1 -> WLAN
+			register "PcieRpEnable[8]" = "1"
+			register "PcieRpClkReqSupport[8]" = "1"
+			register "PcieRpClkReqNumber[8]" = "5"
+			register "PcieRpClkSrcNumber[8]" = "5"
+		end
+		device ref pcie_rp10	on
+			# PCIE x1 -> WiGig
+			register "PcieRpEnable[9]" = "1"
+			register "PcieRpClkReqSupport[9]" = "1"
+			register "PcieRpClkReqNumber[9]" = "4"
+			register "PcieRpClkSrcNumber[9]" = "4"
+		end
+		device ref lpc_espi	on
+			# EC host command ranges are in 0x800-0x8ff & 0x200-0x20f
+			register "gen2_dec" = "0x000c0201"
+
+			chip drivers/pc80/tpm
+				device pnp 0c31.0 on end
+			end
+		end
+		device ref hda		on  end
+	end
+end

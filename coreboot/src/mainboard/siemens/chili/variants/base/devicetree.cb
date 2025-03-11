@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+chip soc/intel/cannonlake
+	# FSP configuration
+	register "RMT" = "0"
+
+	register "PchHdaDspEnable" = "0"
+        register "PchHdaAudioLinkHda" = "1"
+
+	device domain 0 on
+		device ref igpu			on  end
+		device ref dptf			on  end
+		device ref thermal		on  end
+		device ref xhci			on
+			# USB2
+			register "usb2_ports[0]"  = "USB2_PORT_TYPE_C(OC2)"     # Type-C?
+			register "usb2_ports[1]"  = "USB2_PORT_MID(OC0)"        # single blue
+			register "usb2_ports[4]"  = "USB2_PORT_MID(OC_SKIP)"    # SIMATIC NET CP 5711
+			register "usb2_ports[7]"  = "USB2_PORT_MID(OC1)"        # upper blue
+			register "usb2_ports[8]"  = "USB2_PORT_MID(OC4)"        # lower blue
+			register "usb2_ports[11]" = "USB2_PORT_MID(OC_SKIP)"    # STM SC?
+			# USB3
+			register "usb3_ports[0]" = "USB3_PORT_DEFAULT(OC2)"     # Type-C?
+			register "usb3_ports[2]" = "USB3_PORT_DEFAULT(OC1)"     # upper blue
+			register "usb3_ports[3]" = "USB3_PORT_DEFAULT(OC4)"     # lower blue
+			register "usb3_ports[4]" = "USB3_PORT_DEFAULT(OC_SKIP)" # Realtek storage?
+			register "usb3_ports[5]" = "USB3_PORT_DEFAULT(OC0)"     # single blue
+		end
+		device ref shared_sram		on  end
+		device ref sata			on
+			register "SataSalpSupport" = "1"
+			register "SataPortsEnable[0]" = "1"	# HDD / SSD
+			register "SataPortsEnable[1]" = "1"	# ODD
+			register "SataPortsEnable[3]" = "1"	# HDD / SSD
+
+			register "SataPortsDevSlp[0]" = "1"	# M.2
+			register "SataPortsDevSlp[2]" = "1"	# HDD / SSD
+		end
+		device ref pcie_rp5		on
+			device pci 00.0 on end	# x1 i219
+			register "PcieRpEnable[4]" = "1"
+			register "PcieClkSrcUsage[4]" = "0x70"
+			register "PcieClkSrcClkReq[4]" = "4"
+			register "PcieRpSlotImplemented[4]" = "0"
+		end
+		device ref pcie_rp6		on
+			device pci 00.0 on end	# x1 i210
+			register "PcieRpEnable[5]" = "1"
+			register "PcieClkSrcUsage[5]" = "5"
+			register "PcieClkSrcClkReq[5]" = "5"
+			register "PcieRpSlotImplemented[5]" = "0"
+		end
+		device ref pcie_rp7		on
+			register "PcieRpEnable[6]" = "1"
+			register "PcieRpSlotImplemented[6]" = "1"
+			smbios_slot_desc "SlotTypeM2Socket1_SD" "SlotLengthOther" "M.2/E 2230" "SlotDataBusWidth1X"
+		end
+		device ref pcie_rp17		on
+			register "PcieRpEnable[16]" = "1"
+			register "PcieClkSrcUsage[7]" = "16"
+			register "PcieClkSrcClkReq[7]" = "7"
+			register "PcieRpSlotImplemented[16]" = "1"
+			smbios_slot_desc "SlotTypeM2Socket3" "SlotLengthOther" "M.2/M 2280" "SlotDataBusWidth4X"
+		end
+		device ref lpc_espi		on
+			chip drivers/pc80/tpm
+				device pnp 0c31.0 on end
+			end
+		end
+		device ref hda			on  end
+		device ref smbus		on  end
+		device ref gbe			on  end
+	end
+end

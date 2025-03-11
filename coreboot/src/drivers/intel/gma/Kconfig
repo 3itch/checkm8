@@ -1,0 +1,217 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config INTEL_DDI
+	bool
+	default n
+	help
+	  helper functions for intel DDI operations
+
+config INTEL_EDID
+	bool
+	default n
+
+config INTEL_INT15
+	bool
+	default n
+
+config INTEL_GMA_ACPI
+	bool
+	default n
+
+config INTEL_GMA_BCLV_OFFSET
+	hex
+	default 0xc8254
+
+config INTEL_GMA_BCLV_WIDTH
+	int
+	default 16
+
+config INTEL_GMA_BCLM_OFFSET
+	hex
+	default 0xc8256
+
+config INTEL_GMA_BCLM_WIDTH
+	int
+	default 16
+
+config INTEL_GMA_SSC_ALTERNATE_REF
+	bool
+	default n
+	help
+	  Set when the SSC reference clock for LVDS runs at a different fre-
+	  quency than the general display reference clock.
+
+	  To be set by northbridge or mainboard Kconfig.  For most platforms,
+	  there is no choice, i.e. for i945 and gm45 the SSC reference always
+	  differs from the display reference clock (i945: 66Mhz SSC vs. 48MHz
+	  DREF; gm45: 100MHz SSC vs. 96Mhz DREF), for Arrandale and newer, it's
+	  the same frequency for SSC/non-SSC (120MHz).  The only, currently
+	  supported platform with a choice seems to be Pineview, where the
+	  alternative is 100MHz vs. the default 96MHz.
+
+config INTEL_GMA_SWSMISCI
+	bool
+	default n
+	help
+	  Select this option for Atom-based platforms which use the SWSMISCI
+	  register (0xe0) rather than the SWSCI register (0xe8).
+
+config INTEL_GMA_LIBGFXINIT_EDID
+	bool
+
+config VBT_CBFS_COMPRESSION_DEFAULT_LZ4
+	def_bool n
+	help
+	  Set LZ4 VBT compression.
+
+config VBT_CBFS_COMPRESSION_DEFAULT_NONE
+	def_bool n
+	help
+	  Disable VBT compression.
+
+choice
+	prompt "VBT Compression algorithm"
+	depends on INTEL_GMA_ADD_VBT
+	default VBT_CBFS_COMPRESSION_LZ4 if VBT_CBFS_COMPRESSION_DEFAULT_LZ4
+	default VBT_CBFS_COMPRESSION_NONE if VBT_CBFS_COMPRESSION_DEFAULT_NONE
+	default VBT_CBFS_COMPRESSION_LZMA
+
+config VBT_CBFS_COMPRESSION_LZMA
+	bool "Compress VBT with LZMA algorithm"
+
+config VBT_CBFS_COMPRESSION_LZ4
+	bool "Compress VBT with LZ4 algorithm"
+
+config VBT_CBFS_COMPRESSION_NONE
+	bool "Do not compress VBT"
+
+endchoice
+
+config VBT_CBFS_COMPRESSION_ALGORITHM
+	string
+	default "lzma" if VBT_CBFS_COMPRESSION_LZMA
+	default "lz4" if VBT_CBFS_COMPRESSION_LZ4
+	default "none" if VBT_CBFS_COMPRESSION_NONE
+
+config GFX_GMA_ANALOG_I2C_HDMI_B
+	bool
+
+config GFX_GMA_ANALOG_I2C_HDMI_C
+	bool
+
+config GFX_GMA_ANALOG_I2C_HDMI_D
+	bool
+
+config GFX_GMA_IGNORE_PRESENCE_STRAPS
+	def_bool n
+	depends on MAINBOARD_HAS_LIBGFXINIT
+	help
+	  libgfxinit uses the GPU presence straps to determine if a display port
+	  is present/enabled. Select this option if a board doesn't correctly implement
+	  these straps, causing libgfxinit to fail to detect an attached panel.
+
+config GFX_GMA
+	def_bool y
+	depends on NORTHBRIDGE_INTEL_GM45 || NORTHBRIDGE_INTEL_X4X \
+		|| NORTHBRIDGE_INTEL_IRONLAKE || NORTHBRIDGE_INTEL_SANDYBRIDGE \
+		|| NORTHBRIDGE_INTEL_HASWELL || SOC_INTEL_BROADWELL \
+		|| SOC_INTEL_COMMON_SKYLAKE_BASE || SOC_INTEL_APOLLOLAKE \
+		|| SOC_INTEL_CANNONLAKE_BASE
+	depends on MAINBOARD_USE_LIBGFXINIT || INTEL_GMA_LIBGFXINIT_EDID
+	select RAMSTAGE_LIBHWBASE
+
+config EARLY_GFX_GMA
+	def_bool y
+	depends on SOC_INTEL_ALDERLAKE
+	depends on MAINBOARD_USE_EARLY_LIBGFXINIT
+	select ROMSTAGE_LIBHWBASE
+
+config GFX_GMA_DEFAULT_MMIO
+	hex
+	depends on HWBASE_STATIC_MMIO && (GFX_GMA || EARLY_GFX_GMA)
+	help
+	  Graphics device MMIO address. This is typically an unused
+	  memory mapping region which can be allocated to the MMIO
+	  region as graphics PCI device Base Address Range zero.
+
+config GFX_GMA_PANEL_1_ON_EDP
+	bool
+	depends on GFX_GMA || MAINBOARD_HAS_LIBGFXINIT \
+		|| MAINBOARD_HAS_EARLY_LIBGFXINIT
+	default n if GFX_GMA_PANEL_1_ON_LVDS
+	default y
+
+config GFX_GMA_PANEL_1_ON_LVDS
+	bool
+	depends on GFX_GMA || MAINBOARD_HAS_LIBGFXINIT \
+		|| MAINBOARD_HAS_EARLY_LIBGFXINIT
+	default y if NORTHBRIDGE_INTEL_GM45 || NORTHBRIDGE_INTEL_IRONLAKE
+	default n
+
+config INTEL_GMA_OPREGION_2_1
+	bool
+	default n
+
+config INTEL_GMA_VERSION_2
+	bool
+	default n
+	help
+	  Intel display port and pipe related register definitions have changed since
+	  Tiger Lake SoC. This option enables support for the updated `TRANS_DDI_FUNC_CTL`
+	  register definitions.
+
+	  SoCs that support Intel GMA Version 2 include:
+	  * Alder Lake
+	  * Meteor Lake
+	  * Tiger Lake
+
+	  If you are unsure whether your SoC supports Intel GMA Version 2, it is safe to
+	  disable this option.
+
+if GFX_GMA || EARLY_GFX_GMA
+
+config GFX_GMA_DYN_CPU
+	def_bool y
+	help
+	  Activates runtime CPU detection in libgfxinit.
+
+config GFX_GMA_GENERATION
+	string
+	default "Broxton" if SOC_INTEL_APOLLOLAKE
+	default "Skylake" if SOC_INTEL_COMMON_SKYLAKE_BASE || SOC_INTEL_CANNONLAKE_BASE
+	default "Haswell" if NORTHBRIDGE_INTEL_HASWELL || SOC_INTEL_BROADWELL
+	default "Ironlake" if NORTHBRIDGE_INTEL_IRONLAKE || NORTHBRIDGE_INTEL_SANDYBRIDGE
+	default "G45" if NORTHBRIDGE_INTEL_GM45 || NORTHBRIDGE_INTEL_X4X
+	default "Tigerlake" if SOC_INTEL_ALDERLAKE
+
+config GFX_GMA_PCH
+	string
+	default "Ibex_Peak" if NORTHBRIDGE_INTEL_IRONLAKE
+	default "Cougar_Point" if NORTHBRIDGE_INTEL_SANDYBRIDGE
+	default "Lynx_Point" if NORTHBRIDGE_INTEL_HASWELL || SOC_INTEL_BROADWELL
+	default "Sunrise_Point" if SOC_INTEL_COMMON_SKYLAKE_BASE
+	default "Cannon_Point" if SOC_INTEL_CANNONLAKE_BASE
+	default "Alder_Point" if SOC_INTEL_ALDERLAKE
+	default "No_PCH"
+
+config GFX_GMA_PANEL_1_PORT
+	string
+	default "eDP" if GFX_GMA_PANEL_1_ON_EDP
+	default "LVDS"
+
+config GFX_GMA_PANEL_2_PORT
+	string
+	default "Disabled"
+
+config GFX_GMA_ANALOG_I2C_PORT
+	string
+	default "PCH_HDMI_B" if GFX_GMA_ANALOG_I2C_HDMI_B
+	default "PCH_HDMI_C" if GFX_GMA_ANALOG_I2C_HDMI_C
+	default "PCH_HDMI_D" if GFX_GMA_ANALOG_I2C_HDMI_D
+	default "PCH_DAC"
+	help
+	  Boards with a DVI-I connector share the I2C pins for both analog and
+	  digital displays. In that case, the EDID for a VGA display has to be
+	  read over the I2C interface of the coupled digital port.
+
+endif

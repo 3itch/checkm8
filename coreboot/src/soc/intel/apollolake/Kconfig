@@ -1,0 +1,403 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_APOLLOLAKE
+	bool
+	select INTEL_CAR_CQOS
+	select ACPI_INTEL_HARDWARE_SLEEP_VALUES
+	select ACPI_NO_PCAT_8259
+	select ARCH_X86
+	select BOOT_DEVICE_SUPPORTS_WRITES
+	# CPU specific options
+	select CPU_INTEL_COMMON
+	select CPU_SUPPORTS_PM_TIMER_EMULATION
+	select PCR_COMMON_IOSF_1_0
+	select SSE2
+	select SUPPORT_CPU_UCODE_IN_CBFS
+	# Audio options
+	select ACPI_NHLT
+	select SOC_INTEL_COMMON_NHLT
+	# Misc options
+	select CACHE_MRC_SETTINGS
+	select EDK2_CPU_TIMER_LIB if PAYLOAD_EDK2
+	select FAST_SPI_GENERATE_SSDT
+	select FSP_PLATFORM_MEMORY_SETTINGS_VERSIONS
+	select GENERIC_GPIO_LIB
+	select HAVE_ASAN_IN_ROMSTAGE
+	select HAVE_CF9_RESET_PREPARE
+	select HAVE_DPTF_EISA_HID
+	select HAVE_FSP_GOP
+	select HAVE_FSP_LOGO_SUPPORT
+	select HAVE_INTEL_FSP_REPO if !SOC_INTEL_GEMINILAKE
+	select HAVE_SMI_HANDLER
+	select INTEL_DESCRIPTOR_MODE_CAPABLE
+	select INTEL_GMA_ACPI
+	select INTEL_GMA_ADD_VBT if RUN_FSP_GOP
+	select INTEL_GMA_SWSMISCI
+	select MRC_SETTINGS_PROTECT
+	select MRC_SETTINGS_VARIABLE_DATA
+	select NO_PM_ACPI_TIMER
+	select NO_UART_ON_SUPERIO
+	select NO_XIP_EARLY_STAGES
+	select FSP_COMPRESS_FSP_M_LZ4
+	select PARALLEL_MP_AP_WORK
+	select PCIEXP_ASPM
+	select PCIEXP_COMMON_CLOCK
+	select PCIEXP_CLK_PM
+	select PCIEXP_L1_SUB_STATE
+	select PERIODIC_SMI_RATE_SELECTION_IN_GEN_PMCON_B
+	select PLATFORM_USES_FSP2_0
+	select PMC_INVALID_READ_AFTER_WRITE
+	select PMC_GLOBAL_RESET_ENABLE_LOCK
+	select REG_SCRIPT
+	select SA_ENABLE_IMR
+	select SOC_INTEL_COMMON
+	select SOC_INTEL_COMMON_ACPI_WAKE_SOURCE
+	select SOC_INTEL_COMMON_BLOCK
+	select SOC_INTEL_COMMON_BLOCK_POWER_LIMIT
+	select SOC_INTEL_COMMON_BLOCK_ACPI
+	select SOC_INTEL_COMMON_BLOCK_CAR
+	select SOC_INTEL_COMMON_BLOCK_CPU
+	select SOC_INTEL_COMMON_BLOCK_GPIO_DUAL_ROUTE_SUPPORT
+	select SOC_INTEL_COMMON_BLOCK_GPIO_MULTI_ACPI_DEVICES
+	select SOC_INTEL_COMMON_BLOCK_GPIO_IOSTANDBY
+	select SOC_INTEL_COMMON_BLOCK_HECI1_DISABLE_USING_PCR
+	select SOC_INTEL_COMMON_PCH_CLIENT
+	select SOC_INTEL_COMMON_BLOCK_PMC_DISCOVERABLE
+	select SOC_INTEL_COMMON_BLOCK_SRAM
+	select SOC_INTEL_COMMON_BLOCK_SA
+	select SOC_INTEL_COMMON_BLOCK_SCS
+	select SOC_INTEL_COMMON_BLOCK_XHCI_ELOG
+	select SOC_INTEL_COMMON_BLOCK_SMM
+	select SOC_INTEL_COMMON_FSP_RESET
+	select SOC_INTEL_COMMON_RESET
+	select SOC_INTEL_INTEGRATED_SOUTHCLUSTER
+	select SOC_INTEL_MEM_MAPPED_PM_CONFIGURATION
+	select SOC_INTEL_NO_BOOTGUARD_MSR
+	select TSC_MONOTONIC_TIMER
+	select UDELAY_TSC
+	select UDK_2017_BINDING
+	select USE_FSP_NOTIFY_PHASE_POST_PCI_ENUM
+	select USE_FSP_NOTIFY_PHASE_READY_TO_BOOT
+	select USE_FSP_NOTIFY_PHASE_END_OF_FIRMWARE
+	# This SoC does not map SPI flash like many previous SoC. Therefore we
+	# provide a custom media driver that facilitates mapping
+	select X86_CUSTOM_BOOTMEDIA
+	help
+	  Intel Apollolake support
+
+config SOC_INTEL_GEMINILAKE
+	bool
+	default n
+	select SOC_INTEL_APOLLOLAKE
+	select SOC_INTEL_COMMON_BLOCK_CNVI
+	select SOC_INTEL_COMMON_BLOCK_CPU_MPINIT
+	select SOC_INTEL_COMMON_BLOCK_SGX
+	select SOC_INTEL_COMMON_BLOCK_GSPI_VERSION_2
+	select IDT_IN_EVERY_STAGE
+	select PAGING_IN_CACHE_AS_RAM
+	select INTEL_CAR_NEM
+	help
+	  Intel Geminilake support
+
+if SOC_INTEL_APOLLOLAKE
+
+config FSP_STATUS_GLOBAL_RESET
+	hex
+	default 0x40000005
+
+config USE_LEGACY_8254_TIMER
+	default y
+
+config SKIP_CSE_RBP
+	bool
+	default y if BOOT_DEVICE_MEMORY_MAPPED
+	help
+	  Tell CSE we do not need to use Ring Buffer Protocol (RBP) to fetch
+	  firmware for us if we are using memory-mapped SPI. This lets CSE
+	  state machine transition to next boot state, so that it can function
+	  as designed.
+
+config DISABLE_HECI1_AT_PRE_BOOT
+	default y
+
+config MAX_HECI_DEVICES
+	int
+	default 3
+
+config MAX_CPUS
+	int
+	default 4
+
+config VBOOT
+	select VBOOT_SEPARATE_VERSTAGE
+	select VBOOT_MUST_REQUEST_DISPLAY
+	select VBOOT_STARTS_IN_BOOTBLOCK
+	select VBOOT_VBNV_CMOS if !VBOOT_VBNV_FLASH
+	select VBOOT_VBNV_CMOS_BACKUP_TO_FLASH if !VBOOT_VBNV_FLASH
+
+config TPM_ON_FAST_SPI
+	bool
+	default n
+	depends on MEMORY_MAPPED_TPM
+	help
+	  TPM part is conntected on Fast SPI interface and is mapped to the
+	  linear address space.
+
+config PCR_BASE_ADDRESS
+	hex
+	default 0xd0000000
+	help
+	  This option allows you to select MMIO Base Address of sideband bus.
+
+config DCACHE_RAM_BASE
+	hex
+	default 0xfef00000
+
+config DCACHE_RAM_SIZE
+	hex
+	default 0x100000 if SOC_INTEL_GEMINILAKE
+	default 0xc0000
+	help
+	  The size of the cache-as-ram region required during bootblock
+	  and/or romstage.
+
+config DCACHE_BSP_STACK_SIZE
+	hex
+	default 0x4000
+	help
+	  The amount of anticipated stack usage in CAR by bootblock and
+	  other stages.
+
+config SOC_INTEL_COMMON_BLOCK_GSPI_CLOCK_MHZ
+	int
+	default 100
+
+config CPU_XTAL_HZ
+	default 19200000
+
+config DRIVERS_I2C_DESIGNWARE_CLOCK_MHZ
+	int
+	default 133
+
+# 32KiB bootblock is all that is mapped in by the CSE at top of 4GiB.
+config C_ENV_BOOTBLOCK_SIZE
+	hex
+	default 0x8000
+
+config ROMSTAGE_ADDR
+	hex
+	default 0xfef20000
+	help
+	  The base address (in CAR) where romstage should be linked
+
+config VERSTAGE_ADDR
+	hex
+	default 0xfef40000
+	help
+	  The base address (in CAR) where verstage should be linked
+
+config FSP_HEADER_PATH
+	default "src/vendorcode/intel/fsp/fsp2_0/geminilake/2.2.0.0" if VENDOR_GOOGLE && SOC_INTEL_GEMINILAKE
+	default "src/vendorcode/intel/fsp/fsp2_0/geminilake/2.2.3.1" if SOC_INTEL_GEMINILAKE
+	default "3rdparty/fsp/ApolloLakeFspBinPkg/Include/"
+
+config FSP_FD_PATH
+	default "3rdparty/fsp/ApolloLakeFspBinPkg/FspBin/Fsp.fd"
+
+config FSP_M_ADDR
+	hex
+	default 0xfef40000
+	help
+	  The address FSP-M will be relocated to during build time
+
+config NEED_LBP2
+	bool "Write contents for logical boot partition 2."
+	default n
+	help
+	  Write the contents from a file into the logical boot partition 2
+	  region defined by LBP2_FMAP_NAME.
+
+config LBP2_FMAP_NAME
+	string "Name of FMAP region to put logical boot partition 2"
+	depends on NEED_LBP2
+	default "SIGN_CSE"
+	help
+	  Name of FMAP region to write logical boot partition 2 data.
+
+config LBP2_FROM_IFWI
+	bool "Extract the LBP2 from the IFWI binary"
+	depends on NEED_LBP2
+	default n
+	help
+	 The Logical Boot Partition will be automatically extracted
+	 from the supplied IFWI binary
+
+config LBP2_FILE_NAME
+	string "Path of file to write to logical boot partition 2 region"
+	depends on NEED_LBP2 && !LBP2_FROM_IFWI
+	default "3rdparty/blobs/mainboard/\$(CONFIG_MAINBOARD_DIR)/lbp2.bin"
+	help
+	  Name of file to store in the logical boot partition 2 region.
+
+config NEED_IFWI
+	bool "Write content into IFWI region"
+	default n
+	help
+	  Write the content from a file into IFWI region defined by
+	  IFWI_FMAP_NAME.
+
+config IFWI_FMAP_NAME
+	string "Name of FMAP region to pull IFWI into"
+	depends on NEED_IFWI
+	default "IFWI"
+	help
+	  Name of FMAP region to write IFWI.
+
+config IFWI_FILE_NAME
+	string "Path of file to write to IFWI region"
+	depends on NEED_IFWI
+	default "3rdparty/blobs/mainboard/\$(CONFIG_MAINBOARD_DIR)/ifwi.bin"
+	help
+	  Name of file to store in the IFWI region.
+
+config MAX_ROOT_PORTS
+	int
+	default 6
+
+config NHLT_DMIC_1CH_16B
+	bool
+	depends on ACPI_NHLT
+	default n
+	help
+	  Include DSP firmware settings for 1 channel 16B DMIC array.
+
+config NHLT_DMIC_2CH_16B
+	bool
+	depends on ACPI_NHLT
+	default n
+	help
+	  Include DSP firmware settings for 2 channel 16B DMIC array.
+
+config NHLT_DMIC_4CH_16B
+	bool
+	depends on ACPI_NHLT
+	default n
+	help
+	  Include DSP firmware settings for 4 channel 16B DMIC array.
+
+config NHLT_MAX98357
+	bool
+	depends on ACPI_NHLT
+	default n
+	help
+	  Include DSP firmware settings for headset codec.
+
+config NHLT_DA7219
+	bool
+	depends on ACPI_NHLT
+	default n
+	help
+	  Include DSP firmware settings for headset codec.
+
+config NHLT_RT5682
+	bool
+	depends on ACPI_NHLT
+	default n
+	help
+	  Include DSP firmware settings for headset codec.
+#
+# Each bit in QOS mask controls this many bytes. This is calculated as:
+# (CACHE_WAYS / CACHE_BITS_PER_MASK) * CACHE_LINE_SIZE * CACHE_SETS
+#
+
+config CACHE_QOS_SIZE_PER_BIT
+	hex
+	default 0x20000 # 128 KB
+
+config L2_CACHE_SIZE
+	hex
+	default 0x400000 if SOC_INTEL_GEMINILAKE
+	default 0x100000
+
+config SMM_RESERVED_SIZE
+	hex
+	default 0x100000
+
+config CHIPSET_DEVICETREE
+	string
+	default "soc/intel/apollolake/chipset_glk.cb" if SOC_INTEL_GEMINILAKE
+	default "soc/intel/apollolake/chipset_apl.cb"
+
+config IFD_CHIPSET
+	string
+	default "glk" if SOC_INTEL_GEMINILAKE
+	default "aplk"
+
+config CPU_BCLK_MHZ
+	int
+	default 100
+
+config CONSOLE_UART_BASE_ADDRESS
+	hex
+	default 0xcdffc000
+	depends on INTEL_LPSS_UART_FOR_CONSOLE
+
+# M and N divisor values for clock frequency configuration.
+# These values get us a 1.836 MHz clock (ideally we want 1.843 MHz)
+config SOC_INTEL_COMMON_LPSS_UART_CLK_M_VAL
+	hex
+	default 0x25a
+
+config SOC_INTEL_COMMON_LPSS_UART_CLK_N_VAL
+	hex
+	default 0x7fff
+
+config SOC_ESPI
+	bool
+	default n
+	help
+	  Use eSPI bus instead of LPC
+
+config SOC_INTEL_COMMON_BLOCK_GSPI_MAX
+	int
+	default 3
+
+config SOC_INTEL_I2C_DEV_MAX
+	int
+	default 8
+
+# Don't include the early page tables in RW_A or RW_B cbfs regions
+config RO_REGION_ONLY
+	string
+	default "pdpt pt"
+
+config INTEL_GMA_PANEL_2
+	bool
+	default n
+
+config INTEL_GMA_BCLV_OFFSET
+	default 0xc8358 if INTEL_GMA_PANEL_2
+	default 0xc8258
+
+config INTEL_GMA_BCLV_WIDTH
+	default 32
+
+config INTEL_GMA_BCLM_OFFSET
+	default 0xc8354 if INTEL_GMA_PANEL_2
+	default 0xc8254
+
+config INTEL_GMA_BCLM_WIDTH
+	default 32
+
+config BOOTBLOCK_IN_CBFS
+	bool
+	default n
+
+config HAVE_PAM0_REGISTER
+	bool
+	default n
+
+config DOMAIN_RESOURCE_32BIT_LIMIT
+	default PCR_BASE_ADDRESS
+
+endif

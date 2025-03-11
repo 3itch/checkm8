@@ -1,0 +1,290 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_CPU
+	bool
+	default n
+	help
+	  This option selects Intel Common CPU Model support code
+	  which provides various CPU related APIs which are common
+	  between all Intel Processor families. Common CPU code is supported
+	  for SOCs starting from SKL,KBL,APL, and future.
+
+config SOC_INTEL_COMMON_BLOCK_CPU_MPINIT
+	bool
+	default n
+	help
+	  This option selects Intel Common CPU MP Init code. In
+	  this common MP Init mechanism, the MP Init is occurring before
+	  calling FSP Silicon Init. Hence, MP Init will be pulled to
+	  BS_DEV_INIT_CHIPS Entry. And on Exit of BS_DEV_INIT, it is
+	  ensured that all MTRRs are re-programmed based on the DRAM
+	  resource settings.
+
+choice
+	prompt "Application Processors (AP) Feature Programming Configuration to use"
+	default USE_FSP_FEATURE_PROGRAM_ON_APS if MP_SERVICES_PPI_V1 || MP_SERVICES_PPI_V2
+	default USE_COREBOOT_MP_INIT if MP_SERVICES_PPI_V2_NOOP
+
+config USE_FSP_FEATURE_PROGRAM_ON_APS
+	bool "Allow FSP running CPU feature programming on MP init"
+	help
+	  Upon selection, coreboot brings APs from reset and the FSP runs feature programming.
+
+config USE_COREBOOT_MP_INIT
+	bool "Use coreboot MP init"
+	# FSP assumes ownership of the APs (Application Processors)
+	# upon passing `NULL` pointer to the CpuMpPpi FSP-S UPD.
+	# Hence, select `MP_SERVICES_PPI_V2_NOOP` config to pass a valid
+	# pointer to the CpuMpPpi UPD with FSP_UNSUPPORTED type APIs.
+	# This will protect APs from getting hijacked by FSP while coreboot
+	# decides to set SkipMpInit UPD.
+	select RELOAD_MICROCODE_PATCH
+	help
+	  Upon selection, coreboot performs MP Init.
+
+endchoice
+
+config SOC_INTEL_COMMON_BLOCK_CPU_SMMRELOCATE
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK_CPU
+
+config SOC_INTEL_COMMON_BLOCK_CAR
+	bool
+	default n
+	help
+	  This option allows you to select how cache-as-ram (CAR) is set up.
+
+config INTEL_CAR_NEM
+	bool
+	default n
+	help
+	  Traditionally, CAR is set up by using Non-Evict mode. This method
+	  does not allow CAR and cache to co-exist, because cache fills are
+	  blocked in NEM.
+
+config INTEL_CAR_CQOS
+	bool
+	default n
+	help
+	  Cache Quality of Service allows more fine-grained control of cache
+	  usage. As result, it is possible to set up a portion of L2 cache for
+	  CAR and use the remainder for actual caching.
+
+config INTEL_CAR_NEM_ENHANCED
+	bool
+	default n
+	help
+	  A current limitation of NEM (Non-Evict mode) is that code and data sizes
+	  are derived from the requirement to not write out any modified cache line.
+	  With NEM, if there is no physical memory behind the cached area,
+	  the modified data will be lost and NEM results will be inconsistent.
+	  ENHANCED NEM guarantees that modified data is always
+	  kept in cache while clean data is replaced.
+
+config INTEL_CAR_ENEM_USE_EFFECTIVE_WAY_SIZE
+	bool
+	depends on INTEL_CAR_NEM_ENHANCED
+	help
+	  On Alder Lake, Meteor Lake and Panther Lake platforms, the
+	  way size to consider for NEM+ computation is the effective
+	  way size. The effective way size is the biggest power of
+	  two of the way size.
+
+config CAR_HAS_SF_MASKS
+	bool
+	depends on INTEL_CAR_NEM_ENHANCED
+	help
+	  In the case of non-inclusive cache architecture Snoop Filter MSR
+	  IA32_L3_SF_MASK_x programming is required along with the data ways.
+	  This is applicable for TGL and beyond.
+
+config SF_MASK_2WAYS_PER_BIT
+	bool
+	depends on INTEL_CAR_NEM_ENHANCED
+	help
+	  In the case of non-inclusive cache architecture when two ways in
+	  the SF mask are controlled by one bit of the SF QoS register.
+	  This is applicable for TGL alone.
+
+config COS_MAPPED_TO_MSB
+	bool
+	depends on INTEL_CAR_NEM_ENHANCED
+	help
+	  On TGL and JSL platform the class of service configuration
+	  is mapped to MSB of MSR IA32_PQR_ASSOC.
+
+config CAR_HAS_L3_PROTECTED_WAYS
+	bool
+	depends on INTEL_CAR_NEM_ENHANCED
+	help
+	  On ADL and onwards platform has a newer requirement to protect
+	  L3 ways in Non-Inclusive eNEM mode. Hence, MSR 0xc85 is to program
+	  the data ways.
+
+config USE_INTEL_FSP_MP_INIT
+	bool "Perform MP Initialization by FSP"
+	default n
+	depends on !USE_INTEL_FSP_TO_CALL_COREBOOT_PUBLISH_MP_PPI
+	help
+	  This option allows FSP to perform multiprocessor initialization.
+
+config USE_INTEL_FSP_TO_CALL_COREBOOT_PUBLISH_MP_PPI
+	bool "Perform MP Initialization by FSP using coreboot MP PPI service"
+	default y
+	depends on MP_SERVICES_PPI
+	help
+	  This option allows FSP to make use of MP services PPI published by
+	  coreboot to perform multiprocessor initialization.
+
+config CPU_SUPPORTS_INTEL_TME
+	bool
+	default n
+	help
+	  Select this if the SoC supports Intel Total Memory Encryption (TME).
+
+config INTEL_TME
+	bool "Total Memory Encryption (TME)/Multi-key TME (MKTME)"
+	depends on CPU_SUPPORTS_INTEL_TME
+	default y
+	help
+	 Enable Total Memory Encryption (TME)/Multi-key TME (MKTME). The spec is
+	 available at "https://software.intel.com/sites/default/files/managed/a5
+	 /16/Multi-Key-Total-Memory-Encryption-Spec.pdf". If CPU supports TME,
+	 it would get enabled. If CPU supports MKTME, this same config option
+	 enables MKTME.
+
+config TME_KEY_REGENERATION_ON_WARM_BOOT
+	bool "Generate new TME key on each warm boot"
+	depends on INTEL_TME
+	default n
+	help
+	  Program Intel TME to generate a new key for each warm boot. TME always
+	  generates a new key on each cold boot. With this option enabled TME
+	  generates a new key even in warm boot. Without this option TME reuses
+	  the key for warm boot.
+
+	  If a new key is generated on warm boot, DRAM contents from previous
+	  warm boot will not get decrypted. This creates issue in accessing
+	  CBMEM region from previous warm boot. To mitigate the issue coreboot
+	  also programs exclusion range. Intel TME does not encrypt physical
+	  memory range set in exclusion range. Current coreboot implementation
+	  programs TME to exclude CBMEM region. When this config option is
+	  enabled, coreboot instructs Intel FSP to program TME to generate
+	  a new key on every warm boot and also exclude CBMEM region from being
+	  encrypted by TME.
+
+config CPU_XTAL_HZ
+	int
+	help
+	  Base clock which virtually everything runs on.
+
+config CPU_SUPPORTS_PM_TIMER_EMULATION
+	bool
+	default n
+	help
+	  Select this if the SoC's ucode supports PM ACPI timer emulation (Common
+	  timer Copy), which is required to be able to disable the TCO PM ACPI
+	  timer for power saving.
+
+config SOC_INTEL_NO_BOOTGUARD_MSR
+	bool
+	help
+	  Select this on platforms that do not support Bootguard related MSRs
+	  0x139, MSR_BC_PBEC and 0x13A, MSR_BOOT_GUARD_SACM_INFO.
+
+config SOC_INTEL_DISABLE_POWER_LIMITS
+	bool
+	default n
+	help
+	  Select this if the Running Average Power Limits (RAPL) algorithm
+	  for constant power management is not needed.
+
+config SOC_INTEL_SET_MIN_CLOCK_RATIO
+	bool
+	depends on !SOC_INTEL_DISABLE_POWER_LIMITS
+	default n
+	help
+	  If the power budget of the mainboard is limited, it can be useful to
+	  limit the CPU power dissipation at the cost of performance by setting
+	  the lowest possible CPU clock. Enable this option if you need smallest
+	  possible CPU clock. This setting can be overruled by the OS if it has an
+	  p-state driver which can adjust the clock to its need.
+
+config HAVE_HYPERTHREADING
+	def_bool n
+
+config FSP_HYPERTHREADING
+	bool "Enable Hyper-Threading"
+	depends on HAVE_HYPERTHREADING
+	default y
+
+config INTEL_KEYLOCKER
+	bool "Intel Key Locker"
+	default n
+	help
+	 Enable Intel Key Locker if supported by the CPU. Intel Key Locker provides a
+	 mechanism to encrypt and decrypt data with an AES key without having access
+	 to the raw key value by converting AES keys into "handles". The specification
+	 of Key Locker can be found via document #343965 on Intel's site.
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE
+	int
+	depends on INTEL_KEYLOCKER || SOC_INTEL_COMMON_BLOCK_SGX_ENABLE
+	default 256 if SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_256MB || SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_MAX
+	default 128 if SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_128MB
+	default  64 if SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_64MB
+	default  32 if SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_32MB
+	default  16 if SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_16MB
+	default  8 if SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_8MB
+	default  4 if SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_4MB
+	default  2 if SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_2MB
+	default  0 if SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_0MB
+	default  0
+
+choice
+	prompt "PRMRR size"
+	depends on INTEL_KEYLOCKER || SOC_INTEL_COMMON_BLOCK_SGX
+	default SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_MAX if SOC_INTEL_COMMON_BLOCK_SGX_ENABLE
+	default SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_2MB if !SOC_INTEL_COMMON_BLOCK_SGX_ENABLE && INTEL_KEYLOCKER
+	default SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_0MB if !SOC_INTEL_COMMON_BLOCK_SGX_ENABLE && !INTEL_KEYLOCKER
+	help
+	 PRMRR (Protected Memory Range) is the space in RAM that is used to provide a
+	 protected memory area (e.g. for the Intel SGX Secure Enclaves and Intel
+	 Key Locker). The memory region is accessible only by the processor itself to
+	 protect the data from unauthorized access.
+
+	 This option allows to select PRMRR size for the intended feature. Depending on
+	 the SoC a lower, compatible value may be chosen at runtime as not all values
+	 are supported on all families.
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_MAX
+	bool "Maximum"
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_256MB
+	bool "256 MiB"
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_128MB
+	bool "128 MiB"
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_64MB
+	bool "64 MiB"
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_32MB
+	bool "32 MiB"
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_16MB
+	bool "16 MiB"
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_8MB
+	bool "8 MiB"
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_4MB
+	bool "4 MiB"
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_2MB
+	bool "2 MiB"
+
+config SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE_0MB
+	bool "0 MiB"
+
+endchoice

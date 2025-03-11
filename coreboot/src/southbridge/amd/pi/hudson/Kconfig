@@ -1,0 +1,165 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config SOUTHBRIDGE_AMD_PI_AVALON
+	bool
+
+config SOUTHBRIDGE_AMD_PI_KERN
+	bool
+
+if SOUTHBRIDGE_AMD_PI_AVALON || SOUTHBRIDGE_AMD_PI_KERN
+
+config SOUTHBRIDGE_SPECIFIC_OPTIONS
+	def_bool y
+	select ACPI_COMMON_MADT_IOAPIC
+	select ACPI_COMMON_MADT_LAPIC
+	select ACPI_CUSTOM_MADT
+	select HAVE_CONFIGURABLE_APMC_SMI_PORT
+	select HAVE_USBDEBUG_OPTIONS
+	select HAVE_CF9_RESET
+	select HAVE_CF9_RESET_PREPARE
+	select SOC_AMD_COMMON
+	select SOC_AMD_COMMON_BLOCK_ACPIMMIO
+	select SOC_AMD_COMMON_BLOCK_ACPIMMIO_BIOSRAM
+	select SOC_AMD_COMMON_BLOCK_ACPIMMIO_PM_IO_ACCESS
+	select SOC_AMD_COMMON_BLOCK_BANKED_GPIOS
+	select SOC_AMD_COMMON_BLOCK_BANKED_GPIOS_NON_SOC_CODEBASE
+	select SOC_AMD_COMMON_BLOCK_PCI_MMCONF
+	select USE_AMDFWTOOL
+
+config EHCI_BAR
+	hex
+	default 0xfef00000
+
+config HUDSON_XHCI_ENABLE
+	bool "Enable Hudson XHCI Controller"
+	default y
+	help
+	  The XHCI controller must be enabled and the XHCI firmware
+	  must be added in order to have USB 3.0 support configured
+	  by coreboot. The OS will be responsible for enabling the XHCI
+	  controller if the XHCI firmware is available but the
+	  XHCI controller is not enabled by coreboot.
+
+config HUDSON_XHCI_FWM
+	bool "Add xhci firmware"
+	default y
+	help
+	  Add Hudson 2/3/4 XHCI Firmware to support the onboard USB 3.0
+
+config HUDSON_IMC_ENABLE
+	bool
+	default n
+
+config HUDSON_IMC_FWM
+	bool "Add IMC firmware"
+	depends on HUDSON_IMC_ENABLE
+	default y
+	help
+	  Add Hudson 2/3/4 IMC Firmware to support the onboard fan control
+
+config HUDSON_GEC_FWM
+	bool
+	default n
+	help
+	  Add Hudson 2/3/4 GEC Firmware to support the onboard gigabit Ethernet MAC.
+	  Must be connected to a Broadcom B50610 or B50610M PHY on the motherboard.
+
+config HUDSON_PSP
+	bool
+	default y if CPU_AMD_PI_00730F01
+
+config AMDFW_CONFIG_FILE
+	string "AMD PSP Firmware config file"
+	default "src/southbridge/amd/pi/hudson/fw_avl.cfg" if CPU_AMD_PI_00730F01
+
+config HUDSON_XHCI_FWM_FILE
+	string "XHCI firmware path and filename"
+	default "3rdparty/blobs/southbridge/amd/avalon/xhci.bin" if SOUTHBRIDGE_AMD_PI_AVALON
+	default "3rdparty/blobs/southbridge/amd/kern/xhci.bin" if SOUTHBRIDGE_AMD_PI_KERN
+	depends on HUDSON_XHCI_FWM
+
+config HUDSON_IMC_FWM_FILE
+	string "IMC firmware path and filename"
+	default "3rdparty/blobs/southbridge/amd/avalon/imc.bin" if SOUTHBRIDGE_AMD_PI_AVALON
+	default "3rdparty/blobs/southbridge/amd/kern/imc.bin" if SOUTHBRIDGE_AMD_PI_KERN
+	depends on HUDSON_IMC_FWM
+
+config HUDSON_GEC_FWM_FILE
+	string "GEC firmware path and filename"
+	depends on HUDSON_GEC_FWM
+
+config AMD_PUBKEY_FILE
+	depends on HUDSON_PSP
+	string "AMD public Key"
+	default "3rdparty/blobs/southbridge/amd/avalon/PSP/AmdPubKey.bin" if CPU_AMD_PI_00730F01
+
+config HUDSON_SATA_MODE
+	int "SATA Mode"
+	default 2
+	range 0 6
+	help
+	  Select the mode in which SATA should be driven. NATIVE AHCI, or RAID.
+	  The default is NATIVE.
+	  0: NATIVE mode does not require a ROM.
+	  1: RAID mode must have the two ROM files.
+	  2: AHCI may work with or without AHCI ROM. It depends on the payload support.
+	     For example, seabios does not require the AHCI ROM.
+	  3: LEGACY IDE
+	  4: IDE to AHCI
+	  5: AHCI7804: ROM Required, and AMD driver required in the OS.
+	  6: IDE to AHCI7804: ROM Required, and AMD driver required in the OS.
+
+comment "NATIVE"
+	depends on HUDSON_SATA_MODE = 0
+
+comment "RAID"
+	depends on HUDSON_SATA_MODE = 1
+
+comment "AHCI"
+	depends on HUDSON_SATA_MODE = 2
+
+comment "LEGACY IDE"
+	depends on HUDSON_SATA_MODE = 3
+
+comment "IDE to AHCI"
+	depends on HUDSON_SATA_MODE = 4
+
+comment "AHCI7804"
+	depends on HUDSON_SATA_MODE = 5
+
+comment "IDE to AHCI7804"
+	depends on HUDSON_SATA_MODE = 6
+
+config HUDSON_FADT_LEGACY_DEVICES
+	bool
+	help
+	  Select if there are legacy devices on the LPC bus.
+
+config HUDSON_FADT_8042
+	bool
+	help
+	  Select if there is an 8042-compatible keyboard controller in the
+	  system.
+
+config AMDFW_OUTSIDE_CBFS
+	def_bool n
+	help
+	  The AMDFW (PSP) is typically locatable in cbfs.  Select this
+	  option to manually attach the generated amdfw.rom at an
+	  offset of 0x20000 from the bottom of the coreboot ROM image.
+
+config SERIRQ_CONTINUOUS_MODE
+	bool
+	default n
+	help
+	  Set this option to y for serial IRQ in continuous mode.
+	  Otherwise it is in quiet mode.
+
+config HUDSON_ACPI_IO_BASE
+	hex
+	default 0x800
+	help
+	  Base address for the ACPI registers.
+	  This value must match the hardcoded value of AGESA.
+
+endif

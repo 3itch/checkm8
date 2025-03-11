@@ -1,0 +1,19 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_HP_COMPAQ_8200_ELITE_SFF_PC
+	bool "Compaq 8200 Elite SFF"
+
+config BOARD_HP_COMPAQ_8200_ELITE_USDT
+	bool "Compaq 8200 Elite USDT"
+
+config BOARD_HP_COMPAQ_8300_ELITE_SFF
+	bool "Compaq 8300 Elite SFF"
+
+config BOARD_HP_COMPAQ_ELITE_8300_USDT
+	bool "Compaq Elite 8300 USDT"
+
+config BOARD_HP_Z220_CMT_WORKSTATION
+	bool "Z220 CMT Workstation"
+
+config BOARD_HP_Z220_SFF_WORKSTATION
+	bool "Z220 SFF Workstation"

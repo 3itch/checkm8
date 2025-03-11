@@ -1,0 +1,54 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Rambi"
+
+config BOARD_GOOGLE_BANJO
+	bool "->  Banjo (Acer Chromebook 15 (CB3-531))"
+
+config BOARD_GOOGLE_CANDY
+	bool "->  Candy (Dell Chromebook 11 3120)"
+
+config BOARD_GOOGLE_CLAPPER
+	bool "->  Clapper (Lenovo N20 Chromebook)"
+
+config BOARD_GOOGLE_ENGUARDE
+	bool "->  Enguarde"
+
+config BOARD_GOOGLE_EXPRESSO
+	bool "->  Expresso"
+
+config BOARD_GOOGLE_GLIMMER
+	bool "->  Glimmer (Lenovo ThinkPad 11e Chromebook)"
+
+config BOARD_GOOGLE_GNAWTY
+	bool "->  Gnawty (Acer Chromebook 11 (CB3-111/131,C730/C730E/C735))"
+
+config BOARD_GOOGLE_HELI
+	bool "->  Heli (Haier Chromebook G2)"
+
+config BOARD_GOOGLE_KIP
+	bool "->  Kip (HP Chromebook 11 G3 / G4 / G4 EE)"
+
+config BOARD_GOOGLE_NINJA
+	bool "->  Ninja (AOpen Chromebox Commercial)"
+
+config BOARD_GOOGLE_ORCO
+	bool "->  Orco (Lenovo 100S Chromebook)"
+
+config BOARD_GOOGLE_QUAWKS
+	bool "->  Quawks (ASUS Chromebook C300)"
+
+config BOARD_GOOGLE_SQUAWKS
+	bool "->  Squawks (ASUS Chromebook C200)"
+
+config BOARD_GOOGLE_RAMBI
+	bool "->  Rambi"
+
+config BOARD_GOOGLE_SUMO
+	bool "->  Sumo (AOpen Chromebase Commercial)"
+
+config BOARD_GOOGLE_SWANKY
+	bool "->  Swanky (Toshiba Chromebook 2)"
+
+config BOARD_GOOGLE_WINKY
+	bool "->  Winky (Samsung Chromebook 2 (XE500C12))"

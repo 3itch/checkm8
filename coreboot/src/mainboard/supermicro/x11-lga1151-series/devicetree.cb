@@ -1,0 +1,45 @@
+chip soc/intel/skylake
+
+	# FSP Configuration
+	register "SkipExtGfxScan" = "1"
+
+
+	# Enabling SLP_S0, SLP_S3#, SLP_S4#, SLP_SUS and SLP_A Stretch
+	register "s0ix_enable"			= true
+	register "PmConfigSlpS3MinAssert"	= "SLP_S3_MIN_ASSERT_50MS"
+	register "PmConfigSlpS4MinAssert"	= "SLP_S4_MIN_ASSERT_4S"
+	register "PmConfigSlpSusMinAssert"	= "SLP_SUS_MIN_ASSERT_4S"
+	register "PmConfigSlpAMinAssert"	= "SLP_A_MIN_ASSERT_2S"
+
+	device domain 0 on
+		device ref sa_thermal on end
+		device ref south_xhci on end
+		device ref thermal on end
+		device ref heci1 on end
+		device ref sata on
+			register "SataSalpSupport" = "1"
+			register "SataPortsEnable" = "{
+				[0] = 1,
+				[1] = 1,
+				[2] = 1,
+				[3] = 1,
+				[4] = 1,
+				[5] = 1,
+				[6] = 1,
+				[7] = 1,
+			}"
+		end
+		device ref lpc_espi on
+			register "serirq_mode" = "SERIRQ_CONTINUOUS"
+
+			chip superio/common
+				device pnp 2e.0 on  end
+			end
+			chip drivers/pc80/tpm	# TPM
+				device pnp 0c31.0 on  end
+			end
+		end
+		device ref smbus on end
+		device ref fast_spi on end
+	end
+end

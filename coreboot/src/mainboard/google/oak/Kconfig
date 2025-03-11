@@ -1,0 +1,64 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_OAK_COMMON
+	def_bool BOARD_GOOGLE_ELM || \
+		 BOARD_GOOGLE_HANA || \
+		 BOARD_GOOGLE_OAK
+
+if BOARD_GOOGLE_OAK_COMMON
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select SOC_MEDIATEK_MT8173
+	select BOARD_ROMSIZE_KB_4096
+	select COMMON_CBFS_SPI_WRAPPER
+	select DRIVER_PARADE_PS8640
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_SPI
+	select I2C_TPM
+	select MAINBOARD_HAS_TPM1
+	select MAINBOARD_HAS_NATIVE_VGA_INIT
+	select MAINBOARD_FORCE_NATIVE_VGA_INIT
+	select HAVE_LINEAR_FRAMEBUFFER
+	select MAINBOARD_HAS_CHROMEOS
+	select SPI_FLASH
+
+config VBOOT
+	select EC_GOOGLE_CHROMEEC_SWITCHES
+	select VBOOT_VBNV_FLASH
+
+config MAINBOARD_DIR
+	default "google/oak"
+
+config EC_GOOGLE_CHROMEEC_SPI_BUS
+	hex
+	default 0x0
+
+config DRIVER_TPM_I2C_BUS
+	hex
+	default 0x2
+
+config DRIVER_TPM_I2C_ADDR
+	hex
+	default 0x20
+
+config BOOT_DEVICE_SPI_FLASH_BUS
+	int
+	default 9
+
+##########################################################
+#### Update below when adding a new derivative board. ####
+##########################################################
+config MAINBOARD_PART_NUMBER
+	default "Oak" if BOARD_GOOGLE_OAK
+	default "Elm" if BOARD_GOOGLE_ELM
+	default "Hana" if BOARD_GOOGLE_HANA
+
+# All Oak-derivatives count their board IDs as 0 being equivalent to Oak rev6.
+config BOARD_ID_ADJUSTMENT
+	int
+	default 0 if BOARD_GOOGLE_OAK
+	default 7 if BOARD_GOOGLE_ELM
+	default 11 if BOARD_GOOGLE_HANA
+
+endif # BOARD_GOOGLE_OAK

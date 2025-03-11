@@ -1,0 +1,64 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_PRODRIVE_HERMES_BASEBOARD
+	def_bool n
+	select SOC_INTEL_COFFEELAKE
+	select BOARD_ROMSIZE_KB_32768
+	select HAVE_ACPI_TABLES
+	select SOC_INTEL_CANNONLAKE_PCH_H
+	select SUPERIO_ASPEED_COMMON_PRE_RAM
+	select SUPERIO_ASPEED_AST2400
+	select DRIVERS_ASPEED_AST_COMMON
+	select DRIVERS_ASPEED_AST2050
+	select INTEL_LPSS_UART_FOR_CONSOLE
+	select MAINBOARD_HAS_TPM2
+	select MEMORY_MAPPED_TPM
+	select INTEL_GMA_HAVE_VBT
+	select SOC_INTEL_COMMON_BLOCK_HDA_VERB
+	select ONBOARD_VGA_IS_PRIMARY
+	select SMBIOS_TYPE41_PROVIDED_BY_DEVTREE
+	select HAVE_ACPI_RESUME if !HERMES_USES_SPS_FIRMWARE
+	select DISABLE_ACPI_HIBERNATE if HERMES_USES_SPS_FIRMWARE
+
+config BOARD_PRODRIVE_HERMES
+	select BOARD_PRODRIVE_HERMES_BASEBOARD
+
+if BOARD_PRODRIVE_HERMES_BASEBOARD
+
+config HERMES_USES_SPS_FIRMWARE
+	bool "Build for use with SPS (Server Platform Services) firmware"
+	help
+	  Depending on the intended use case, the Hermes mainboard can use either
+	  CSME or SPS firmware SKUs. Choose this option if using SPS firmware, as
+	  SPS doesn't support ACPI S3 and S4 sleep states.
+
+config MAINBOARD_FAMILY
+	string
+	default "PRODRIVE_HERMES_SERIES"
+
+config MAINBOARD_PART_NUMBER
+	default "Hermes CFL"
+
+config MAINBOARD_DIR
+	default "prodrive/hermes"
+
+config PCIEXP_L1_SUB_STATE
+	bool
+	default n
+
+config PCIEXP_CLK_PM
+	bool
+	default n
+
+config CONSOLE_POST
+	bool
+	default y
+
+config POST_IO
+	bool
+	default n
+
+config CBFS_SIZE
+	default 0x900000
+
+endif # BOARD_PRODRIVE_HERMES_BASEBOARD

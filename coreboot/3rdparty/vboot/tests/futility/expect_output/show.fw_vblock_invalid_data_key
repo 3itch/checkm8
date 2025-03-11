@@ -1,0 +1,9 @@
+Keyblock:                tests/futility/data/fw_vblock_invalid_data_key.bin
+  Size:                  0x8b8
+  Signature:             ignored
+    Size:                0x400
+    Data size:           0x478
+  Flags:                 23  !DEV DEV !REC !MINIOS
+  Data key algorithm:    -1 INVALID
+  Data key version:      1
+  Data key sha1sum:      e2c1c92d7d7aa7dfed5e8375edd30b7ae52b7450

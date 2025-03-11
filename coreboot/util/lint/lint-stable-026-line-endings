@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# DESCR: Verify that files don't contain windows line endings
+
+LINTDIR="$(
+  cd -- "$(dirname "$0")" > /dev/null 2>&1 || return
+  pwd -P
+)"
+
+# shellcheck source=helper_functions.sh
+. "${LINTDIR}/helper_functions.sh"
+
+EXCLUDE='^3rdparty/\|^payloads/external\|^.git\|build\|util/crossgcc/xgcc'
+
+${GREP_FILES} -IlP "\r$" | grep -v "$EXCLUDE"

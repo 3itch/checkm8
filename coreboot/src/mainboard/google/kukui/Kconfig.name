@@ -1,0 +1,65 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Kukui"
+
+config BOARD_GOOGLE_KUKUI
+	bool "->  Kukui"
+
+config BOARD_GOOGLE_KRANE
+	bool "->  Krane (Lenovo Chromebook Duet/Lenovo IdeaPad Duet Chromebook)"
+
+config BOARD_GOOGLE_KODAMA
+	bool "->  Kodama (Lenovo 10e Chromebook Tablet)"
+
+config BOARD_GOOGLE_KAKADU
+	bool "->  Kakadu"
+
+config BOARD_GOOGLE_FLAPJACK
+	bool "->  Flapjack"
+
+config BOARD_GOOGLE_KATSU
+	bool "->  Katsu"
+
+comment "Jacuzzi"
+
+config BOARD_GOOGLE_JACUZZI
+	bool "->  Jacuzzi"
+
+config BOARD_GOOGLE_JUNIPER
+	bool "->  Juniper (Acer Chromebook Spin 311 (CP311-3H))"
+
+config BOARD_GOOGLE_KAPPA
+	bool "->  Kappa"
+
+config BOARD_GOOGLE_DAMU
+	bool "->  Damu (ASUS Chromebook Flip CM3 (CM3200))"
+
+config BOARD_GOOGLE_CERISE
+	bool "->  Cerise"
+
+config BOARD_GOOGLE_STERN
+	bool "->  Stern"
+
+config BOARD_GOOGLE_WILLOW
+	bool "->  Willow"
+
+config BOARD_GOOGLE_ESCHE
+	bool "->  Esche (HP Chromebook 11MK G9 EE)"
+
+config BOARD_GOOGLE_BURNET
+	bool "->  Burnet (HP Chromebook x360 11MK G3 EE)"
+
+config BOARD_GOOGLE_FENNEL
+	bool "->  Fennel"
+
+config BOARD_GOOGLE_COZMO
+	bool "->  Cozmo"
+
+config BOARD_GOOGLE_MAKOMO
+	bool "->  Makomo"
+
+config BOARD_GOOGLE_MUNNA
+	bool "->  Munna"
+
+config BOARD_GOOGLE_PICO
+	bool "->  Pico"

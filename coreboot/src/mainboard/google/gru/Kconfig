@@ -1,0 +1,102 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_GRU_COMMON
+	def_bool BOARD_GOOGLE_BOB || \
+		 BOARD_GOOGLE_GRU || \
+		 BOARD_GOOGLE_KEVIN || \
+		 BOARD_GOOGLE_NEFARIO || \
+		 BOARD_GOOGLE_RAINIER || \
+		 BOARD_GOOGLE_SCARLET
+
+if BOARD_GOOGLE_GRU_COMMON
+
+# Most Grus have TPM2 but later Kevins don't... decide this in one place for
+# convenience. Explicitly override it when building for earlier Kevins.
+config GRU_HAS_TPM2
+	bool "Build for a board revision with a SPI TPM 2.0"
+	default !BOARD_GOOGLE_KEVIN
+
+config GRU_HAS_CENTERLOG_PWM
+	def_bool BOARD_GOOGLE_GRU || \
+		 BOARD_GOOGLE_KEVIN || \
+		 BOARD_GOOGLE_BOB
+
+config GRU_HAS_WLAN_RESET
+	def_bool BOARD_GOOGLE_GRU || \
+		 BOARD_GOOGLE_KEVIN || \
+		 BOARD_GOOGLE_BOB
+
+config GRU_BASEBOARD_SCARLET
+	def_bool BOARD_GOOGLE_SCARLET || \
+		 BOARD_GOOGLE_RAINIER
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOARD_ROMSIZE_KB_8192
+	select COMMON_CBFS_SPI_WRAPPER
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_RTC
+	select EC_GOOGLE_CHROMEEC_SPI
+	select MAINBOARD_FORCE_NATIVE_VGA_INIT
+	select MAINBOARD_HAS_CHROMEOS
+	select MAINBOARD_HAS_NATIVE_VGA_INIT
+	select RK3399_SPREAD_SPECTRUM_DDR if BOARD_GOOGLE_BOB
+	select RTC
+	select SOC_ROCKCHIP_RK3399
+	select SPI_FLASH
+	select SPI_FLASH_GIGADEVICE
+	select SPI_FLASH_WINBOND
+	select I2C_TPM if !GRU_HAS_TPM2
+	select TPM_GOOGLE_CR50 if GRU_HAS_TPM2
+	select SPI_TPM if GRU_HAS_TPM2
+	select MAINBOARD_HAS_TPM1 if !GRU_HAS_TPM2
+	select MAINBOARD_HAS_TPM2 if GRU_HAS_TPM2
+
+config VBOOT
+	select EC_GOOGLE_CHROMEEC_SWITCHES
+	select VBOOT_VBNV_FLASH
+
+config MAINBOARD_DIR
+	default "google/gru"
+
+config EC_GOOGLE_CHROMEEC_SPI_BUS
+	hex
+	default 0x5
+
+config BOOT_DEVICE_SPI_FLASH_BUS
+	int
+	default 1
+
+config DRIVER_TPM_I2C_BUS
+	hex
+	default 0x0
+
+config DRIVER_TPM_I2C_ADDR
+	hex
+	default 0x20
+
+config DRIVER_TPM_SPI_BUS
+	hex
+	default 0x2 if GRU_BASEBOARD_SCARLET
+	default 0x0
+
+config CONSOLE_SERIAL_UART_ADDRESS
+	hex
+	depends on DRIVERS_UART
+	default 0xFF1A0000
+
+##########################################################
+#### Update below when adding a new derivative board. ####
+##########################################################
+config DEVICETREE
+	default "devicetree.scarlet.cb" if BOARD_GOOGLE_SCARLET
+
+config MAINBOARD_PART_NUMBER
+	default "Scarlet" if BOARD_GOOGLE_SCARLET
+	default "Bob" if BOARD_GOOGLE_BOB
+	default "Gru" if BOARD_GOOGLE_GRU
+	default "Kevin" if BOARD_GOOGLE_KEVIN
+	default "Nefario" if BOARD_GOOGLE_NEFARIO
+	default "Rainier" if BOARD_GOOGLE_RAINIER
+
+endif # BOARD_GOOGLE_GRU_COMMON

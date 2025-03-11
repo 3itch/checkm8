@@ -1,0 +1,134 @@
+chip soc/intel/skylake
+
+	# GPE configuration
+	# Note that GPE events called out in ASL code rely on this
+	# route. i.e. If this route changes then the affected GPE
+	# offset bits also need to be changed.
+	register "gpe0_dw0" = "GPP_G"
+	register "gpe0_dw1" = "GPP_D"
+	register "gpe0_dw2" = "GPP_E"
+
+	device domain 0 on
+		subsystemid 0x15d9 0x0896 inherit
+		device ref south_xhci on
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_MID(OC3),	/* USB 9 (3.0) */
+				[1] = USB2_PORT_MID(OC3),	/* USB 8 (3.0) */
+				[2] = USB2_PORT_MID(OC1),	/* USB 3 */
+				[3] = USB2_PORT_MID(OC1),	/* USB 2 */
+				[4] = USB2_PORT_MID(OC2),	/* USB 1 */
+				[5] = USB2_PORT_MID(OC2),	/* USB 0 */
+				[6] = USB2_PORT_MID(OC0),	/* USB 5 */
+				[7] = USB2_PORT_MID(OC0),	/* USB 4 */
+				[8] = USB2_PORT_MID(OC_SKIP),	/* IPMI USB HUB */
+				[9] = USB2_PORT_MID(OC5),	/* USB 10 (3.0) */
+				[10] = USB2_PORT_MID(OC4),	/* USB 7 (3.0) */
+				[11] = USB2_PORT_MID(OC4),	/* USB 6 (3.0) */
+			}"
+
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC4),	/* USB 7 */
+				[1] = USB3_PORT_DEFAULT(OC4),	/* USB 6 */
+				[2] = USB3_PORT_DEFAULT(OC5),	/* USB 10 */
+				[3] = USB3_PORT_DEFAULT(OC3),	/* USB 9 */
+				[4] = USB3_PORT_DEFAULT(OC3),	/* USB 8 */
+			}"
+		end
+		device ref peg0 on
+			# Slot JPCIE6
+			smbios_slot_desc "SlotTypePciExpressGen3X16" "SlotLengthLong" "CPU SLOT6 PCI-E 3.0 X8(IN X16)" "SlotDataBusWidth8X"
+		end
+		device ref peg1 on
+			# Slot JPCIE7
+			smbios_slot_desc "SlotTypePciExpressGen3X8" "SlotLengthShort" "CPU SLOT7 PCI-E 3.0 X8" "SlotDataBusWidth8X"
+		end
+		device ref pcie_rp1 on
+			# Slot JPCIE4
+			register "PcieRpEnable[0]" = "1"
+			register "PcieRpLtrEnable[0]" = "1"
+			register "PcieRpAdvancedErrorReporting[0]" = "1"
+			smbios_slot_desc "SlotTypePciExpressGen3X8" "SlotLengthShort" "PCH SLOT4 PCI-E 3.0 X4(IN X8)" "SlotDataBusWidth4X"
+		end
+		device ref pcie_rp5 on
+			# Slot JPCIE5
+			register "PcieRpEnable[4]" = "1"
+			register "PcieRpLtrEnable[4]" = "1"
+			register "PcieRpAdvancedErrorReporting[4]" = "1"
+			smbios_slot_desc "SlotTypePciExpressGen3X8" "SlotLengthShort" "PCH SLOT5 PCI-E 3.0 X4(IN X8)" "SlotDataBusWidth4X"
+		end
+		device ref pcie_rp9 on
+			register "PcieRpEnable[8]" = "1"
+			register "PcieRpLtrEnable[8]" = "1"
+			register "PcieRpAdvancedErrorReporting[8]" = "1"
+			device pci 00.0 on	# GbE 1
+				subsystemid 0x15d9 0x1533
+			end
+		end
+		device ref pcie_rp10 on
+			register "PcieRpEnable[9]" = "1"
+			register "PcieRpLtrEnable[9]" = "1"
+			register "PcieRpAdvancedErrorReporting[9]" = "1"
+			device pci 00.0 on	# GbE 2
+				subsystemid 0x15d9 0x1533
+			end
+		end
+		device ref pcie_rp11 on
+			register "PcieRpEnable[10]" = "1"
+			register "PcieRpLtrEnable[10]" = "1"
+			register "PcieRpAdvancedErrorReporting[10]" = "1"
+			device pci 00.0 on	# Aspeed PCI Bridge
+				device pci 00.0 on end	# Aspeed 2400 VGA
+			end
+		end
+		device ref lpc_espi on
+			register "gen1_dec" = "0x007c0a01"	# Super IO SWC
+			register "gen2_dec" = "0x000c0ca1"	# IPMI KCS
+
+			chip drivers/ipmi
+				use pch_gpio as gpio_dev
+				register "bmc_jumper_gpio" = "GPP_D22" # JPB1
+				register "post_complete_gpio" = "GPP_B20"
+				# On cold boot it takes a while for the BMC to start the IPMI service
+				register "wait_for_bmc" = "1"
+				register "bmc_boot_timeout" = "60"
+				device pnp ca2.0 on end	# IPMI KCS
+			end
+			chip superio/common
+				device pnp 2e.0 on
+					chip superio/aspeed/ast2400
+						device pnp 2e.2 on	# SUART1 / COM1 (ext)
+							io 0x60 = 0x3f8
+							irq 0x70 = 4
+							drq 0xf0 = 0x00
+						end
+						device pnp 2e.3 on	# SUART2 / COM2 (int)
+							io 0x60 = 0x2f8
+							irq 0x70 = 3
+							drq 0xf0 = 0x00
+						end
+						device pnp 2e.4 on	# SWC
+							io 0x60 = 0xa00
+							io 0x62 = 0xa10
+							io 0x64 = 0xa20
+							io 0x66 = 0xa30
+							irq 0x70 = 0x00
+						end
+						device pnp 2e.5 off end	# KBC
+						device pnp 2e.7 on	# GPIO
+							irq 0x70 = 0x00
+						end
+						device pnp 2e.b off end	# SUART3
+						device pnp 2e.c off end	# SUART4
+						device pnp 2e.d on	# iLPC2AHB
+							irq 0x70 = 0x00
+						end
+						device pnp 2e.e on	# Mailbox
+							io 0x60 = 0xa40
+							irq 0x70 = 0x00
+						end
+					end
+				end
+			end
+		end
+	end
+end

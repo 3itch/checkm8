@@ -1,0 +1,7 @@
+These are officially signed BIOS images from existing Chromebooks.
+
+  bios_link_mp.bin    uses the RO_NORMAL flag to skip RW firmware validation
+  bios_peppy_mp.bin   doesn't do any of those things
+
+This is dev-signed BIOS image with CBFS support:
+  bios_voxel_dev.bin

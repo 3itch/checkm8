@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config SUPERIO_WANTS_14MHZ_CLOCK
+	bool
+
+config SUPERIO_SMSC_SMSCSUPERIO
+	bool
+	select SUPERIO_WANTS_14MHZ_CLOCK

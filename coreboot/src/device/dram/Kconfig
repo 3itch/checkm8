@@ -1,0 +1,31 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config USE_DDR5
+	bool
+	default n
+	help
+	  system supports DDR5 memory
+
+config USE_LPDDR4
+	bool
+	default n
+	help
+	  system supports LPDDR4 memory
+
+config USE_DDR4
+	bool
+	default n
+	help
+	  system supports DDR4 memory
+
+config USE_DDR3
+	bool
+	default n
+	help
+	  system supports DDR3 memory
+
+config USE_DDR2
+	bool
+	default n
+	help
+	  system supports DDR2 memory

@@ -1,0 +1,262 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+chip soc/intel/skylake
+
+	register "deep_sx_config" = "DSX_EN_WAKE_PIN"
+
+	register "eist_enable" = "true"
+
+	# GPE configuration
+	# Note that GPE events called out in ASL code rely on this
+	# route. i.e. If this route changes then the affected GPE
+	# offset bits also need to be changed.
+	register "gpe0_dw0" = "GPP_B"
+	register "gpe0_dw1" = "GPP_D"
+	register "gpe0_dw2" = "GPP_E"
+
+	# Enable DPTF
+	register "dptf_enable" = "1"
+
+	# FSP Configuration
+	register "PrimaryDisplay" = "Display_PEG"
+
+	# Enabling SLP_S3#, SLP_S4#, SLP_SUS and SLP_A Stretch
+	# SLP_S3 Minimum Assertion Width. Values 0: 60us, 1: 1ms, 2: 50ms, 3: 2s
+	register "PmConfigSlpS3MinAssert" = "0x02"
+
+	# SLP_S4 Minimum Assertion Width. Values 0: default, 1: 1s, 2: 2s, 3: 3s, 4: 4s
+	register "PmConfigSlpS4MinAssert" = "0x04"
+
+	# SLP_SUS Minimum Assertion Width. Values 0: 0ms, 1: 500ms, 2: 1s, 3: 4s
+	register "PmConfigSlpSusMinAssert" = "0x03"
+
+	# SLP_A Minimum Assertion Width. Values 0: 0ms, 1: 4s, 2: 98ms, 3: 2s
+	register "PmConfigSlpAMinAssert" = "0x03"
+
+	# PL2 override 91W
+	register "power_limits_config" = "{
+		.tdp_pl2_override = 91,
+	}"
+
+	# Send an extra VR mailbox command for the PS4 exit issue
+	register "SendVrMbxCmd" = "2"
+
+	device domain 0 on
+		device ref system_agent	on
+			subsystemid 0x1849 0x191f
+		end
+		device ref peg0		on
+			subsystemid 0x1849 0x1901
+			register "Peg0MaxLinkWidth" = "Peg0_x16"
+
+			# Configure PCIe clockgen in PCH
+			register "PcieRpClkReqSupport[0]"	= "1"
+			register "PcieRpClkReqNumber[0]"	= "0"
+			register "PcieRpClkSrcNumber[0]"	= "0"
+		end
+		device ref igpu		on
+			subsystemid 0x1849 0x1912
+		end
+		device ref sa_thermal	on	end
+		device ref south_xhci	on
+			subsystemid 0x1849 0xa131
+
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_MID(OC0),
+				[1] = USB2_PORT_MID(OC0),
+				[2] = USB2_PORT_MID(OC4),
+				[3] = USB2_PORT_MID(OC4),
+				[4] = USB2_PORT_MID(OC2),
+				[5] = USB2_PORT_MID(OC2),
+				[6] = USB2_PORT_MID(OC0),
+				[7] = USB2_PORT_MID(OC0),
+				[8] = USB2_PORT_MID(OC0),
+				[9] = USB2_PORT_MID(OC0),
+				[10] = USB2_PORT_MID(OC1),
+				[11] = USB2_PORT_MID(OC1),
+				[12] = USB2_PORT_MID(OC_SKIP),
+				[13] = USB2_PORT_MID(OC_SKIP),
+			}"
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC0),
+				[1] = USB3_PORT_DEFAULT(OC0),
+				[2] = USB3_PORT_DEFAULT(OC3),
+				[3] = USB3_PORT_DEFAULT(OC3),
+				[4] = USB3_PORT_DEFAULT(OC1),
+				[5] = USB3_PORT_DEFAULT(OC1),
+				[6] = USB3_PORT_DEFAULT(OC_SKIP),
+				[7] = USB3_PORT_DEFAULT(OC_SKIP),
+				[8] = USB3_PORT_DEFAULT(OC_SKIP),
+				[9] = USB3_PORT_DEFAULT(OC_SKIP),
+			}"
+		end
+		device ref thermal	on
+			subsystemid 0x1849 0xa131
+		end
+		device ref heci1	on
+			subsystemid 0x1849 0xa131
+		end
+		device ref sata		on
+			subsystemid 0x1849 0xa102
+			register "SataSalpSupport" = "1"
+			# SATA4 and SATA5 are located in the lower right corner of the board,
+			# but they are not populated. This is because the same PCB is used to
+			# make boards with better PCHs, which can have up to six SATA ports.
+			# However, the H110 PCH only has four SATA ports, which explains why
+			# two connectors are missing.
+			register "SataPortsEnable" = "{
+				[0] = 1,
+				[1] = 1,
+				[2] = 1,
+				[3] = 1,
+			}"
+		end
+		device ref pcie_rp1	on	end
+		device ref pcie_rp5	on
+			register "PcieRpEnable[4]"			= "1"
+			register "PcieRpClkReqSupport[4]"		= "1"
+			register "PcieRpClkReqNumber[4]"		= "2"
+			register "PcieRpAdvancedErrorReporting[4]"	= "1"
+			register "PcieRpLtrEnable[4]"			= "1"
+			register "PcieRpClkSrcNumber[4]"		= "2"
+			register "PcieRpHotPlug[4]"			= "1"
+		end
+		device ref pcie_rp6	on
+			register "PcieRpEnable[5]"			= "1"
+
+			# Disable CLKREQ#, since onboard LAN is always present
+			register "PcieRpClkReqSupport[5]"		= "0"
+			register "PcieRpAdvancedErrorReporting[5]"	= "1"
+			register "PcieRpLtrEnable[5]"			= "1"
+			register "PcieRpClkSrcNumber[5]"		= "1"
+		end
+		device ref pcie_rp7	on
+			register "PcieRpEnable[6]"			= "1"
+			register "PcieRpClkReqSupport[6]"		= "1"
+			register "PcieRpClkReqNumber[6]"		= "3"
+			register "PcieRpAdvancedErrorReporting[6]"	= "1"
+			register "PcieRpLtrEnable[6]"			= "1"
+			register "PcieRpClkSrcNumber[6]"		= "3"
+			register "PcieRpHotPlug[6]"			= "1"
+		end
+		device ref lpc_espi	on
+			subsystemid 0x1849 0x1a43
+
+			# Set @0x280-0x2ff I/O Range for SuperIO HWM
+			register "gen1_dec" = "0x007c0281"
+
+			# Set LPC Serial IRQ mode
+			register "serirq_mode" = "SERIRQ_CONTINUOUS"
+
+			chip superio/common
+				device pnp 2e.0 on # passes SIO base addr to SSDT gen
+
+					chip superio/nuvoton/nct6791d
+						device pnp 2e.1   on
+							# Global Control Registers
+							# Device IRQ Polarity
+							irq 0x13 = 0x00
+							irq 0x14 = 0x00
+							# Global Option
+							irq 0x24 = 0xfb
+							irq 0x27 = 0x10
+							# Multi Function
+							irq 0x1a = 0xb0
+							irq 0x1b = 0xe6
+							irq 0x2a = 0x04
+							irq 0x2c = 0x40
+							irq 0x2d = 0x03
+
+							# Parallel Port
+							io  0x60 = 0x0378
+							irq 0x70 = 7
+							drq 0x74 = 4      # No DMA
+							irq 0xf0 = 0x3c   # Printer mode
+						end
+						device pnp 2e.2   on      # UART A
+							io  0x60 = 0x03f8
+							irq 0x70 = 4
+						end
+						device pnp 2e.3   on      # IR
+							io  0x60 = 0x02f8
+							irq 0x70 = 3
+						end
+						device pnp 2e.5   on      # PS/2 KBC
+							io  0x60 = 0x0060
+							io  0x62 = 0x0064
+							irq 0x70 = 1      # Keyboard
+							irq 0x72 = 12     # Mouse
+						end
+						device pnp 2e.6   off end # CIR
+						device pnp 2e.7   on      # GPIO6
+							irq 0xf6 = 0xff
+							irq 0xf7 = 0xff
+							irq 0xf8 = 0xff
+						end
+						device pnp 2e.107 on      # GPIO7
+							irq 0xe0 = 0x7f
+							irq 0xe1 = 0x0d
+						end
+						device pnp 2e.207 on      # GPIO8
+							irq 0xe6 = 0xff
+							irq 0xe7 = 0xff
+							irq 0xed = 0xff
+						end
+						device pnp 2e.8   off end # WDT
+						device pnp 2e.108 on  end # GPIO0
+						device pnp 2e.308 off end # GPIO base
+						device pnp 2e.408 off end # WDTMEM
+						device pnp 2e.708 on  end # GPIO1
+						device pnp 2e.9   on  end # GPIO2
+						device pnp 2e.109 on      # GPIO3
+							irq 0xe4 = 0x7b
+							irq 0xe5 = 0x02
+							irq 0xea = 0x04
+						end
+						device pnp 2e.209 on      # GPIO4
+							irq 0xf0 = 0x7f
+							irq 0xf1 = 0x80
+						end
+						device pnp 2e.309 on      # GPIO5
+							irq 0xf4 = 0xdf
+							irq 0xf5 = 0xd5
+						end
+						device pnp 2e.a   on
+							# Power RAM in S3 and let the PCH
+							# handle power failure actions
+							irq 0xe4 = 0x70
+							# Set HWM reset source to LRESET#
+							irq 0xe7 = 0x01
+						end # ACPI
+						device pnp 2e.b   on      # HWM, LED
+							io  0x60 = 0x0290
+							io  0x62 = 0
+							irq 0x70 = 0
+						end
+						device pnp 2e.d   off end # BCLK, WDT2, WDT_MEM
+						device pnp 2e.e   off end # CIR wake-up
+						device pnp 2e.f   off end # GPIO PP/OD
+						device pnp 2e.14  off end # SVID, Port 80 UART
+						device pnp 2e.16  off end # DS5
+						device pnp 2e.116 off end # DS3
+						device pnp 2e.316 on  end # PCHDSW
+						device pnp 2e.416 off end # DSWWOPT
+						device pnp 2e.516 on  end # DS3OPT
+						device pnp 2e.616 on  end # DSDSS
+						device pnp 2e.716 off end # DSPU
+					end # chip superio/nuvoton/nct6791d
+
+				end # device pnp 2e.0
+			end # chip superio/common
+
+			chip drivers/pc80/tpm
+				device pnp 4e.0 on end  # TPM module
+			end
+		end
+		device ref hda		on
+			register "PchHdaVcType" = "Vc1"
+		end
+		device ref smbus	on	end
+		device ref fast_spi	on	end
+	end
+end

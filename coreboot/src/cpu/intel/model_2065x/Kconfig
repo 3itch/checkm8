@@ -1,0 +1,31 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config CPU_INTEL_MODEL_2065X
+	bool
+	select HAVE_X86_64_SUPPORT
+	select ARCH_X86
+	select SSE2
+	select UDELAY_TSC
+	select TSC_MONOTONIC_TIMER
+	select SUPPORT_CPU_UCODE_IN_CBFS
+	#select AP_IN_SIPI_WAIT
+	select TSC_SYNC_MFENCE
+	select CPU_INTEL_COMMON
+	select CPU_INTEL_COMMON_TIMEBASE
+	select CPU_INTEL_COMMON_VOLTAGE
+
+if CPU_INTEL_MODEL_2065X
+
+config SMM_TSEG_SIZE
+	hex
+	default 0x800000
+
+config SMM_RESERVED_SIZE
+	hex
+	default 0x100000
+
+config MAX_CPUS
+	int
+	default 4
+
+endif

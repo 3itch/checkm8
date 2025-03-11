@@ -1,0 +1,289 @@
+{
+    "parts": [
+        {
+            "name": "MT62F512M32D2DR-031 WT:B",
+            "attribs": {
+                "densityPerDieGb": 8,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name": "MT62F1G32D4DR-031 WT:B",
+            "attribs": {
+                "densityPerDieGb": 8,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name": "H9JCNNNCP3MLYR-N6E",
+            "attribs": {
+                "densityPerDieGb": 8,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name": "K3LKBKB0BM-MGCP",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name": "H9JCNNNBK3MLYR-N6E",
+            "attribs": {
+                "densityPerDieGb": 8,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name": "MT62F2G32D8DR-031 WT:B",
+            "attribs": {
+                "densityPerDieGb": 8,
+                "diesPerPackage": 8,
+                "bitWidthPerChannel": 8,
+                "ranksPerChannel": 2,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name": "K3LKLKL0EM-MGCN",
+            "attribs": {
+                "densityPerDieGb": 8,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 5500
+            }
+        },
+        {
+            "name": "H58G56AK6BX069",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name": "H58G66AK6BX070",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name":  "MT62F1G32D4DS-031 WT:B",
+            "attribs": {
+                "densityPerDieGb": 8,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name":  "K3LKCKC0BM-MGCP",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name":  "MT62F1G32D2DS-026 WT:B",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 7500,
+                "lp5x": true
+            }
+        },
+        {
+            "name":  "MT62F2G32D4DS-026 WT:B",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 7500,
+                "lp5x": true
+            }
+        },
+        {
+            "name":  "K3KL6L60GM-MGCT",
+            "attribs": {
+                "densityPerDieGb": 8,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 7500,
+                "lp5x": true
+            }
+        },
+        {
+            "name":  "K3KL8L80CM-MGCT",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 7500,
+                "lp5x": true
+            }
+        },
+        {
+            "name":  "K3KL9L90CM-MGCT",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 7500,
+                "lp5x": true
+            }
+        },
+        {
+            "name":  "H58G66BK7BX067",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 7500,
+                "lp5x": true
+            }
+        },
+        {
+            "name":  "H58G56BK7BX068",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 7500,
+                "lp5x": true
+            }
+        },
+        {
+            "name": "H9JCNNNFA5MLYR-N6E",
+            "attribs": {
+                "densityPerDieGb": 8,
+                "diesPerPackage": 8,
+                "bitWidthPerChannel": 8,
+                "ranksPerChannel": 2,
+                "speedMbps": 6400
+            }
+        },
+        {
+            "name": "H58G66BK8BX067",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 8533,
+                "lp5x": true
+            }
+        },
+        {
+            "name": "H58G56BK8BX068",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 8533,
+                "lp5x": true
+            }
+        },
+        {
+            "name": "MT62F1G32D2DS-023 WT:B",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 8533,
+                "lp5x": true
+            }
+        },
+        {
+            "name": "MT62F2G32D4DS-023 WT:B",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 8533,
+                "lp5x": true
+            }
+        },
+        {
+            "name":  "MT62F1G32D2DS-023 WT:C",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 8533,
+                "lp5x": true
+            }
+        },
+        {
+            "name":  "K3KL8L80DM-MGCU",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 8533,
+                "lp5x": true
+            }
+        },
+        {
+            "name":  "MT62F2G32D4DS-020 WT:F",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 4,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 2,
+                "speedMbps": 8533,
+                "lp5x": true
+            }
+        },
+	{
+            "name": "H58G56CK8BX146",
+            "attribs": {
+                "densityPerDieGb": 16,
+                "diesPerPackage": 2,
+                "bitWidthPerChannel": 16,
+                "ranksPerChannel": 1,
+                "speedMbps": 8533,
+                "lp5x": true
+            }
+        }
+    ]
+}

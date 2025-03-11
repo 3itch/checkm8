@@ -1,0 +1,6 @@
+# Create and mount working paths for vboot tools.
+on post-fs-data-checkpointed
+    mkdir /data/vendor/vboot
+    mkdir /data/vendor/vboot/tmp
+    mount tmpfs tmpfs /data/vendor/vboot/tmp nosuid nodev noexec rw context=u:object_r:firmware_tool_data_file:s0
+    restorecon /data/vendor/vboot

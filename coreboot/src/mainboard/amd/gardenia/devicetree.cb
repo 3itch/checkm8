@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+chip soc/amd/stoneyridge
+
+	register "spd_addr_lookup" = "
+	{
+		{ {0xA2, 0x00} }, // socket 0 - Channel 0, slots 0 & 1
+	}"
+
+	device domain 0 on
+		subsystemid 0x1022 0x1410 inherit
+		device ref iommu on end
+		device ref gfx on end
+		device ref gfx_hda on end
+		device ref gpp_bridge_0 on end # x4 PCIe slot
+		device ref gpp_bridge_1 on end # M.2 slot
+		device ref gpp_bridge_3 on end # x1 PCIe slot
+		device ref gpp_bridge_4 on end # Cardreader
+		device ref hda_bridge on end
+		device ref hda on end
+		device ref xhci on end
+		device ref sata on end
+		device ref ehci on end
+		device ref sdhci on end
+	end #domain
+end	#chip soc/amd/stoneyridge

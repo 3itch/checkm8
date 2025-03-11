@@ -1,0 +1,15 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Jecht"
+
+config BOARD_GOOGLE_GUADO
+	bool "->  Guado (ASUS Chromebox CN62)"
+
+config BOARD_GOOGLE_JECHT
+	bool "->  Jecht"
+
+config BOARD_GOOGLE_RIKKU
+	bool "->  Rikku (Acer Chromebox CXI2)"
+
+config BOARD_GOOGLE_TIDUS
+	bool "->  Tidus (Lenovo ThinkCentre Chromebox)"

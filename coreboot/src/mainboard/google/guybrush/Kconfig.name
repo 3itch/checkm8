@@ -1,0 +1,12 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Guybrush"
+
+config BOARD_GOOGLE_DEWATT
+	bool "->  Dewatt (Acer Chromebook Spin 514)"
+
+config BOARD_GOOGLE_GUYBRUSH
+	bool "->  Guybrush"
+
+config BOARD_GOOGLE_NIPPERKIN
+	bool "->  Nipperkin (HP Elite c645 G2 Chromebook)"

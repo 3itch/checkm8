@@ -1,0 +1,7 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config EC_RODA_IT8518
+	bool
+	select EC_ACPI
+	help
+	  Interface to IT8518 embedded controller in Roda notebooks.

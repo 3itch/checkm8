@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# DESCR: Check for superfluous whitespace in the tree
+
+LINTDIR="$(
+  cd -- "$(dirname "$0")" > /dev/null 2>&1 || return
+  pwd -P
+)"
+# shellcheck source=helper_functions.sh
+. "${LINTDIR}/helper_functions.sh"
+
+EXCLUDELIST='^src/vendorcode/|^util/kconfig/|^util/nvidia/cbootimage|^util/goswid|__pycache__|COPYING|LICENSE|README|_shipped$|\.patch$|\.bin$|\.hex$|\.jpg$|\.gif$|\.ttf$|\.woff$|\.png$|\.eot$|\.vbt$|\.ico$|\.md$|\.apcb$|\.dtb$'
+INCLUDELIST="src util payloads Makefile* toolchain.mk tests"
+
+# shellcheck disable=SC2086,SC2046
+if uname | grep -qi "linux"; then
+	grep -n -H "[[:space:]][[:space:]]*$" \
+		$(${FIND_FILES} ${INCLUDELIST} ${FINDOPTS} | \
+			grep -Ev "($EXCLUDELIST)" ) | \
+		sed -e "s,^.*$,File & has lines ending with whitespace.,"
+else
+	# The above form is much (100x) faster, but doesn't work
+	# on all systems. A for loop also works but takes 30% longer
+	${FIND_FILES} ${INCLUDELIST} ${FINDOPTS}| \
+		grep -Ev "($EXCLUDELIST)" | \
+		xargs -I % \
+			grep -l "[[:space:]][[:space:]]*$" % | \
+			sed -e "s,^.*$,File & has lines ending with whitespace.,"
+fi

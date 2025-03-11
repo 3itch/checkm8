@@ -1,0 +1,208 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_AMD_COMMON_BLOCK_PSP
+	bool
+	help
+	  This option builds in the Platform Security Processor initialization
+	  functions. Do not select this directly in SoC code, select
+	  SOC_AMD_COMMON_BLOCK_PSP_GENx instead.
+
+config SOC_AMD_COMMON_BLOCK_PSP_GEN1
+	bool
+	select SOC_AMD_COMMON_BLOCK_PSP
+	help
+	  Used by the PSP in AMD systems before family 17h, e.g. stoneyridge.
+
+config SOC_AMD_COMMON_BLOCK_PSP_GEN2
+	bool
+	select SOC_AMD_COMMON_BLOCK_PSP
+	select SOC_AMD_COMMON_BLOCK_SMN
+	help
+	  Used by the PSP in AMD family 17h, 19h and possibly newer CPUs.
+
+config SOC_AMD_PSP_SELECTABLE_SMU_FW
+	bool
+	help
+	  Some PSP implementations allow storing SMU firmware into cbfs and
+	  calling the PSP to load the blobs at the proper time.
+
+	  The soc/<codename> should select this if its PSP supports the feature
+	  and each mainboard can choose to select an appropriate fanless or
+	  fanned set of blobs.  Ask your AMD representative whether your APU
+	  is considered fanless.
+
+config SOC_AMD_COMMON_BLOCK_PSP_RPMC
+	bool
+	depends on SOC_AMD_COMMON_BLOCK_PSP_GEN2
+	select SPI_FLASH_RPMC
+	help
+	  Select this option in the SoC's Kconfig to include the support for
+	  the replay-protected monotonic counter (RPMC) feature.
+
+config PERFORM_RPMC_PROVISIONING
+	bool "Send RPMC fusing command to PSP"
+	default n
+	depends on SOC_AMD_COMMON_BLOCK_PSP_RPMC
+	help
+	  Send the RPMC root key provisioning command to the PSP in case it's
+	  not already fused. Sending this command will fuse the silicon which
+	  is a permanent change.
+
+config SOC_AMD_COMMON_BLOCK_PSP_SPL
+	bool
+	help
+	  Select this option in the SoC's Kconfig to include the Security Patch
+	  Level (SPL) support code. This code will only send the actual SPL
+	  fuse update command to the PSP if the PERFORM_SPL_FUSING option is
+	  also selected.
+
+config PERFORM_SPL_FUSING
+	bool "Send SPL fusing command to PSP"
+	default n
+	depends on SOC_AMD_COMMON_BLOCK_PSP_SPL
+	help
+	  Send the Security Patch Level (SPL) fusing command to the PSP in
+	  order to update the minimum SPL version to be written to the SoC's
+	  fuse bits. This will prevent using any embedded firmware components
+	  with lower SPL version.
+
+	  If unsure, answer 'n'
+
+config SPL_TABLE_FILE
+	string "SPL table file override"
+	depends on SOC_AMD_COMMON_BLOCK_PSP_SPL
+	help
+	  Provide a mainboard-specific Security Patch Level (SPL) table file
+	  override. The SPL file is required to support PSP FW anti-rollback
+	  and needs to be created by AMD. The default SPL file specified in the
+	  SoC's fw.cfg is in the corresponding folder of the amd_blobs submodule
+	  and applies to all boards that use the SoC without verstage on PSP.
+	  In the verstage on PSP case, a different SPL file is specific as an
+	  override via this Kconfig option.
+
+config HAVE_SPL_RW_AB_FILE
+	bool "Have a separate mainboard-specific SPL file in RW A/B partitions"
+	depends on SOC_AMD_COMMON_BLOCK_PSP_SPL
+	depends on VBOOT_SLOTS_RW_AB
+	help
+	  Have separate mainboard-specific Security Patch Level (SPL) table
+	  file for the RW A/B FMAP partitions.
+
+config SPL_RW_AB_TABLE_FILE
+	string "Separate SPL table file override for RW A/B partitions"
+	depends on HAVE_SPL_RW_AB_FILE
+
+config PSP_PLATFORM_SECURE_BOOT
+	bool "Platform secure boot enable"
+	depends on SOC_AMD_COMMON_BLOCK_PSP_GEN2
+	default n
+	help
+	  Select this config to enable PSP Platform Secure Boot.
+
+	  Platform Secure Boot will automatically be fused on boot if the
+	  coreboot ROM is properly signed and can not be disabled once fused.
+	  Refer AMD PSB user guide doc# 56654, Revision# 1.00, this document is
+	  only available with NDA customers.
+
+config SOC_AMD_COMMON_BLOCK_PSP_SMI
+	bool
+	select SPI_FLASH_SMM if BOOT_DEVICE_SPI_FLASH_RW_NOMMAP
+	help
+	  Add PSP SMI handler for SPI flash access.
+
+	  When ROM armor isn't enabled, the x86 part owns the SPI controller,
+	  so when the PSP wants to access the SPI flash, it sends an SMI to the
+	  x86 side and the corresponding SMI handler will do the SPI flash
+	  access for the PSP.
+
+	  WARNING: Since the flash access in the SMI handler is a blocking
+	  operation during which all cores stay in SMM, an erase operation may
+	  lock up the system for a long enough time to be noticeable. Reads and
+	  writes with small data sizes are less problematic. This is AMD
+	  specific design and should be enabled when PSP requires to access the
+	  SPI flash after the BOOT_DONE PSP command.
+
+config PSP_INCLUDES_HSP
+	bool
+	depends on SOC_AMD_COMMON_BLOCK_PSP
+	help
+	  Select this config to indicate SoC includes Hardware Security Processor(HSP).
+
+config AMD_FWM_POSITION_20000_DEFAULT
+	# This is the default if nothing else is selected
+	bool
+
+config AMD_FWM_POSITION_420000_DEFAULT
+	bool
+
+config AMD_FWM_POSITION_820000_DEFAULT
+	bool
+
+config AMD_FWM_POSITION_C20000_DEFAULT
+	bool
+
+config AMD_FWM_POSITION_E20000_DEFAULT
+	bool
+
+config AMD_FWM_POSITION_F20000_DEFAULT
+	bool
+
+config AMD_FWM_POSITION_FA0000_DEFAULT
+	bool
+
+choice
+	prompt "AMD FW position"
+	default AMD_FWM_POSITION_420000 if AMD_FWM_POSITION_420000_DEFAULT
+	default AMD_FWM_POSITION_820000 if AMD_FWM_POSITION_820000_DEFAULT
+	default AMD_FWM_POSITION_C20000 if AMD_FWM_POSITION_C20000_DEFAULT
+	default AMD_FWM_POSITION_E20000 if AMD_FWM_POSITION_E20000_DEFAULT
+	default AMD_FWM_POSITION_F20000 if AMD_FWM_POSITION_F20000_DEFAULT
+	default AMD_FWM_POSITION_FA0000 if AMD_FWM_POSITION_FA0000_DEFAULT
+	default AMD_FWM_POSITION_20000
+	help
+	  Set the position on flash offset where the AMD FW needs to be.
+	  This position is relative to a 16MB flash window. If the flash
+	  size is smaller than 16MB it gets mapped at the top of that window.
+
+config AMD_FWM_POSITION_20000
+	bool "0x20000"
+
+config AMD_FWM_POSITION_420000
+	bool "0x420000"
+
+config AMD_FWM_POSITION_820000
+	bool "0x820000"
+
+config AMD_FWM_POSITION_C20000
+	bool "0xC20000"
+
+config AMD_FWM_POSITION_E20000
+	bool "0xE20000"
+
+config AMD_FWM_POSITION_F20000
+	bool "0xF20000"
+
+config AMD_FWM_POSITION_FA0000
+	bool "0xFA0000"
+
+endchoice
+
+config AMD_FWM_POSITION
+	hex
+	default 0x20000 if AMD_FWM_POSITION_20000
+	default 0x420000 if AMD_FWM_POSITION_420000
+	default 0x820000 if AMD_FWM_POSITION_820000
+	default 0xc20000 if AMD_FWM_POSITION_C20000
+	default 0xe20000 if AMD_FWM_POSITION_E20000
+	default 0xf20000 if AMD_FWM_POSITION_F20000
+	default 0xfa0000 if AMD_FWM_POSITION_FA0000
+
+config USE_AMDFWTOOL
+	bool
+	default y if SOC_AMD_COMMON_BLOCK_PSP
+	help
+	  Select this if AMDFWTOOL needs to be built
+
+config PSPV2_MBOX_CMD_OFFSET
+	hex
+	default 0x10570

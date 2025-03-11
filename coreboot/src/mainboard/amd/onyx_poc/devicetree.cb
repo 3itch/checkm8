@@ -1,0 +1,194 @@
+chip soc/amd/genoa_poc
+
+	# USB configuration
+	register "usb.xhci0_enable" = "1"
+	register "usb.xhci1_enable" = "1"
+	# OC pins
+	register "usb.usb2_oc_pins[0].port0" = "0x0"
+	register "usb.usb2_oc_pins[0].port1" = "0x1"
+	register "usb.usb2_oc_pins[0].port2" = "0x0"
+	register "usb.usb2_oc_pins[0].port3" = "0x1"
+
+	register "usb.usb2_oc_pins[1].port0" = "0x0"
+	register "usb.usb2_oc_pins[1].port1" = "0x1"
+
+	register "usb.usb3_oc_pins[0].port0" = "0x0"
+	register "usb.usb3_oc_pins[0].port1" = "0x1"
+	register "usb.usb3_oc_pins[0].port2" = "0x0"
+	register "usb.usb3_oc_pins[0].port3" = "0x1"
+	register "usb.usb3_oc_pins[1].port0" = "0x0"
+	register "usb.usb3_oc_pins[1].port1" = "0x1"
+
+	register "usb.polarity_cfg_low" = "true"
+
+	register "usb.usb3_force_gen1.port0" = "3"
+	register "usb.usb3_force_gen1.port1" = "3"
+	register "usb.usb3_force_gen1.port2" = "3"
+	register "usb.usb3_force_gen1.port3" = "3"
+
+	# eSPI configuration
+	register "common_config.espi_config" = "{
+		.std_io_decode_bitmap = ESPI_DECODE_IO_0x80_EN,
+		.io_mode = ESPI_IO_MODE_SINGLE,
+		.op_freq_mhz = ESPI_OP_FREQ_33_MHZ,
+		.crc_check_enable = 1,
+		.alert_pin = ESPI_ALERT_PIN_PUSH_PULL,
+		.periph_ch_en = 0,
+		.vw_ch_en = 0,
+		.oob_ch_en = 0,
+		.flash_ch_en = 0,
+	}"
+
+	# PHY settings
+	register "usb.usb31_phy_enable" = "1"
+	register "usb.usb31_phy" = "{
+			{0x01, 0x07, 0x00, 0x00, 0x07, 0x01, 0x05, 0x00, 0x05, 0x00, 0x05, 0x00},
+			{0x05, 0x07, 0x00, 0x00, 0x07, 0x01, 0x05, 0x00, 0x05, 0x00, 0x05, 0x00},
+			{0x05, 0x07, 0x00, 0x00, 0x07, 0x01, 0x05, 0x00, 0x05, 0x00, 0x05, 0x00},
+			{0x05, 0x07, 0x00, 0x00, 0x07, 0x01, 0x05, 0x00, 0x05, 0x00, 0x05, 0x00},
+			{0x05, 0x01, 0x07, 0x00, 0x00, 0x07, 0x01, 0x05, 0x00, 0x05, 0x00, 0x05},
+			{0x00, 0x05, 0x07, 0x00, 0x00, 0x07, 0x01, 0x05, 0x00, 0x05, 0x00, 0x05},
+			{0x00, 0x05, 0x07, 0x00, 0x00, 0x07, 0x01, 0x05, 0x00, 0x05, 0x00, 0x05},
+			{0x00, 0x05, 0x07, 0x00, 0x00, 0x07, 0x01, 0x05, 0x00, 0x05, 0x00, 0x05},
+		}"
+
+	device domain 0 on
+		device ref iommu_0 on end
+		device ref rcec_0 on end
+		chip drivers/amd/opensil/mpio # P2
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "48"
+			register "end_lane" = "63"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			device ref gpp_bridge_0_0_a on end
+		end
+		chip drivers/amd/opensil/mpio # G2
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "112"
+			register "end_lane" = "127"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			register "hotplug" = "ServerExpress"
+			device ref gpp_bridge_0_0_b on end
+		end
+		chip drivers/amd/opensil/mpio
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "128"
+			register "end_lane" = "131"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			device ref gpp_bridge_0_0_c on end
+		end
+		device ref gpp_bridge_0_a on
+			device ref xhci_0 on end
+			device ref mp0_0 on end
+		end
+		device ref gpp_bridge_0_b on
+			device ref sata_0_0 on end
+			device ref sata_0_1 on end
+		end
+	end
+
+	device domain 1 on
+		device ref iommu_1 on end
+		device ref rcec_1 on end
+		chip drivers/amd/opensil/mpio # P3
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "16"
+			register "end_lane" = "31"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			device ref gpp_bridge_1_0_a on end
+		end
+		chip drivers/amd/opensil/mpio # G3
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "80"
+			register "end_lane" = "95"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			device ref gpp_bridge_1_0_b on end
+		end
+	end
+
+	device domain 2 on
+		device ref iommu_2 on end
+		device ref rcec_2 on end
+		chip drivers/amd/opensil/mpio # P1
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "32"
+			register "end_lane" = "47"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			register "hotplug" = "ServerExpress"
+			device ref gpp_bridge_2_0_a on end
+		end
+		chip drivers/amd/opensil/mpio # G1
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "64"
+			register "end_lane" = "79"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			device ref gpp_bridge_2_0_b on end
+		end
+
+	end
+
+	device domain 3 on
+		device ref iommu_3 on end
+		device ref rcec_3 on end
+		chip drivers/amd/opensil/mpio # P0
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "0"
+			register "end_lane" = "15"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			device ref gpp_bridge_3_0_a on end
+		end
+		chip drivers/amd/opensil/mpio # G0
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "96"
+			register "end_lane" = "111"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			device ref gpp_bridge_3_0_b on end
+		end
+		chip drivers/amd/opensil/mpio
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "132"
+			register "end_lane" = "133"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			device ref gpp_bridge_3_0_c on end # WAFL
+		end
+		chip drivers/amd/opensil/mpio
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "134"
+			register "end_lane" = "134"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			register "bmc" = "1"
+			device ref gpp_bridge_3_1_c on end # BMC
+		end
+		chip drivers/amd/opensil/mpio
+			register "type" = "IFTYPE_PCIE"
+			register "start_lane" = "135"
+			register "end_lane" = "135"
+			register "gpio_group" = "1"
+			register "aspm" = "L1"
+			device ref gpp_bridge_3_2_c on end # BMC
+		end
+		device ref gpp_bridge_3_a on
+			device ref xhci_3 on end
+			device ref mp0_3 on end
+		end
+		device ref gpp_bridge_3_b on
+			device ref sata_3_0 on end
+			device ref sata_3_1 on end
+		end
+	end
+
+	device ref uart_0 on end
+	device ref uart_1 on end
+
+end

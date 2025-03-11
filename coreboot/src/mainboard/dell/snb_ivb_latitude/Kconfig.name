@@ -1,0 +1,34 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_DELL_LATITUDE_E5420
+	bool "Latitude E5420"
+
+config BOARD_DELL_LATITUDE_E5520
+	bool "Latitude E5520"
+
+config BOARD_DELL_LATITUDE_E6220
+	bool "Latitude E6220"
+
+config BOARD_DELL_LATITUDE_E6320
+	bool "Latitude E6320"
+
+config BOARD_DELL_LATITUDE_E6420
+	bool "Latitude E6420"
+
+config BOARD_DELL_LATITUDE_E6520
+	bool "Latitude E6520"
+
+config BOARD_DELL_LATITUDE_E5530
+	bool "Latitude E5530"
+
+config BOARD_DELL_LATITUDE_E6230
+	bool "Latitude E6230"
+
+config BOARD_DELL_LATITUDE_E6330
+	bool "Latitude E6330"
+
+config BOARD_DELL_LATITUDE_E6430
+	bool "Latitude E6430"
+
+config BOARD_DELL_LATITUDE_E6530
+	bool "Latitude E6530"

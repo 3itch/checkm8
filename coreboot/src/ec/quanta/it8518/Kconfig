@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config EC_QUANTA_IT8518
+	bool
+	help
+	  Interface to QUANTA IT8518 Embedded Controller.

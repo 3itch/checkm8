@@ -1,0 +1,166 @@
+chip soc/intel/cannonlake
+
+# CPU (soc/intel/cannonlake/cpu.c)
+	# Power limit
+	register "power_limits_config" = "{
+		.tdp_pl1_override = 15,
+		.tdp_pl2_override = 28,
+	}"
+
+# FSP Memory (soc/intel/cannonlake/romstage/fsp_params.c)
+	register "SaGv" = "SaGv_FixedHigh"
+
+# FSP Silicon (soc/intel/cannonlake/fsp_params.c)
+
+	# Thermal
+	register "tcc_offset" = "12"
+
+	# Serial IRQ Mode
+	register "serirq_mode" = "SERIRQ_CONTINUOUS"
+
+# Actual device tree
+	device domain 0 on
+		device ref xhci on
+			chip drivers/usb/acpi
+				device usb 0.0 on
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-A Front Left Upper""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(0, 0)"
+						device usb 2.0 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-A Front Left Lower""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(0, 1)"
+						device usb 2.1 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-A Rear Upper""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(1, 0)"
+						device usb 2.2 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-A Front Right Lower""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(0, 2)"
+						device usb 2.3 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-A Front Right Upper""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(0, 3)"
+						device usb 2.4 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-C Port Rear""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						register "group" = "ACPI_PLD_GROUP(1, 2)"
+						device usb 2.5 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-A Rear Lower""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(1, 1)"
+						device usb 2.9 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB3 Type-A Front Left Upper""
+						register "type" = "UPC_TYPE_USB3_A"
+						register "group" = "ACPI_PLD_GROUP(0, 0)"
+						device usb 3.0 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB3 Type-A Front Left Lower""
+						register "type" = "UPC_TYPE_USB3_A"
+						register "group" = "ACPI_PLD_GROUP(0, 1)"
+						device usb 3.1 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB3 Type-C Rear""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						register "group" = "ACPI_PLD_GROUP(1, 2)"
+						device usb 3.3 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB3 Type-A Rear Lower""
+						register "type" = "UPC_TYPE_USB3_A"
+						register "group" = "ACPI_PLD_GROUP(1, 1)"
+						device usb 3.4 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB3 Type-A Rear Upper""
+						register "type" = "UPC_TYPE_USB3_A"
+						register "group" = "ACPI_PLD_GROUP(1, 0)"
+						device usb 3.5 on end
+					end
+				end
+			end
+			register "usb2_ports[0]" = "USB2_PORT_MID(OC0)"		# Type-A front left upper
+			register "usb2_ports[1]" = "USB2_PORT_MID(OC0)"		# Type-A front left lower
+			register "usb2_ports[2]" = "USB2_PORT_MID(OC2)"		# Type-A rear upper
+			register "usb2_ports[3]" = "USB2_PORT_MID(OC1)"		# Type-A front right lower
+			register "usb2_ports[4]" = "USB2_PORT_MID(OC1)"		# Type-A front right upper
+			register "usb2_ports[5]" = "USB2_PORT_TYPE_C(OC3)"	# Type-C rear
+			register "usb2_ports[6]" = "USB2_PORT_MID(OC_SKIP)"	# m.2-2230/Bluetooth
+			register "usb2_ports[9]" = "USB2_PORT_MID(OC2)"		# Type-A rear lower
+			register "usb3_ports[0]" = "USB3_PORT_DEFAULT(OC0)"	# Type-A front left upper
+			register "usb3_ports[1]" = "USB3_PORT_DEFAULT(OC0)"	# Type-A front left lower
+			register "usb3_ports[3]" = "USB3_PORT_DEFAULT(OC3)"	# Type-C rear
+			register "usb3_ports[4]" = "USB3_PORT_DEFAULT(OC2)"	# Type-A rear lower
+			register "usb3_ports[5]" = "USB3_PORT_DEFAULT(OC2)"	# Type-A rear upper
+		end
+		device ref sata on
+			register "SataPortsEnable[0]" = "1" # 2.5"
+			register "SataPortsEnable[2]" = "1" # m.2
+			register "satapwroptimize" = "1"
+		end
+		device ref pcie_rp8 on	# x1 M.2/E 2230 (WLAN)
+			register "PcieRpSlotImplemented[7]" = "1"
+			register "PcieRpEnable[7]" = "1"
+			register "PcieRpLtrEnable[7]" = "1"
+			# ClkSrcUsage must be set to free-run since SRCCLKREQ2 is NC
+			register "PcieClkSrcUsage[2]" = "0x80"
+			smbios_slot_desc "SlotTypeM2Socket1_SD" "SlotLengthOther" "M.2/E 2230" "SlotDataBusWidth1X"
+		end
+		device ref pcie_rp10 on
+			device pci 00.0 on end # x1 (LAN)
+			register "PcieRpEnable[9]" = "1"
+			register "PcieClkSrcUsage[3]" = "9"
+			register "PcieClkSrcClkReq[3]" = "3"
+		end
+		device ref pcie_rp13 on	# x4 M.2/M 2280 (NVMe)
+			register "PcieRpSlotImplemented[12]" = "1"
+			register "PcieRpEnable[12]" = "1"
+			register "PcieRpLtrEnable[12]" = "1"
+			register "PcieClkSrcUsage[1]" = "12"
+			register "PcieClkSrcClkReq[1]" = "1"
+			smbios_slot_desc "SlotTypeM2Socket3" "SlotLengthOther" "M.2/M 2280" "SlotDataBusWidth4X"
+		end
+		device ref lpc_espi on
+			chip superio/ite/it8528e
+				device pnp 2e.1 on      # UART1
+					io 0x60 = 0x3F8
+					irq 0x70 = 0x04
+				end
+				device pnp 2e.2 off end # UART2
+				device pnp 2e.4 off end # System Wake-Up Control (SWUC)
+				device pnp 2e.5 off end # KBC/Mouse
+				device pnp 2e.6 off end # KBC/Keyboard
+				device pnp 2e.a off end # Consumer IR
+				device pnp 2e.f off end # Shared Memory/Flash Interface (SMFI)
+				device pnp 2e.10 on # RTC-like Timer
+					io 0x62 = 0x360	# BRAM1 I/O base address
+				end
+				device pnp 2e.11 off end # Power Management I/F Channel 1 (PMC1)
+				device pnp 2e.12 off end # Power Management I/F Channel 2 (PMC2)
+				device pnp 2e.13 off end # Serial Peripheral Interface (SSPI)
+				device pnp 2e.14 off end # Platform Environment Control Interface (PECI)
+				device pnp 2e.17 off end # Power Management I/F Channel 3 (PMC3)
+				device pnp 2e.18 off end # Power Management I/F Channel 4 (PMC4)
+				device pnp 2e.19 off end # Power Management I/F Channel 5 (PMC5)
+			end
+		end
+	end
+end

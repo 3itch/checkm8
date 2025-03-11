@@ -1,0 +1,7 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_ACER_G43T_AM3
+	bool "G43T-AM3"
+
+config BOARD_ACER_Q45T_AM
+	bool "Q45T-AM"

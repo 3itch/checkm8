@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config SUPERIO_FINTEK_F81803A
+	bool
+	select SUPERIO_FINTEK_COMMON_PRE_RAM
+
+config SUPERIO_FINTEK_FAN_CONTROL
+	bool
+	default n
+
+config SUPERIO_FINTEK_FAN_API_CALL
+	depends on SUPERIO_FINTEK_FAN_CONTROL
+	bool
+	default n

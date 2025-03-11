@@ -1,0 +1,28 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config CPU_INTEL_SOCKET_LGA775
+	bool
+	select CPU_INTEL_MODEL_6FX
+	select CPU_INTEL_MODEL_F3X
+	select CPU_INTEL_MODEL_F4X
+	select CPU_INTEL_MODEL_1067X
+	select SIPI_VECTOR_IN_ROM
+
+if CPU_INTEL_SOCKET_LGA775
+
+config DCACHE_RAM_SIZE
+	hex
+	default 0x8000 # 32 kB
+
+config PRERAM_CBFS_CACHE_SIZE
+	default 0x0
+
+config DCACHE_BSP_STACK_SIZE
+	hex
+	default 0x2000
+
+config DCACHE_RAM_BASE
+	hex
+	default 0xfeff8000 # 4GB - 16MB - DCACHE_RAM_SIZE
+
+endif # CPU_INTEL_SOCKET_LGA775

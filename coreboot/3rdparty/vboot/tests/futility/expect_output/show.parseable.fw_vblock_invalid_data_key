@@ -1,0 +1,10 @@
+fw_pre::keyblock::valid
+fw_pre::keyblock::size::2232
+fw_pre::keyblock::signature::ignored
+fw_pre::keyblock::signature::size::1024
+fw_pre::keyblock::signature::data_size::1144
+fw_pre::keyblock::flags::23::!DEV:DEV:!REC:!MINIOS
+fw_pre::keyblock::data_key::algorithm::-1::INVALID
+fw_pre::keyblock::data_key::version::1
+fw_pre::keyblock::data_key::sha1_sum::e2c1c92d7d7aa7dfed5e8375edd30b7ae52b7450
+fw_pre::keyblock::data_key::invalid

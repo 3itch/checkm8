@@ -1,0 +1,8 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVERS_I2C_SX9360
+	bool
+	default n
+	depends on HAVE_ACPI_TABLES
+	help
+	  Board has a Semtech SX9360 proximity sensor.

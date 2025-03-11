@@ -1,0 +1,28 @@
+chip northbridge/intel/haswell
+
+	register "panel_cfg" = "{
+		.up_delay_ms		=  40,
+		.down_delay_ms		=  15,
+		.cycle_delay_ms		= 400,
+		.backlight_on_delay_ms	= 210,
+		.backlight_off_delay_ms	= 210,
+		.backlight_pwm_hz	= 200,
+	}"
+
+	device domain 0 on
+
+		chip southbridge/intel/lynxpoint
+
+			device pci 1f.2 on # SATA Controller
+				# DTLE DATA / EDGE values
+				register "sata_port0_gen3_dtle" = "0x5"
+				register "sata_port1_gen3_dtle" = "0x5"
+			end
+
+			device pci 16.0 on # Management Engine Interface 1
+				# Disable PCIe CLKOUT 2-5 and CLKOUT_XDP
+				register "icc_clock_disable" = "0x013c0000"
+			end
+		end
+	end
+end

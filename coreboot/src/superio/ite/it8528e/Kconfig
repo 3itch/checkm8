@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config SUPERIO_ITE_IT8528E
+	bool
+	select SUPERIO_ITE_COMMON_PRE_RAM

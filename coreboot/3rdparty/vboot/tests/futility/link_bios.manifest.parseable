@@ -1,0 +1,5 @@
+link::host::image::bios.bin
+link::host::versions::ro::Google_Link.2695.1.133
+link::host::versions::rw::Google_Link.2695.1.133
+link::host::keys::recovery::7e74cd6d66f361da068c0419d2e0946b4d091e1c
+link::host::keys::root::7b5c520ceabce86f13e02b7ca363cfb509fc5b98

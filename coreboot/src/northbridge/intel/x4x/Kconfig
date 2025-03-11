@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config NORTHBRIDGE_INTEL_X4X
+	bool
+	select HAVE_DEBUG_RAM_SETUP
+	select VGA
+	select INTEL_GMA_ACPI
+	select CACHE_MRC_SETTINGS
+	select BOOT_DEVICE_SPI_FLASH_NO_EARLY_WRITES
+	select HAVE_X86_64_SUPPORT
+	select USE_DDR3
+	select USE_DDR2
+	select NEED_SMALL_2MB_PAGE_TABLES
+
+if NORTHBRIDGE_INTEL_X4X
+
+config CBFS_SIZE
+	default 0x100000 if !SOUTHBRIDGE_INTEL_I82801GX
+
+config VGA_BIOS_ID
+	string
+	default "8086,2e32"
+
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0xe0000000
+
+config ECAM_MMCONF_BUS_NUMBER
+	int
+	default 256
+
+# This number must be equal or lower than what's reported in ACPI PCI _CRS
+config DOMAIN_RESOURCE_32BIT_LIMIT
+	default 0xfec00000
+
+config SMM_RESERVED_SIZE
+	hex
+	default 0x100000
+
+config MAX_CPUS
+	int
+	default 4
+
+config FIXED_MCHBAR_MMIO_BASE
+	default 0xfed14000
+
+config FIXED_DMIBAR_MMIO_BASE
+	default 0xfed18000
+
+config FIXED_EPBAR_MMIO_BASE
+	default 0xfed19000
+
+endif

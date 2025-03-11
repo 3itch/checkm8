@@ -1,0 +1,22 @@
+chip northbridge/intel/haswell
+
+	register "panel_cfg" = "{
+		.up_delay_ms		=  60,
+		.down_delay_ms		=  60,
+		.cycle_delay_ms		= 400,
+		.backlight_on_delay_ms	= 210,
+		.backlight_off_delay_ms	= 210,
+		.backlight_pwm_hz	= 200,
+	}"
+
+	device domain 0 on
+
+		chip southbridge/intel/lynxpoint
+
+			device pci 16.0 on # Management Engine Interface 1
+				# Disable PCIe CLKOUT 1-5 and CLKOUT_XDP
+				register "icc_clock_disable" = "0x013e0000"
+			end
+		end
+	end
+end

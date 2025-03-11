@@ -1,0 +1,42 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Trogdor"
+
+config BOARD_GOOGLE_BUBS
+	bool "->  Bubs"
+
+config BOARD_GOOGLE_COACHZ
+	bool "->  Coachz"
+
+config BOARD_GOOGLE_GELARSHIE
+	bool "->  Gelarshie"
+
+config BOARD_GOOGLE_HOMESTAR
+	bool "->  Homestar"
+
+config BOARD_GOOGLE_KINGOFTOWN
+	bool "->  Kingoftown"
+
+config BOARD_GOOGLE_LAZOR
+	bool "->  Lazor"
+
+config BOARD_GOOGLE_MARZIPAN
+	bool "->  Marzipan"
+
+config BOARD_GOOGLE_MRBLAND
+	bool "->  Mrbland"
+
+config BOARD_GOOGLE_PAZQUEL
+	bool "->  Pazquel"
+
+config BOARD_GOOGLE_POMPOM
+	bool "->  Pompom"
+
+config BOARD_GOOGLE_QUACKINGSTICK
+	bool "->  Quackingstick"
+
+config BOARD_GOOGLE_WORMDINGLER
+	bool "->  Wormdingler"
+
+config BOARD_GOOGLE_TROGDOR
+	bool "->  Trogdor"

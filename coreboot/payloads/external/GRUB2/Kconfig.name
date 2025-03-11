@@ -1,0 +1,24 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config PAYLOAD_GRUB2
+	bool "GRUB2"
+	depends on ARCH_X86 || ARCH_ARM
+	select PAYLOAD_BUILD_GRUB2
+	help
+	  Select this option if you want to build a coreboot image
+	  with a GRUB2 payload. If you don't know what this is
+	  about, just leave it enabled.
+
+	  See https://doc.coreboot.org/payloads.html for more information.
+
+config PAYLOAD_SEAGRUB
+	bool "GRUB2 atop SeaBIOS"
+	depends on ARCH_X86
+	select PAYLOAD_BUILD_SEABIOS
+	select GRUB2_SECONDARY_PAYLOAD
+	help
+	  Select this option if you want to build a coreboot image
+	  with a GRUB2 payload running atop SeaBIOS to improve its
+	  hardware compatibility.
+
+	  See https://doc.coreboot.org/payloads.html for more information.

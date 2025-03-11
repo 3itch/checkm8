@@ -1,0 +1,4 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_PROTECTLI_VP46XX
+	bool "VP4630/VP4650/VP4670"

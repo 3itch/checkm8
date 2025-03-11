@@ -1,0 +1,134 @@
+chip soc/intel/skylake
+
+	# Enable Panel as eDP and configure power delays
+	register "panel_cfg" = "{
+		.up_delay_ms		=  210,	// T3
+		.down_delay_ms		=  500,	// T10
+		.cycle_delay_ms		= 5000,	// T12
+		.backlight_on_delay_ms	=    1,	// T7
+		.backlight_off_delay_ms	=  200,	// T9
+	}"
+
+	# Enable deep Sx states
+	register "deep_s3_enable_ac" = "true"
+	register "deep_s3_enable_dc" = "true"
+	register "deep_s5_enable_ac" = "true"
+	register "deep_s5_enable_dc" = "true"
+	register "deep_sx_config" = "DSX_EN_LAN_WAKE_PIN"
+
+	register "eist_enable" = "true"
+
+	# GPE configuration
+	# Note that GPE events called out in ASL code rely on this
+	# route. i.e. If this route changes then the affected GPE
+	# offset bits also need to be changed.
+	register "gpe0_dw0" = "GPP_C"
+	register "gpe0_dw1" = "GPP_D"
+	register "gpe0_dw2" = "GPP_E"
+
+	# Disable DPTF
+	register "dptf_enable" = "0"
+
+	# FSP Configuration
+	register "DspEnable" = "0"
+	register "IoBufferOwnership" = "0"
+	register "SkipExtGfxScan" = "1"
+	register "SaGv" = "SaGv_Enabled"
+	register "PmConfigSlpS3MinAssert" = "2"		# 50ms
+	register "PmConfigSlpS4MinAssert" = "1"		# 1s
+	register "PmConfigSlpSusMinAssert" = "3"	# 500ms
+	register "PmConfigSlpAMinAssert" = "3"		# 2s
+
+	# PL1 override 25W
+	# PL2 override 44W
+	register "power_limits_config" = "{
+		.tdp_pl1_override = 25,
+		.tdp_pl2_override = 44,
+	}"
+
+	# Send an extra VR mailbox command for the PS4 exit issue
+	register "SendVrMbxCmd" = "2"
+
+	device domain 0 on
+		device ref igpu		on  end
+		device ref sa_thermal	on  end
+		device ref south_xhci	on
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_MID(OC1),	// Type-A Port (left)
+				[1] = USB2_PORT_MID(OC1),	// Type-A Port (left)
+				[2] = USB2_PORT_FLEX(OC_SKIP),	// FPR
+				[3] = USB2_PORT_FLEX(OC_SKIP),	// SD
+				[4] = USB2_PORT_FLEX(OC_SKIP),	// INT
+				[5] = USB2_PORT_MID(OC1),	// Type-A Port (right)
+				[6] = USB2_PORT_FLEX(OC_SKIP),	// Webcam
+				[7] = USB2_PORT_MID(OC_SKIP),	// mPCIe / WiFi Port
+				[8] = USB2_PORT_MID(OC_SKIP),	// mSATA / WWAN Port
+			}"
+
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC1),	// Type-A Port (left)
+				[1] = USB3_PORT_DEFAULT(OC1),	// Type-A Port (left)
+			}"
+		end
+		device ref thermal	on  end
+		device ref heci1	on  end
+		device ref sata		on
+			register "SataSalpSupport" = "1"
+
+			# The X210 has 3 SATA ports: a full SATA port, mSATA, and SATA over M.2
+			register "SataPortsEnable" = "{
+				[0] = 1,
+				[1] = 1,
+				[2] = 1,
+			}"
+			register "SataPortsDevSlp" = "{
+				[0] = 1,
+				[1] = 1,
+				[2] = 1,
+			}"
+		end
+		device ref pcie_rp3	on
+			# Ethernet controller
+			register "PcieRpEnable[2]" = "1"
+			register "PcieRpClkReqSupport[2]" = "1"
+			register "PcieRpClkReqNumber[2]" = "0"
+			register "PcieRpClkSrcNumber[2]" = "0"
+			register "PcieRpAdvancedErrorReporting[2]" = "1"
+			register "PcieRpLtrEnable[2]" = "1"
+		end
+		device ref pcie_rp4	on
+			# Wireless controller
+			register "PcieRpEnable[3]" = "1"
+			register "PcieRpClkReqSupport[3]" = "1"
+			register "PcieRpClkReqNumber[3]" = "1"
+			register "PcieRpClkSrcNumber[3]" = "1"
+			register "PcieRpAdvancedErrorReporting[3]" = "1"
+			register "PcieRpLtrEnable[3]" = "1"
+		end
+		device ref pcie_rp9	on
+			# NVMe controller
+			register "PcieRpEnable[8]" = "1"
+			register "PcieRpClkReqSupport[8]" = "1"
+			register "PcieRpClkReqNumber[8]" = "4"
+			register "PcieRpClkSrcNumber[8]" = "4"
+			register "PcieRpAdvancedErrorReporting[8]" = "1"
+			register "PcieRpLtrEnable[8]" = "1"
+		end
+		device ref lpc_espi	on
+			register "serirq_mode" = "SERIRQ_CONTINUOUS"
+
+			register "gen1_dec" = "0x000c0681"
+			register "gen2_dec" = "0x000c1641"
+
+			chip ec/51nb/npce985la0dx
+				device pnp 0c09.0 on end
+				device pnp 4e.5   on end
+				device pnp 4e.6   on end
+				device pnp 4e.11  on end
+			end
+		end
+		device ref pmc		on  end
+		device ref hda		on  end
+		device ref smbus	on  end
+	end
+end

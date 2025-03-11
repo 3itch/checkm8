@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_MSI
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/msi/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/msi/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "MSI"
+
+endif # VENDOR_MSI

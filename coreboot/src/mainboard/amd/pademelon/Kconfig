@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_AMD_PADEMELON
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select SOC_AMD_STONEYRIDGE
+	select AMD_APU_PKG_FP4
+	select BOARD_ROMSIZE_KB_8192
+	select DRIVERS_I2C_GENERIC
+	select HAVE_ACPI_TABLES
+	select GFXUMA
+	select STONEYRIDGE_LEGACY_FREE
+	select ONBOARD_VGA_IS_PRIMARY
+	select SUPERIO_FINTEK_F81803A
+	select SUPERIO_FINTEK_COMMON_PRE_RAM
+	select SUPERIO_FINTEK_FAN_CONTROL
+	select SUPERIO_FINTEK_FAN_API_CALL
+	select AZALIA_HDA_CODEC_SUPPORT
+
+config MAINBOARD_DIR
+	default "amd/pademelon"
+
+config MAINBOARD_PART_NUMBER
+	default "Pademelon"
+
+choice
+	prompt "SOC used in pademelon board"
+	default PADEMELON_MERLIN_FALCON
+
+config PADEMELON_MERLIN_FALCON
+	bool "Merlin Falcon"
+	select AMD_APU_MERLINFALCON
+
+config PADEMELON_PRAIRIE_FALCON
+	bool "Prairie Falcon"
+	select AMD_APU_PRAIRIEFALCON
+
+endchoice
+
+
+config OVERRIDE_DEVICETREE
+	default "override-merlinfalcon.cb" if PADEMELON_MERLIN_FALCON
+	default "override-prairiefalcon.cb" if PADEMELON_PRAIRIE_FALCON
+
+config MAX_CPUS
+	int
+	default 4
+
+config IRQ_SLOT_COUNT
+	int
+	default 11
+
+config VGA_BIOS
+	default y if USE_AMD_BLOBS
+
+config HWM_PORT
+	hex
+	default 0x0225
+	help
+	  HWM base address must be an odd address. Hardware monitor used
+	  addresses are HWM_PORT for index an HWM_PORT + 1 for data.
+	  If changed, make sure fan_init.c IO window setting. The HWM
+	  (Hardware Monitor) is used for fan control within pademelon.
+
+if !EM100
+config EFS_SPI_READ_MODE
+	default 4          # Dual IO (1-2-2)
+
+config EFS_SPI_SPEED
+	default 0	# 66MHz
+endif
+
+endif # BOARD_AMD_PADEMELON

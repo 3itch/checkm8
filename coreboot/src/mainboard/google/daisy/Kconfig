@@ -1,0 +1,46 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_GOOGLE_DAISY
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOOT_DEVICE_NOT_SPI_FLASH
+	select CPU_SAMSUNG_EXYNOS5250
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_I2C
+	select BOARD_ROMSIZE_KB_4096
+	select DRIVER_MAXIM_MAX77686
+	select DRIVER_TI_TPS65090
+	select MAINBOARD_HAS_NATIVE_VGA_INIT
+	select MAINBOARD_FORCE_NATIVE_VGA_INIT
+	select HAVE_LINEAR_FRAMEBUFFER
+	select I2C_TPM
+	select MAINBOARD_HAS_TPM1
+
+config MAINBOARD_DIR
+	default "google/daisy"
+
+config MAINBOARD_PART_NUMBER
+	default "Daisy"
+
+config MAX_CPUS
+	int
+	default 2
+
+config DRAM_SIZE_MB
+	int
+	default 2048
+
+config EC_GOOGLE_CHROMEEC_I2C_BUS
+	hex
+	default 0x4
+
+config UART_FOR_CONSOLE
+	int
+	default 3
+
+config PMIC_BUS
+	int
+	default 0
+
+endif # BOARD_GOOGLE_DAISY

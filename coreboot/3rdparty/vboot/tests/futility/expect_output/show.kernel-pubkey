@@ -1,0 +1,22 @@
+Kernel partition:        tests/futility/data/kernel_part.bin
+Keyblock:
+  Size:                  0x4b8
+  Signature:             valid
+    Size:                0x200
+    Data size:           0x278
+  Flags:                 23  !DEV DEV !REC !MINIOS
+  Data key algorithm:    4 RSA2048 SHA256
+  Data key version:      1
+  Data key sha1sum:      d6170aa480136f1f29cf339a5ab1b960585fa444
+Kernel Preamble:
+  Size:                  0xfb48
+  Header version:        2.2
+  Kernel version:        1
+  Flags:                 0
+  Body load address:     0x100000
+  Body size:             0xe000
+  Bootloader address:    0x10a000
+  Bootloader size:       0x4000
+Body verification succeeded.
+Config:
+hi there

@@ -1,0 +1,24 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "MC APLx"
+
+config BOARD_SIEMENS_MC_APL1
+	bool "-> MC APL1"
+
+config BOARD_SIEMENS_MC_APL2
+	bool "-> MC APL2"
+
+config BOARD_SIEMENS_MC_APL3
+	bool "-> MC APL3"
+
+config BOARD_SIEMENS_MC_APL4
+	bool "-> MC APL4"
+
+config BOARD_SIEMENS_MC_APL5
+	bool "-> MC APL5"
+
+config BOARD_SIEMENS_MC_APL6
+	bool "-> MC APL6"
+
+config BOARD_SIEMENS_MC_APL7
+	bool "-> MC APL7"

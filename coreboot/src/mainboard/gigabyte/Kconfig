@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_GIGABYTE
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/gigabyte/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/gigabyte/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "GIGABYTE"
+
+endif # VENDOR_GIGABYTE

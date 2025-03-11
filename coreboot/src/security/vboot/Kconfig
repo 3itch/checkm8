@@ -1,0 +1,507 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+menu "Verified Boot (vboot)"
+
+config VBOOT_LIB
+	bool
+	help
+	  Build and link the vboot library. Makes the vboot API accessible across
+	  all coreboot stages, without enabling vboot verification. For verification,
+	  please see the VBOOT option below.
+
+config VBOOT
+	bool "Verify firmware with vboot."
+	default n
+	select VBOOT_LIB
+	select VBOOT_MOCK_SECDATA if !TPM
+	depends on 0 = 0  # Must have a 'depends on' or board overrides will break it.
+	help
+	  Enabling VBOOT will use vboot to verify the components of the firmware
+	  (stages, payload, etc).
+
+if VBOOT
+
+comment "Anti-Rollback Protection disabled because mocking secdata is enabled."
+	depends on VBOOT_MOCK_SECDATA
+
+config VBOOT_SLOTS_RW_A
+	bool "Firmware RO + RW_A"
+	help
+	  Have one update partition beside the RO partition.
+
+config VBOOT_SLOTS_RW_AB
+	bool "Firmware RO + RW_A + RW_B"
+	select VBOOT_SLOTS_RW_A
+	help
+	  Have two update partitions beside the RO partition.
+
+config VBOOT_CBFS_INTEGRATION
+	bool "Enable vboot and CBFS integration"
+	default n
+	depends on VBOOT_SLOTS_RW_A
+	depends on CBFS_VERIFICATION
+	select INCLUDE_CONFIG_FILE  # futility needs this to auto-detect signing type
+	help
+	  Say yes here to enable cryptographic verification of RW slots CBFS
+	  metadata. This will replace body hash verification.
+
+	  This option enables integration of vboot and CBFS. Verification of RW
+	  slots is performed by calculation of their CBFS metadata hash.
+	  It also requires CBFS_VERIFICATION to be enabled, so that CBFS files
+	  contents are correctly verified.
+
+config VBOOT_VBNV_CMOS
+	bool
+	default n
+	depends on PC80_SYSTEM
+	help
+	  VBNV is stored in CMOS
+
+config VBOOT_VBNV_OFFSET
+	hex
+	default 0x26
+	depends on VBOOT_VBNV_CMOS
+	help
+	  CMOS offset for VbNv data. This value must match cmos.layout
+	  in the mainboard directory, minus 14 bytes for the RTC.
+
+config VBOOT_VBNV_CMOS_BACKUP_TO_FLASH
+	bool
+	default n
+	depends on VBOOT_VBNV_CMOS && BOOT_DEVICE_SUPPORTS_WRITES
+	help
+	  Vboot non-volatile storage data will be backed up from CMOS to flash
+	  and restored from flash if the CMOS is invalid due to power loss.
+
+config VBOOT_VBNV_FLASH
+	bool
+	default n
+	depends on BOOT_DEVICE_SUPPORTS_WRITES
+	help
+	  VBNV is stored in flash storage
+
+config VBOOT_STARTS_BEFORE_BOOTBLOCK
+	def_bool n
+	select VBOOT_SEPARATE_VERSTAGE
+	help
+	  Firmware verification happens before the main processor is brought
+	  online.
+
+config VBOOT_STARTS_IN_BOOTBLOCK
+	bool
+	default n
+	select SEPARATE_ROMSTAGE
+	help
+	  Firmware verification happens during the end of or right after the
+	  bootblock. This implies that a static VBOOT2_WORK() buffer must be
+	  allocated in memlayout.
+
+config VBOOT_STARTS_IN_ROMSTAGE
+	bool
+	default n
+	depends on !VBOOT_STARTS_IN_BOOTBLOCK
+	help
+	  Firmware verification happens during the end of romstage (after
+	  memory initialization). This implies that the vboot work buffer is
+	  in CBMEM from the start and doesn't need to be reserved in memlayout.
+
+config VBOOT_MOCK_SECDATA
+	bool "Mock secdata for firmware verification"
+	default n
+	help
+	  Enabling VBOOT_MOCK_SECDATA will mock secdata for the firmware
+	  verification to avoid access to a secdata storage (typically TPM).
+	  All operations for a secdata storage will be successful. This option
+	  can be used during development when a TPM is not present or broken.
+	  THIS SHOULD NOT BE LEFT ON FOR PRODUCTION DEVICES.
+
+config VBOOT_DISABLE_DEV_ON_RECOVERY
+	bool
+	default n
+	help
+	  When this option is enabled, the ChromeOS device leaves the
+	  developer mode as soon as recovery request is detected. This is
+	  handy on embedded devices with limited input capabilities.
+
+config VBOOT_SEPARATE_VERSTAGE
+	bool
+	default n
+	depends on VBOOT_STARTS_IN_BOOTBLOCK || VBOOT_STARTS_BEFORE_BOOTBLOCK
+	help
+	  If this option is set, vboot verification runs in a standalone stage
+	  that is loaded from the bootblock and exits into romstage. If it is
+	  not set, the verification code is linked directly into the bootblock
+	  or the romstage and runs as part of that stage (cf. related options
+	  VBOOT_STARTS_IN_BOOTBLOCK/_ROMSTAGE and VBOOT_RETURN_FROM_VERSTAGE).
+
+config VBOOT_RETURN_FROM_VERSTAGE
+	bool
+	default n
+	depends on VBOOT_SEPARATE_VERSTAGE
+	help
+	  If this is set, the verstage returns back to the calling stage instead
+	  of exiting to the succeeding stage so that the verstage space can be
+	  reused by the succeeding stage. This is useful if a RAM space is too
+	  small to fit both the verstage and the succeeding stage.
+
+config VBOOT_MUST_REQUEST_DISPLAY
+	bool
+	default y if VGA_ROM_RUN
+	default n
+	help
+	  Set this option to indicate to vboot that this platform will skip its
+	  display initialization on a normal (non-recovery, non-developer) boot.
+	  Unless display is specifically requested, the video option ROM is not
+	  loaded, and any other native display initialization code is not run.
+
+config VBOOT_ALWAYS_ENABLE_DISPLAY
+	bool "Force to always enable display"
+	default y if BMP_LOGO
+	default n
+	help
+	  Set this option to indicate to vboot that display should always be enabled.
+
+config VBOOT_ALWAYS_ALLOW_UDC
+	bool "Always allow UDC"
+	default n
+	depends on !CHROMEOS
+	help
+	  This option allows UDC to be enabled regardless of the vboot state.
+
+config VBOOT_HAS_REC_HASH_SPACE
+	bool
+	default y if MRC_SAVE_HASH_IN_TPM && HAS_RECOVERY_MRC_CACHE
+	default n
+	help
+	  Set this option to indicate to vboot that recovery data hash space
+	  is present in TPM.
+
+config VBOOT_LID_SWITCH
+	bool
+	default n
+	help
+	  Whether this platform has a lid switch. If it does, vboot will not
+	  decrement try counters for boot failures if the lid is closed.
+
+config VBOOT_WIPEOUT_SUPPORTED
+	bool
+	default n
+	help
+	  When this option is enabled, the firmware provides the ability to
+	  signal the application the need for factory reset (a.k.a. wipe
+	  out) of the device
+
+config VBOOT_FWID_MODEL
+	string "Firmware ID model"
+	default "Google_\$(CONFIG_MAINBOARD_PART_NUMBER)" if CHROMEOS
+	default "\$(CONFIG_MAINBOARD_VENDOR)_\$(CONFIG_MAINBOARD_PART_NUMBER)"
+	help
+	  This is the first part of the FWID written to various regions of a
+	  vboot firmware image to identify its version.
+
+config VBOOT_FWID_VERSION
+	string "Firmware ID version"
+	default ".\$(KERNELVERSION)"
+	help
+	  This is the second part of the FWID written to various regions of a
+	  vboot firmware image to identify its version.
+
+config VBOOT_NO_BOARD_SUPPORT
+	bool "Allow the use of vboot without board support"
+	default n
+	help
+	  Enable weak functions for get_write_protect_state and
+	  get_recovery_mode_switch in order to proceed with refactoring
+	  of the vboot2 code base. Later on this code is removed and replaced
+	  by interfaces.
+
+config RO_REGION_ONLY
+	string "Additional files that should not be copied to RW"
+	default ""
+	help
+	  Add a space delimited list of filenames that should only be in the
+	  RO section.
+
+config RW_REGION_ONLY
+	string
+	default ""
+	depends on VBOOT_SLOTS_RW_A
+	help
+	  Add a space delimited list of filenames that should only be in the
+	  RW sections.
+
+config RWA_REGION_ONLY
+	string
+	default ""
+	depends on VBOOT_SLOTS_RW_AB
+	help
+	  Add a space-delimited list of filenames that should only be in the
+	  RW-A section.
+
+config RWB_REGION_ONLY
+	string
+	default ""
+	depends on VBOOT_SLOTS_RW_AB
+	help
+	  Add a space-delimited list of filenames that should only be in the
+	  RW-B section.
+
+config CBFS_MCACHE_RW_PERCENTAGE
+	int "Percentage of CBFS metadata cache used for RW CBFS"
+	depends on !NO_CBFS_MCACHE
+	default 50
+	help
+	  The amount of the CBFS_MCACHE area that's used for the RW CBFS, in
+	  percent from 0 to 100. The remaining area will be used for the RO
+	  CBFS. Default is an even 50/50 split. When VBOOT is disabled, this
+	  will automatically be 0 (meaning the whole MCACHE is used for RO).
+	  Do NOT change this value for vboot RW updates!
+
+config VBOOT_CLEAR_RECOVERY_IN_RAMSTAGE
+	bool "Clear the recovery request at the end of ramstage"
+	default n
+	help
+	  If this option is enabled, the recovery request will be cleared and
+	  saved to VBNV storage at the end of ramstage. This is useful for
+	  platforms without vboot-integrated payloads, to avoid being stuck in
+	  the recovery mode.
+
+config VBOOT_ENABLE_CBFS_FALLBACK
+	bool
+	default n
+	depends on VBOOT_SLOTS_RW_A
+	help
+	  When this option is enabled, the CBFS code will look for a file in the
+	  RO (COREBOOT) region if it isn't available in the active RW region.
+
+config VBOOT_EARLY_EC_SYNC
+	bool
+	default n
+	depends on EC_GOOGLE_CHROMEEC
+	help
+	  Enables CrOS EC software sync in romstage, before memory training
+	  runs. This is useful mainly as a way to achieve full USB-PD
+	  negotiation earlier in the boot flow, as the EC will only do this once
+	  it has made the sysjump to its RW firmware. It should not
+	  significantly impact boot time, as this operation will be performed
+	  later in the boot flow if it is disabled here.
+
+config VBOOT_EC_EFS
+	bool "Early firmware selection (EFS) EC"
+	default n
+	help
+	  CrosEC can support EFS: Early Firmware Selection. If it's enabled,
+	  software sync needs to also support it. This setting tells vboot to
+	  perform EFS software sync.
+
+config VBOOT_X86_SHA256_ACCELERATION
+	bool "Use sha extension for sha256 hash calculation"
+	default n
+	depends on ARCH_X86
+	help
+	  Use sha256msg1, sha256msg2, sha256rnds2 instruction to accelerate
+	  SHA hash calculation in vboot.
+
+config VBOOT_X86_RSA_ACCELERATION
+	bool "Use SSE2 instructions for RSA signature verification"
+	default n
+	depends on ARCH_X86
+	help
+	  Use paddq, pmuludq, psrlq, punpckldq and punpcklqdq SSE2
+	  instructions to accelerate the modulus exponentiation which
+	  is part of the RSA signature verification process.
+
+config VBOOT_ARMV8_CE_SHA256_ACCELERATION
+	bool "Use ARMv8 Crypto Extension for sha256 hash calculation"
+	default y if CHROMEOS
+	default n
+	depends on ARCH_ARM64
+	help
+	  Use ARMv8 Crypto Extension to accelerate SHA hash calculation in vboot.
+
+config VBOOT_ARM64_RSA_ACCELERATION
+	bool "Use arm64 SIMD instructions to accelerate RSA signature verification"
+	default y
+	depends on ARCH_VERSTAGE_ARM64
+	help
+	  Use arm64 SIMD instructions (NEON) to parallelize two multiplications
+	  in the modulus exponentiation algorithm, which speeds up RSA signature
+	  verification in vboot. This is supported on all arm64 CPUs so you'd
+	  generally always want this enabled, unless your SoC is overriding
+	  vboot's hwcrypto API with its own crypto accelerator IP instead (or
+	  you're trying really hard to save on code size).
+
+config VBOOT_DEFINE_WIDEVINE_COUNTERS
+	bool
+	default n
+	help
+	  Set up Widevine Secure Counters in TPM NVRAM by defining space. Enabling this
+	  config will only define the counter space. Counters need to be incremented
+	  separately before any read operation is performed on them.
+
+config VBOOT_HASH_BLOCK_SIZE
+	hex
+	default 0x400
+	help
+	  Set the default hash size.  Generally 1k is reasonable, but in some
+	  cases it may improve hashing speed to increase the size.
+
+	  Note that this buffer is allocated in the stack.  Although the
+	  build should fail if the stack size is exceeded, it's something to
+	  be aware of when changing the size.
+
+config VBOOT_GSCVD
+	bool "Generate GSC verification data"
+	depends on TPM_GOOGLE
+	select CBFS_VERIFICATION
+	default n if TPM_GOOGLE_CR50
+	default y
+	help
+	  Generate a Google Security Chip Verification Data (GSCVD) structure on the flash to
+	  allow the GSC to verify the CBFS verification anchor. Used by default with Ti50 GSCs.
+	  Requires an RO_GSCVD FMAP section.
+
+config VBOOT_GSC_BOARD_ID
+	string
+	depends on VBOOT_GSCVD
+	default "ZZCR"
+	help
+	  GSC board ID to be embedded in the GSCVD. Usually each specific mainboard variant
+	  has its own. Google engineers can find these in the go/cros-dlm database ("Products").
+	  The specific board IDs are filled in as part of the production signing process, so
+	  this value is just a default and doesn't need to be set per-variant in coreboot.
+	  (Note: This is a completely separate thing from coreboot's `board_id()` function.)
+
+menu "GBB configuration"
+
+config GBB_HWID
+	string "Hardware ID"
+	default ""
+	help
+	  A hardware identifier for device. On ChromeOS this is used for auto
+	  update and recovery, and will be generated when manufacturing by the
+	  factory software, in a strictly defined format.
+	  Leave empty to get a test-only ChromeOS HWID v2 string generated.
+
+config GBB_BMPFV_FILE
+	string "Path to bmpfv image"
+	default ""
+
+config GBB_FLAG_DEV_SCREEN_SHORT_DELAY
+	bool "Reduce dev screen delay"
+	default n
+
+config GBB_FLAG_LOAD_OPTION_ROMS
+	bool "Load option ROMs"
+	default n
+
+config GBB_FLAG_ENABLE_ALTERNATE_OS
+	bool "Allow booting a non-ChromeOS kernel if dev switch is on"
+	default n
+
+config GBB_FLAG_FORCE_DEV_SWITCH_ON
+	bool "Force dev switch on"
+	default n
+
+config GBB_FLAG_FORCE_DEV_BOOT_USB
+	bool "Allow booting from USB in dev mode even if dev_boot_usb=0"
+	default y
+
+config GBB_FLAG_DISABLE_FW_ROLLBACK_CHECK
+	bool "Disable firmware rollback protection"
+	default y
+
+config GBB_FLAG_ENTER_TRIGGERS_TONORM
+	bool "Return to normal boot with Enter"
+	default n
+
+config GBB_FLAG_FORCE_DEV_BOOT_ALTFW
+	bool "Allow booting altfw in dev mode even if dev_boot_altfw=0"
+	default n
+
+config GBB_FLAG_RUNNING_FAFT
+	bool "Running FAFT tests; used as a hint to disable other debug features"
+	default n
+
+config GBB_FLAG_DISABLE_EC_SOFTWARE_SYNC
+	bool "Disable EC software sync"
+	default n
+
+config GBB_FLAG_DEFAULT_DEV_BOOT_ALTFW
+	bool "Default to booting altfw in dev mode"
+	default n
+
+config GBB_FLAG_DISABLE_PD_SOFTWARE_SYNC
+	bool "Disable PD software sync"
+	default n
+
+config GBB_FLAG_DISABLE_LID_SHUTDOWN
+	bool "Disable shutdown on closed lid"
+	default n
+
+config GBB_FLAG_FORCE_MANUAL_RECOVERY
+	bool "Always assume manual recovery in recovery mode"
+	default n
+
+config GBB_FLAG_DISABLE_FWMP
+	bool "Disable Firmware Management Parameters (FWMP)"
+	default n
+
+config GBB_FLAG_ENABLE_UDC
+	bool "Enable USB Device Controller"
+	default n
+
+config GBB_FLAG_FORCE_CSE_SYNC
+	bool "Running tests; enforce CSE sync"
+	default n
+
+endmenu # GBB
+
+menu "Vboot Keys"
+config VBOOT_ROOT_KEY
+	string "Root key (public)"
+	default "\$(VBOOT_SOURCE)/tests/devkeys/root_key.vbpubk"
+
+config VBOOT_RECOVERY_KEY
+	string "Recovery key (public)"
+	default "\$(VBOOT_SOURCE)/tests/devkeys/recovery_key.vbpubk"
+
+config VBOOT_FIRMWARE_PRIVKEY
+	string "Firmware key (private)"
+	default "\$(VBOOT_SOURCE)/tests/devkeys/firmware_data_key.vbprivk"
+
+config VBOOT_KERNEL_KEY
+	string "Kernel subkey (public)"
+	default "\$(VBOOT_SOURCE)/tests/devkeys/kernel_subkey.vbpubk"
+
+config VBOOT_KEYBLOCK
+	string "Keyblock to use for the RW regions"
+	default "\$(VBOOT_SOURCE)/tests/devkeys/firmware.keyblock"
+
+config VBOOT_KEYBLOCK_VERSION
+	int "Keyblock version number"
+	default 1
+
+config VBOOT_KEYBLOCK_PREAMBLE_FLAGS
+	hex "Keyblock preamble flags"
+	default 0x0
+
+if VBOOT_GSCVD
+
+config VBOOT_GSCVD_ROOT_PUBKEY
+	string "GSCVD root key (public)"
+	default "\$(VBOOT_SOURCE)/tests/devkeys/arv_root.vbpubk"
+
+config VBOOT_GSCVD_PLATFORM_PRIVKEY
+	string "GSCVD platform key (private)"
+	default "\$(VBOOT_SOURCE)/tests/devkeys/arv_platform.vbprivk"
+
+config VBOOT_GSCVD_PLATFORM_KEYBLOCK
+	string "GSCVD platform keyblock (public)"
+	default "\$(VBOOT_SOURCE)/tests/devkeys/arv_platform.keyblock"
+
+endif # VBOOT_GSCVD
+
+endmenu # Keys
+endif # VBOOT
+endmenu # Verified Boot (vboot)

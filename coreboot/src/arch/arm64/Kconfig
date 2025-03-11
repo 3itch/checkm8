@@ -1,0 +1,86 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config ARCH_ARM64
+	bool
+
+config ARCH_BOOTBLOCK_ARM64
+	bool
+	select ARCH_ARM64
+
+config ARCH_VERSTAGE_ARM64
+	bool
+	select ARCH_ARM64
+
+config ARCH_ROMSTAGE_ARM64
+	bool
+	select ARCH_ARM64
+
+config ARCH_RAMSTAGE_ARM64
+	bool
+	select ARCH_ARM64
+
+source "src/arch/arm64/armv8/Kconfig"
+
+if ARCH_ARM64
+
+config ARM64_CURRENT_EL
+	int
+	default 3
+	range 1 3
+	help
+	  The exception level on which coreboot is started. Accepted
+	  values are: 1 (EL1), 2 (EL2) and 3 (EL3). This option can be
+	  used to restrict access to available control registers in case
+	  prior firmware already dropped to a lower exception level. By default,
+	  coreboot is the first firmware that runs on the system and should thus
+	  always run on EL3. This option is only provided for edge-case platforms
+	  that require running a different firmware before coreboot which drops
+	  to a lower exception level.
+
+config ARM64_USE_ARCH_TIMER
+	bool
+	default n
+
+config ARM64_USE_ARM_TRUSTED_FIRMWARE
+	bool
+	default n
+	depends on ARCH_RAMSTAGE_ARM64 && ARM64_CURRENT_EL = 3
+
+config ARM64_BL31_OPTEE_WITH_SMC
+	bool "Build OP-TEE dispatcher for BL31 and allow loading via an SMC"
+	default n
+	depends on ARM64_USE_ARM_TRUSTED_FIRMWARE
+	help
+	  This option adds support for building the OP-TEE Secure Payload Dispatcher
+	  (SPD) for BL31, and allows loading the OP-TEE image via a Secure Monitor Call
+	  (SMC).
+
+config ARM64_BL31_EXTERNAL_FILE
+	string "Path to external BL31.ELF (leave empty to build from source)"
+	depends on ARM64_USE_ARM_TRUSTED_FIRMWARE
+	help
+	  The blob to use instead of building the Arm Trusted Firmware
+	  from tree. It is discouraged as compatibility with out-of-tree
+	  blobs may break anytime.
+
+config ARM64_USE_SECURE_OS
+	bool
+	default n
+	depends on ARM64_USE_ARM_TRUSTED_FIRMWARE
+
+config ARM64_SECURE_OS_FILE
+	string "Secure OS binary file"
+	depends on ARM64_USE_SECURE_OS
+	help
+	  Secure OS binary file.
+
+config ARM64_A53_ERRATUM_843419
+	bool
+	default n
+	help
+	  Some early Cortex-A53 revisions had a hardware bug that results in
+	  incorrect address calculations in rare cases. This option enables a
+	  linker workaround to avoid those cases if your toolchain supports it.
+	  Should be selected automatically by SoCs that are affected.
+
+endif # if ARCH_ARM64

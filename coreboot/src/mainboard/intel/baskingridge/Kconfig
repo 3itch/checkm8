@@ -1,0 +1,30 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_INTEL_BASKING_RIDGE
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select NORTHBRIDGE_INTEL_HASWELL
+	select SOUTHBRIDGE_INTEL_LYNXPOINT
+	select BOARD_ROMSIZE_KB_8192
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select HAVE_ACPI_RESUME
+	select MAINBOARD_HAS_CHROMEOS
+	select MEMORY_MAPPED_TPM
+	select INTEL_INT15
+
+config VBOOT
+	select VBOOT_VBNV_CMOS
+
+config MAINBOARD_DIR
+	default "intel/baskingridge"
+
+config MAINBOARD_PART_NUMBER
+	default "BASKING RIDGE"
+
+config MAX_CPUS
+	int
+	default 16
+
+endif # BOARD_INTEL_BASKING_RIDGE

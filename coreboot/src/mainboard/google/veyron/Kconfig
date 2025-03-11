@@ -1,0 +1,82 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_VEYRON
+	def_bool BOARD_GOOGLE_VEYRON_JAQ || \
+		 BOARD_GOOGLE_VEYRON_JERRY || \
+		 BOARD_GOOGLE_VEYRON_MIGHTY || \
+		 BOARD_GOOGLE_VEYRON_MINNIE || \
+		 BOARD_GOOGLE_VEYRON_SPEEDY
+
+if BOARD_GOOGLE_VEYRON
+
+# Some Veyron boards incorrectly had their RAM code strapped with 100Kohm
+# resistors. These get overpowered by the SoC's internal pull-downs, so we
+# cannot read those pins as tri-state. They're restricted to binary RAM codes.
+config VEYRON_FORCE_BINARY_RAM_CODE
+	def_bool BOARD_GOOGLE_VEYRON_JAQ || \
+		 BOARD_GOOGLE_VEYRON_JERRY || \
+		 BOARD_GOOGLE_VEYRON_MIGHTY
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select COMMON_CBFS_SPI_WRAPPER
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_SPI
+	select SOC_ROCKCHIP_RK3288
+	select MAINBOARD_HAS_CHROMEOS
+	select BOARD_ROMSIZE_KB_4096
+	select SPI_FLASH
+	select SPI_FLASH_GIGADEVICE
+	select SPI_FLASH_WINBOND
+	select I2C_TPM
+	select MAINBOARD_HAS_TPM1
+	select SYSTEM_TYPE_LAPTOP
+
+config VBOOT
+	select VBOOT_VBNV_FLASH
+
+config MAINBOARD_DIR
+	default "google/veyron"
+
+config MAINBOARD_PART_NUMBER
+	default "Veyron_Jaq" if BOARD_GOOGLE_VEYRON_JAQ
+	default "Veyron_Jerry" if BOARD_GOOGLE_VEYRON_JERRY
+	default "Veyron_Mighty" if BOARD_GOOGLE_VEYRON_MIGHTY
+	default "Veyron_Minnie" if BOARD_GOOGLE_VEYRON_MINNIE
+	default "Veyron_Speedy" if BOARD_GOOGLE_VEYRON_SPEEDY
+	default "Veyron"
+
+config EC_GOOGLE_CHROMEEC_SPI_BUS
+	hex
+	default 0x0
+
+config EC_GOOGLE_CHROMEEC_SPI_WAKEUP_DELAY_US
+	int
+	default 100
+
+config BOOT_DEVICE_SPI_FLASH_BUS
+	int
+	default 2
+
+config DRIVER_TPM_I2C_BUS
+	hex
+	default 0x1
+
+config DRIVER_TPM_I2C_ADDR
+	hex
+	default 0x20
+
+config CONSOLE_SERIAL_UART_ADDRESS
+	hex
+	depends on DRIVERS_UART
+	default 0xFF690000
+
+config PMIC_BUS
+	int
+	default 0
+
+config CBFS_SIZE
+	default 0x100000 if CHROMEOS
+	default ROM_SIZE
+
+endif #  BOARD_GOOGLE_VEYRON

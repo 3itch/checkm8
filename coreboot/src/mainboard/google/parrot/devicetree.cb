@@ -1,0 +1,98 @@
+chip northbridge/intel/sandybridge
+	# IGD Displays
+	register "gfx" = "GMA_STATIC_DISPLAYS(0)"
+
+	# Enable DisplayPort B Hotplug with 6ms pulse
+	register "gpu_dp_b_hotplug" = "0x06"
+
+	# Enable Panel as LVDS and configure power delays
+	register "gpu_panel_port_select" = "PANEL_PORT_LVDS"
+	register "gpu_panel_power_cycle_delay" = "5"		# 400ms
+	register "gpu_panel_power_up_delay" = "500"		# 50ms
+	register "gpu_panel_power_down_delay" = "150"		# 15ms
+	register "gpu_panel_power_backlight_on_delay" = "2100"	# 210ms
+	register "gpu_panel_power_backlight_off_delay" = "2100"	# 210ms
+
+	# Set backlight PWM values
+	register "gpu_cpu_backlight" = "0x000001d4"
+	register "gpu_pch_backlight" = "0x03aa0000"
+
+	register "spd_addresses" = "{0x50, 0, 0x52, 0}"
+	register "ec_present" = "1"
+	# FIXME: Native raminit requires reduced max clock
+	register "max_mem_clock_mhz" = "CONFIG(USE_NATIVE_RAMINIT) ? 666 : 800"
+
+	device domain 0 on
+		device ref host_bridge on end # host bridge
+		device ref igd on end # vga controller
+
+		chip southbridge/intel/bd82x6x # Intel Series 6 Cougar Point PCH
+			# GPI routing
+			#  0 No effect (default)
+			#  1 SMI# (if corresponding ALT_GPI_SMI_EN bit is also set)
+			#  2 SCI (if corresponding GPIO_EN bit is also set)
+			# Set Lid Switch to SMI to capture in recovery mode.  It gets reset to
+			# SCI mode when we go to ACPI mode.
+			register "alt_gp_smi_en" = "0x8100"
+			register "gpi7_routing" = "2"
+			register "gpi8_routing" = "1"
+			register "gpi15_routing" = "1" #lid switch gpe
+
+			register "sata_port_map" = "0x1"
+
+			register "usb_port_config" = "{
+				{0, 0, -1}, /* P0: Empty */
+				{1, 0, 0}, /* P1: Left USB 1  (OC0) */
+				{1, 0, 1}, /* P2: Left USB 2  (OC1) */
+				{1, 0, 1}, /* P3: Left USB 3  (OC1) */
+				{0, 0, -1}, /* P4-P7: Empty */
+				{0, 0, -1},
+				{0, 0, -1},
+				{0, 0, -1},
+				/* Empty and onboard Ports 8-13, set to un-used pin OC4 */
+				{1, 0, -1}, /* P8: MiniPCIe (WLAN) (no OC) */
+				{0, 0, -1}, /* P9: Empty */
+				{1, 0, -1}, /* P10: Camera (no OC) */
+				{0, 0, -1}, {0, 0, -1}, {0, 0, -1}
+			}"
+
+			# EC range is 0xFD60 (EC_IO) and 0x68/0x6C
+			register "gen1_dec" = "0x0004fd61"
+			register "gen2_dec" = "0x00040069"
+
+			# Enable zero-based linear PCIe root port functions
+			register "pcie_port_coalesce" = "true"
+
+			device ref mei1 on end # Management Engine Interface 1
+			device ref mei2 off end # Management Engine Interface 2
+			device ref me_ide_r off end # Management Engine IDE-R
+			device ref me_kt off end # Management Engine KT
+			device ref gbe off end # Intel Gigabit Ethernet
+			device ref ehci2 on end # USB2 EHCI #2
+			device ref hda on end # High Definition Audio
+			device ref pcie_rp1 off end # PCIe Port #1
+			device ref pcie_rp2 on end # PCIe Port #2 (WLAN)
+			device ref pcie_rp3 on end # PCIe Port #3 (ETH0)
+			device ref pcie_rp4 off end # PCIe Port #4
+			device ref pcie_rp5 off end # PCIe Port #5
+			device ref pcie_rp6 off end # PCIe Port #6
+			device ref pcie_rp7 off end # PCIe Port #7
+			device ref pcie_rp8 off end # PCIe Port #8
+			device ref ehci1 on end # USB2 EHCI #1
+			device ref pci_bridge off end # PCI bridge
+			device ref lpc on
+				chip ec/compal/ene932
+					# 60/64 KBC
+					device pnp ff.1 on # dummy address
+					end
+				end
+			end # LPC bridge
+			device ref sata1 on end # SATA Controller 1
+			device ref smbus on
+				subsystemid 0x18D1 0x04B4
+			end # SMBus
+			device ref sata2 off end # SATA Controller 2
+			device ref thermal on end # Thermal
+		end
+	end
+end

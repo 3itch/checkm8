@@ -1,0 +1,35 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#include <memlayout.h>
+
+#include <arch/header.ld>
+
+/* Note: The BootROM will jump to 0xFF704004 after loading bootblock,
+ * so the bootblock loading address must be at 0xFF704004.
+ */
+SECTIONS
+{
+	DRAM_START(0x00000000)
+	RAMSTAGE(0x00200000, 2M)
+	POSTRAM_CBFS_CACHE(0x01000000, 1M)
+	DMA_COHERENT(0x10000000, 2M)
+	FRAMEBUFFER(0x10800000, 8M)
+
+	SRAM_START(0xFF700000)
+	TTB(0xFF700000, 16K)
+	BOOTBLOCK(0xFF704004, 15K - 4)
+	PRERAM_CBMEM_CONSOLE(0xFF707C00, 1K)
+	VBOOT2_WORK(0xFF708000, 12K)
+	OVERLAP_VERSTAGE_ROMSTAGE(0xFF70B000, 49K)
+	TIMESTAMP(0xFF717400, 0x180)
+	PRERAM_CBFS_CACHE(0xFF717580, 0x100)
+	STACK(0xFF717680, 3K - 0x280)
+	SRAM_END(0xFF718000)
+
+	/* 4K of special SRAM in PMU power domain.
+	 * Careful: only supports 32-bit wide write accesses! */
+	REGION_START(pmu_sram, 0xFF720000)
+	TTB_SUBTABLES(0xFF720800, 1K)
+	WATCHDOG_TOMBSTONE(0xFF720FFC, 4)
+	REGION_END(pmu_sram, 0xFF721000)
+}

@@ -1,0 +1,36 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Hatch"
+
+config BOARD_GOOGLE_AKEMI
+	bool "->  Akemi (IdeaPad Flex 5/5i Chromebook)"
+
+config BOARD_GOOGLE_DRATINI
+	bool "->  Dratini (HP Pro c640 Chromebook)"
+
+config BOARD_GOOGLE_HATCH
+	bool "->  Hatch"
+
+config BOARD_GOOGLE_HELIOS
+	bool "->  Helios (ASUS Chromebook Flip C436FA)"
+
+config BOARD_GOOGLE_HELIOS_DISKSWAP
+	bool "->  Helios_Diskswap"
+
+config BOARD_GOOGLE_JINLON
+	bool "->  Jinlon (HP Elite c1030 Chromebook)"
+
+config BOARD_GOOGLE_KINDRED
+	bool "->  Kindred (Acer Chromebook 712)"
+
+config BOARD_GOOGLE_KOHAKU
+	bool "->  Kohaku (Samsung Galaxy Chromebook)"
+
+config BOARD_GOOGLE_MUSHU
+	bool "->  Mushu"
+
+config BOARD_GOOGLE_NIGHTFURY
+	bool "->  Nightfury (Samsung Galaxy Chromebook 2)"
+
+config BOARD_GOOGLE_PALKIA
+	bool "->  Palkia"

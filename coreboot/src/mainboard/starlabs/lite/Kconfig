@@ -1,0 +1,108 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_STARLABS_LITE_SERIES
+	def_bool n
+	select BOARD_ROMSIZE_KB_8192
+	select DRIVERS_EFI_VARIABLE_STORE
+	select DRIVERS_OPTION_CFR
+	select DRIVERS_I2C_HID
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_CMOS_DEFAULT
+	select HAVE_OPTION_TABLE
+	select HAVE_INTEL_PTT
+	select INTEL_GMA_HAVE_VBT
+	select INTEL_LPSS_UART_FOR_CONSOLE
+	select CRB_TPM
+	select MAINBOARD_HAS_TPM2
+	select ONBOARD_VGA_IS_PRIMARY
+	select SOC_INTEL_COMMON_BLOCK_HDA
+	select SOC_INTEL_COMMON_BLOCK_HDA_VERB
+	select SPI_FLASH_GIGADEVICE
+	select SYSTEM_TYPE_LAPTOP
+	select TPM2
+
+config BOARD_STARLABS_LITE_GLK
+	select BOARD_STARLABS_LITE_SERIES
+	select EC_STARLABS_ITE
+	select EC_STARLABS_KBL_LEVELS
+	select SOC_INTEL_GEMINILAKE
+
+config BOARD_STARLABS_LITE_GLKR
+	select BOARD_STARLABS_LITE_SERIES
+	select EC_STARLABS_FAST_CHARGE
+	select EC_STARLABS_NUVOTON
+	select EC_STARLABS_KBL_LEVELS
+	select SOC_INTEL_GEMINILAKE
+
+if BOARD_STARLABS_LITE_SERIES
+
+config CONSOLE_SERIAL
+	default n if !EDK2_DEBUG
+
+config DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/devicetree.cb"
+
+config EC_GPE_SCI
+	default 0x26
+
+config EC_STARLABS_BATTERY_MODEL
+	default "3172120X2-I116CG"
+
+config EC_STARLABS_BATTERY_TYPE
+	default "LiP"
+
+config EC_STARLABS_BATTERY_OEM
+	default "Apower Electronics"
+
+config EC_VARIANT_DIR
+	default "glk"  if BOARD_STARLABS_LITE_GLK
+	default "glkr" if BOARD_STARLABS_LITE_GLKR
+
+config FMDFILE
+	default "src/mainboard/starlabs/lite/vboot.fmd" if VBOOT
+	default "src/mainboard/starlabs/lite/board.fmd"
+
+config MAINBOARD_DIR
+	default "starlabs/lite"
+
+config MAINBOARD_FAMILY
+	string
+	default "I3" if BOARD_STARLABS_LITE_GLK
+	default "I4" if BOARD_STARLABS_LITE_GLKR
+
+config MAINBOARD_PART_NUMBER
+	default "Lite Mk III" if BOARD_STARLABS_LITE_GLK
+	default "Lite Mk IV"  if BOARD_STARLABS_LITE_GLKR
+
+config MAINBOARD_SMBIOS_PRODUCT_NAME
+	string
+	default "Lite"
+
+config POWER_STATE_DEFAULT_ON_AFTER_FAILURE
+	default n
+
+config TRACKPAD_INTERRUPT
+	hex
+	default 0x1 if BOARD_STARLABS_LITE_GLK
+	default 0x0 if BOARD_STARLABS_LITE_GLKR
+
+config EDK2_BOOTSPLASH_FILE
+	string
+	default "3rdparty/blobs/mainboard/starlabs/Logo.bmp"
+
+config UART_FOR_CONSOLE
+	default 2
+
+config VARIANT_DIR
+	default "glk"  if BOARD_STARLABS_LITE_GLK
+	default "glkr" if BOARD_STARLABS_LITE_GLKR
+
+config VBOOT
+	select VBOOT_VBNV_FLASH
+
+config WEBCAM_USB_PORT
+	int
+	default 4 if BOARD_STARLABS_LITE_GLK
+	default 7 if BOARD_STARLABS_LITE_GLKR
+endif

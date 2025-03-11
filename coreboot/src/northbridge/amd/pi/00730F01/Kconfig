@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config NORTHBRIDGE_AMD_PI_00730F01
+	bool
+	select USE_DDR3
+
+if NORTHBRIDGE_AMD_PI_00730F01
+
+config CHIPSET_DEVICETREE
+	string
+	default "northbridge/amd/pi/00730F01/chipset.cb"
+
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0xF8000000
+
+config ECAM_MMCONF_BUS_NUMBER
+	default 64
+
+config VGA_BIOS_ID
+	string
+	default "1002,9850"
+	help
+	  The default VGA BIOS PCI vendor/device ID should be set to the
+	  result of the map_oprom_vendev() function in northbridge.c.
+
+config VGA_BIOS_FILE
+	string
+	default "3rdparty/blobs/northbridge/amd/00730F01/VBIOS.bin"
+
+endif

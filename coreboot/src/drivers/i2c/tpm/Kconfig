@@ -1,0 +1,38 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config I2C_TPM
+	bool
+	help
+	  I2C TPM driver is enabled!
+
+config DRIVER_TIS_DEFAULT
+	bool
+	depends on I2C_TPM
+	default n if TPM_ATMEL
+	default y
+
+config DRIVER_TPM_I2C_BUS
+	hex
+	default 0x9 # FIXME, workaround for Kconfig BS
+	depends on I2C_TPM
+
+config DRIVER_TPM_I2C_ADDR
+	hex
+	default 0x2 # FIXME, workaround for Kconfig BS
+	depends on I2C_TPM
+
+config DRIVER_I2C_TPM_ACPI
+	bool "Generate I2C TPM ACPI device" if I2C_TPM
+	default y if ARCH_X86 && I2C_TPM
+	default n
+
+config DRIVER_TPM_DISPLAY_TIS_BYTES
+	bool "TPM: Display the TIS transactions to I2C TPM chip"
+	default n
+	depends on I2C_TPM
+
+config TPM_ATMEL
+	bool
+	default n
+	help
+	  The mainboard has an Atmel TPM chip.

@@ -1,0 +1,44 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_INTEL_STRAGO
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select ACPI_GNVS_USB_CHARGECTL
+	select BOARD_ROMSIZE_KB_8192
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_BOARDID
+	select EC_GOOGLE_CHROMEEC_LPC
+	select EC_GOOGLE_CHROMEEC_MEC
+	select ENABLE_BUILTIN_COM1
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select MAINBOARD_HAS_CHROMEOS
+	select MEMORY_MAPPED_TPM
+	select SOC_INTEL_BRASWELL
+	select PCIEXP_L1_SUB_STATE
+
+config VBOOT
+	select EC_GOOGLE_CHROMEEC_SWITCHES
+	select VBOOT_LID_SWITCH
+	select VBOOT_VBNV_FLASH
+
+config MAINBOARD_DIR
+	default "intel/strago"
+
+config MAINBOARD_PART_NUMBER
+	default "Strago"
+
+config VGA_BIOS_ID
+	string
+	depends on VGA_BIOS
+	default "8086,22b0"
+	help
+	  The VGA_BIOS_ID for the C0 version of the video BIOS is hardcoded
+	  in soc/intel/braswell/Makefile.mk as 8086,22b1
+
+config CBFS_SIZE
+	default 0x200000
+
+endif # BOARD_INTEL_STRAGO

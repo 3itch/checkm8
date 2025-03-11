@@ -1,0 +1,98 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_BASEBOARD_DRALLION
+	def_bool n
+	select BOARD_ROMSIZE_KB_32768
+	select DRIVERS_GFX_GENERIC
+	select DRIVERS_I2C_GENERIC
+	select DRIVERS_I2C_HID
+	select DRIVERS_INTEL_ISH
+	select DRIVERS_SPI_ACPI
+	select DRIVERS_USB_ACPI
+	select EC_GOOGLE_WILCO
+	select GOOGLE_SMBIOS_MAINBOARD_VERSION
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_SPD_IN_CBFS
+	select I2C_TPM
+	select INTEL_GMA_HAVE_VBT
+	select INTEL_LPSS_UART_FOR_CONSOLE
+	select MAINBOARD_HAS_CHROMEOS
+	select MAINBOARD_HAS_TPM2
+	select MAINBOARD_USES_IFD_EC_REGION
+	select SMBIOS_SERIAL_FROM_VPD if VPD
+	select SOC_INTEL_COMETLAKE_1
+	select SOC_INTEL_COMMON_BLOCK_HDA_VERB
+	select SOC_INTEL_COMMON_BLOCK_SMM_ESPI_DISABLE
+	select SYSTEM_TYPE_LAPTOP
+	select TPM_GOOGLE_CR50
+
+config BOARD_GOOGLE_DRALLION
+	select BOARD_GOOGLE_BASEBOARD_DRALLION
+
+if BOARD_GOOGLE_BASEBOARD_DRALLION
+
+config DISABLE_HECI1_AT_PRE_BOOT
+	default y
+
+config CHROMEOS
+	select GBB_FLAG_FORCE_DEV_SWITCH_ON
+	select GBB_FLAG_FORCE_DEV_BOOT_USB
+	select GBB_FLAG_FORCE_DEV_BOOT_ALTFW
+	select GBB_FLAG_DISABLE_EC_SOFTWARE_SYNC
+
+config CHROMEOS_WIFI_SAR
+	bool "Enable SAR options for ChromeOS build"
+	depends on CHROMEOS
+	select DSAR_ENABLE
+	select GEO_SAR_ENABLE
+	select SAR_ENABLE
+	select USE_SAR
+
+config DIMM_MAX
+	default 2
+
+config DRIVER_TPM_I2C_BUS
+	hex
+	default 0x4
+
+config DRIVER_TPM_I2C_ADDR
+	hex
+	default 0x50
+
+config TPM_TIS_ACPI_INTERRUPT
+	int
+	default 82  # GPE0_DW2_18 (GPP_D18)
+
+config POWER_OFF_ON_CR50_UPDATE
+	bool
+	default n
+
+config MAINBOARD_DIR
+	default "google/drallion"
+
+config MAINBOARD_FAMILY
+	string
+	default "Google_Drallion" if BOARD_GOOGLE_DRALLION
+
+config MAINBOARD_PART_NUMBER
+	default "Drallion" if BOARD_GOOGLE_DRALLION
+
+config UART_FOR_CONSOLE
+	int
+	default 0 if BOARD_GOOGLE_DRALLION
+
+config VARIANT_DIR
+	default "drallion" if BOARD_GOOGLE_DRALLION
+
+config DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/devicetree.cb"
+
+config VBOOT
+	select HAS_RECOVERY_MRC_CACHE
+	select VBOOT_LID_SWITCH
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/default.fmd" if !CHROMEOS
+
+endif # BOARD_GOOGLE_BASEBOARD_DRALLION

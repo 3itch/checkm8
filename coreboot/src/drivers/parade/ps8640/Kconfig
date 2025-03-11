@@ -1,0 +1,7 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVER_PARADE_PS8640
+	bool
+	default n
+	help
+	  Parade PS8640 MIPI DSI to eDP Converter

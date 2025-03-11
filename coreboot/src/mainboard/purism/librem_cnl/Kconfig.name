@@ -1,0 +1,10 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_PURISM_LIBREM_MINI
+	bool "Librem Mini"
+
+config BOARD_PURISM_LIBREM_MINI_V2
+	bool "Librem Mini v2"
+
+config BOARD_PURISM_LIBREM_14
+	bool "Librem 14"

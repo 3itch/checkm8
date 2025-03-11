@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_AMD_GARDENIA
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select SOC_AMD_STONEYRIDGE
+	select AMD_APU_STONEYRIDGE
+	select AMD_APU_PKG_FP4
+	select HAVE_ACPI_TABLES
+	select BOARD_ROMSIZE_KB_8192
+	select GFXUMA
+
+config MAINBOARD_DIR
+	default "amd/gardenia"
+
+config MAINBOARD_PART_NUMBER
+	default "GARDENIA"
+
+config MAX_CPUS
+	int
+	default 4
+
+config IRQ_SLOT_COUNT
+	int
+	default 11
+
+config ONBOARD_VGA_IS_PRIMARY
+	bool
+	default y
+
+config STONEYRIDGE_LEGACY_FREE
+	bool
+	default y
+
+if !EM100
+config EFS_SPI_READ_MODE
+	default 4          # Dual IO (1-2-2)
+
+config EFS_SPI_SPEED
+	default 0	# 66MHz
+endif
+
+endif # BOARD_AMD_GARDENIA

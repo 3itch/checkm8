@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_SUPERMICRO
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/supermicro/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/supermicro/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "Supermicro"
+
+endif # VENDOR_SUPERMICRO

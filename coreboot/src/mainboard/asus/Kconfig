@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_ASUS
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/asus/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/asus/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "ASUS"
+
+endif # VENDOR_ASUS

@@ -1,0 +1,7 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVERS_LENOVO_HYBRID_GRAPHICS
+	bool
+	default n
+	# for dual graphics we need to set this
+	select ONBOARD_VGA_IS_PRIMARY

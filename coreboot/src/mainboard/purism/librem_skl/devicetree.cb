@@ -1,0 +1,166 @@
+chip soc/intel/skylake
+
+	# IGD Displays
+	register "gfx" = "GMA_STATIC_DISPLAYS(0)"
+
+	register "panel_cfg" = "{
+		.up_delay_ms		= 200,
+		.down_delay_ms		=  50,
+		.cycle_delay_ms		= 500,
+		.backlight_on_delay_ms	=   1,
+		.backlight_off_delay_ms	= 200,
+		.backlight_pwm_hz	= 200,
+	}"
+
+	register "deep_s3_enable_ac" = "false"
+	register "deep_s3_enable_dc" = "false"
+	register "deep_s5_enable_ac" = "false"
+	register "deep_s5_enable_dc" = "false"
+	register "deep_sx_config" = "DSX_EN_LAN_WAKE_PIN"
+
+	register "eist_enable" = "true"
+
+	# Set the Thermal Control Circuit (TCC) activaction value to 95C
+	# even though FSP integration guide says to set it to 100C for SKL-U
+	# (offset at 0), because when the TCC activates at 100C, the CPU
+	# will have already shut itself down from overheating protection.
+	register "tcc_offset" = "5" # TCC of 95C
+
+	# GPE configuration
+	# Note that GPE events called out in ASL code rely on this
+	# route. i.e. If this route changes then the affected GPE
+	# offset bits also need to be changed.
+	register "gpe0_dw0" = "GPP_C"
+	register "gpe0_dw1" = "GPP_D"
+	register "gpe0_dw2" = "GPP_E"
+
+	# Disable DPTF
+	register "dptf_enable" = "0"
+
+	# FSP Configuration
+	register "DspEnable" = "0"
+	register "IoBufferOwnership" = "0"
+	register "SkipExtGfxScan" = "1"
+	register "SaGv" = "SaGv_Enabled"
+	register "PmConfigSlpS3MinAssert" = "2"		# 50ms
+	register "PmConfigSlpS4MinAssert" = "1"		# 1s
+	register "PmConfigSlpSusMinAssert" = "3"	# 500ms
+	register "PmConfigSlpAMinAssert" = "3"		# 2s
+
+	# VR Settings Configuration for 4 Domains
+	#+----------------+-----------+-----------+-------------+----------+
+	#| Domain/Setting |     SA    |    IA     | GT Unsliced |    GT    |
+	#+----------------+-----------+-----------+-------------+----------+
+	#| Psi1Threshold  | 20A       | 20A       | 20A         | 20A      |
+	#| Psi2Threshold  | 4A        | 5A        | 5A          | 5A       |
+	#| Psi3Threshold  | 1A        | 1A        | 1A          | 1A       |
+	#| Psi3Enable     | 1         | 1         | 1           | 1        |
+	#| Psi4Enable     | 1         | 1         | 1           | 1        |
+	#| ImonSlope      | 0         | 0         | 0           | 0        |
+	#| ImonOffset     | 0         | 0         | 0           | 0        |
+	#| IccMax         | 7A        | 34A       | 35A         | 35A      |
+	#| VrVoltageLimit | 1.52V     | 1.52V     | 1.52V       | 1.52V    |
+	#| AC LoadLine    | 15 mOhm   | 5.7 mOhm  | 5.2 mOhm    | 5.2 mOhm |
+	#| DC LoadLine    | 14.3 mOhm | 4.83 mOhm | 4.2 mOhm    | 4.2 mOhm |
+	#+----------------+-----------+-----------+-------------+----------+
+	register "domain_vr_config[VR_SYSTEM_AGENT]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(4),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(7),
+		.voltage_limit = 1520,
+		.ac_loadline = 1500,
+		.dc_loadline = 1430,
+	}"
+
+	register "domain_vr_config[VR_IA_CORE]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(34),
+		.voltage_limit = 1520,
+		.ac_loadline = 570,
+		.dc_loadline = 483,
+	}"
+
+	register "domain_vr_config[VR_GT_UNSLICED]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(35),
+		.voltage_limit = 1520,
+		.ac_loadline = 520,
+		.dc_loadline = 420,
+	}"
+
+	register "domain_vr_config[VR_GT_SLICED]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(35),
+		.voltage_limit = 1520,
+		.ac_loadline = 520,
+		.dc_loadline = 420,
+	}"
+
+	# PL2 override 25W
+	register "power_limits_config" = "{
+		.tdp_pl2_override = 25,
+	}"
+
+	# Send an extra VR mailbox command for the PS4 exit issue
+	register "SendVrMbxCmd" = "2"
+
+	device domain 0 on
+		device ref igpu		on  end
+		device ref sa_thermal	on  end
+		device ref south_xhci	on  end
+		device ref south_xdci	on  end
+		device ref thermal	on  end
+		device ref sata		on
+			register "SataPortsEnable" = "{
+				[0] = 1,
+				[2] = 1,
+			}"
+		end
+		device ref pcie_rp5	on
+			register "PcieRpEnable[4]" = "1"
+		end
+		device ref pcie_rp9	on
+			register "PcieRpEnable[8]" = "1"
+		end
+		device ref lpc_espi	on
+			# EC/KBC requires continuous mode
+			register "serirq_mode" = "SERIRQ_CONTINUOUS"
+
+			# EC host command ranges are in 0x380-0x383 & 0x80-0x8f
+			register "gen1_dec" = "0x00000381"
+			chip drivers/pc80/tpm
+				device pnp 0c31.0 on end
+			end
+		end
+		device ref hda		on  end
+		device ref smbus	on  end
+		device ref fast_spi	on  end
+	end
+end

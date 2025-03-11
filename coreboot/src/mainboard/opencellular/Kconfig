@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_OPENCELLULAR
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/opencellular/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/opencellular/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "OpenCellular"
+
+endif # VENDOR_OPENCELLULAR

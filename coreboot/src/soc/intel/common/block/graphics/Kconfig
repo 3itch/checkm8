@@ -1,0 +1,72 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_GRAPHICS
+	bool
+	select ROMSTAGE_VGA if MAINBOARD_USE_EARLY_LIBGFXINIT
+	help
+	  Intel Processor common Graphics support
+
+if SOC_INTEL_COMMON_BLOCK_GRAPHICS
+
+config SOC_INTEL_GFX_HAVE_DDI_A_BIFURCATION
+	bool
+	help
+	  Skylake, Kaby Lake and Coffee Lake desktop CPUs support eDP
+	  bifurcation, i.e. 4 eDP lanes get split between DDI-A (eDP)
+	  and DDI-E (DP, used for VGA). Selected from SoC Kconfig, if
+	  applicable.
+
+config SOC_INTEL_GFX_ENABLE_DDI_E_BIFURCATION
+	bool
+	depends on SOC_INTEL_GFX_HAVE_DDI_A_BIFURCATION
+	help
+	  Selected by mainboards that use DDI-E, which is most commonly
+	  used to drive a DP-to-VGA adapter to provide a VGA connector.
+
+config SOC_INTEL_DISABLE_IGD
+	bool "Disable Integrated GFX Controller (0:2:0)"
+	default n
+	select MAINBOARD_NO_FSP_GOP
+	help
+	  Selected by mainboard user that need to skip IGD initialization
+	  where OS can only use one GPU hence need to disable IGD and don't
+	  need to run FSP GOP.
+
+config SOC_INTEL_GFX_FRAMEBUFFER_OFFSET
+	hex
+	default 0x0
+	help
+	  PCI config offset 0x18 point to LMEMBAR and need to add GTT size to
+	  reach at DSM which is referred here as SOC_INTEL_GFX_MEMBASE_OFFSET.
+	  SoC that follow such design would override SOC_INTEL_GFX_FRAMEBUFFER_OFFSET
+	  with GTT_SIZE value. On SoC platform where PCI config offset 0x18 points
+	  to the GMADR directly can use the default value 0x0 without any override.
+
+config SOC_INTEL_GFX_NON_PREFETCHABLE_MMIO
+	bool
+	default n
+	help
+	  Ignore BAR0(offset 0x10)'s pre-fetchable attribute to use non-prefetchable
+	  MMIO to fix OS display driver failure.
+
+config SOC_INTEL_GFX_MBUS_JOIN
+	bool
+	help
+	  The MBUS (Memory Bus) is a high-speed interface that connects the graphics
+	  controller to the system memory. It provides a dedicated data path for graphics
+	  data, which helps to improve graphics performance.
+
+	  The MBUS is a key technology that helps to make the Intel i915 driver powerful
+	  and versatile graphics drivers available. It provides the high-speed data transfer
+	  capabilities that are essential for smooth and responsive graphics performance.
+
+	  Enable this config to ensure that the Intel GFX controller joins the MBUS before the
+	  i915 driver is loaded. This is necessary to prevent the i915 driver from re-initializing
+	  the display if the firmware has already initialized it. Without this config, the i915
+	  driver will initialize the display to bring up the login screen although the firmware
+	  has initialized the display using the GFX MMIO registers and framebuffer.
+
+	  When enabled, saves 75ms-80ms of the boot time by avoiding redundent display
+	  initialization by kernel graphics driver (i.e., i915_gfx).
+
+endif

@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_BIOSTAR
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/biostar/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/biostar/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "Biostar"
+
+endif # VENDOR_BIOSTAR

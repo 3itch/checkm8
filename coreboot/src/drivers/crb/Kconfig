@@ -1,0 +1,13 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config CRB_TPM
+	bool
+	default n
+	help
+	  Mainboard has Command Response Buffer support
+
+config CRB_TPM_BASE_ADDRESS
+	hex
+	default 0xfed40000
+	help
+	  Base Address of the CRB TPM Command Structure

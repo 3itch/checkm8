@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVERS_ASPEED_AST2050
+	bool
+	select DRIVERS_ASPEED_AST_COMMON
+	select MAINBOARD_HAS_NATIVE_VGA_INIT

@@ -1,0 +1,265 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if ARCH_X86
+
+config PARALLEL_MP
+	def_bool y
+	help
+	 This option uses common MP infrastructure for bringing up APs
+	 in parallel. It additionally provides a more flexible mechanism
+	 for sequencing the steps of bringing up the APs.
+	 The code also works for just initialising the BSP in case there
+	 are no APs.
+
+config PARALLEL_MP_AP_WORK
+	def_bool n
+	depends on PARALLEL_MP
+	help
+	 Allow APs to do other work after initialization instead of going
+	 to sleep.
+
+config X86_SMM_SKIP_RELOCATION_HANDLER
+	bool
+	default n
+	depends on PARALLEL_MP && HAVE_SMI_HANDLER
+	help
+	  Skip SMM relocation using a relocation handler running in SMM
+	  with a stub at 0x30000. This is useful on platforms that have
+	  an alternative way to set SMBASE.
+
+config DEFAULT_X2APIC
+	def_bool n
+	help
+	  Allow SoC code to set LAPIC access mode to X2APIC.
+
+config DEFAULT_X2APIC_RUNTIME
+	def_bool n
+	help
+	  Allow SoC code to set LAPIC access mode to X2APIC_RUNTIME.
+
+config DEFAULT_X2APIC_LATE_WORKAROUND
+	def_bool n
+	help
+	  Allow SoC code to set LAPIC access mode to X2APIC_LATE_WORKAROUND.
+
+choice
+	prompt "APIC operation mode"
+	default X2APIC_ONLY if DEFAULT_X2APIC
+	default X2APIC_RUNTIME if DEFAULT_X2APIC_RUNTIME
+	default X2APIC_LATE_WORKAROUND if DEFAULT_X2APIC_LATE_WORKAROUND
+	default XAPIC_ONLY
+
+config XAPIC_ONLY
+	prompt "Set XAPIC mode"
+	bool
+	help
+	  coreboot and SMM runtime only use XAPIC mode.
+	  FIXME: DMAR should have X2APIC optout bit set.
+
+config X2APIC_ONLY
+	prompt "Set X2APIC mode"
+	bool
+	depends on PARALLEL_MP
+	help
+	  coreboot and SMM runtime only use X2APIC mode.
+	  Note: OS switches back to XAPIC mode if VT-d is disabled.
+	  FIXME: S3 resume (and SMM runtime) will break if OS makes the switch.
+
+config X2APIC_RUNTIME
+	prompt "Support both XAPIC and X2APIC"
+	bool
+	depends on PARALLEL_MP
+	help
+	  The switch to X2APIC mode happens early in ramstage. SMM runtime can
+	  support either mode in case the OS switches back to XAPIC.
+
+config X2APIC_LATE_WORKAROUND
+	prompt "Use XAPIC for AP bringup, then change to X2APIC"
+	bool
+	depends on PARALLEL_MP && MAX_CPUS < 256
+	help
+	  Choose this option if the platform supports dynamic switching between
+	  XAPIC to X2APIC. The initial Application Processors (APs) are configured
+	  in XAPIC mode at reset and later enable X2APIC as a CPU feature.
+	  All access mechanisms between XAPIC (mmio) and X2APIC (msr) switches
+	  at runtime when this option is enabled.
+
+endchoice
+
+config UDELAY_LAPIC
+	bool
+	default n
+
+config LAPIC_MONOTONIC_TIMER
+	def_bool n
+	depends on UDELAY_LAPIC
+	help
+	  Expose monotonic time using the local APIC.
+
+config UDELAY_LAPIC_FIXED_FSB
+	int
+
+config UDELAY_TSC
+	bool
+	default n
+
+config UNKNOWN_TSC_RATE
+	bool
+	default y if LAPIC_MONOTONIC_TIMER
+
+config TSC_MONOTONIC_TIMER
+	def_bool n
+	depends on UDELAY_TSC
+	help
+	  Expose monotonic time using the TSC.
+
+config TSC_SYNC_LFENCE
+	bool
+	default n
+	help
+	  The CPU driver should select this if the CPU needs
+	  to execute an lfence instruction in order to synchronize
+	  rdtsc. This is true for all modern AMD CPUs.
+
+config TSC_SYNC_MFENCE
+	bool
+	default n
+	help
+	  The CPU driver should select this if the CPU needs
+	  to execute an mfence instruction in order to synchronize
+	  rdtsc. This is true for all modern Intel CPUs.
+
+config SETUP_XIP_CACHE
+	bool
+	depends on !NO_XIP_EARLY_STAGES
+	help
+	  Select this option to set up an MTRR to cache XIP stages loaded
+	  from the bootblock. This is useful on platforms lacking a
+	  non-eviction mode and therefore need to be careful to avoid
+	  eviction.
+
+config X86_CLFLUSH_CAR
+	bool
+	help
+	  Select this on platforms that allow CLFLUSH while operating in CAR.
+
+config HAVE_SMI_HANDLER
+	bool
+	default n
+	depends on (SMM_ASEG || SMM_TSEG)
+
+config NO_SMM
+	bool
+	default n
+
+config NEED_SMALL_2MB_PAGE_TABLES
+	bool
+	default n
+	help
+	  Select this option from boards/SoCs that do not support the Page1GB
+	  CPUID feature (CPUID.80000001H:EDX.bit26).
+
+config SMM_ASEG
+	bool
+	default n
+	depends on !NO_SMM
+	help
+	  Legacy memory region of SMM (System Management Mode). It has been
+	  replaced by TSEG and is currently only used for QEMU emulation target.
+
+config SMM_TSEG
+	bool
+	default y
+	depends on !(NO_SMM || SMM_ASEG)
+	help
+	  Top of Low Memory Segment (TSEG) is comprised of the SMRAM and IEDRAM.
+	  SMRAM is a memory region used in SMM (System Management Mode) only.
+	  IEDRAM is a memory region used for enhanced debug features.
+	  SMM-mode processor access to TSEG always targets the physical DRAM.
+
+if HAVE_SMI_HANDLER
+
+config SMM_MODULE_STACK_SIZE
+	hex
+	default 0x800 if ARCH_RAMSTAGE_X86_64
+	default 0x400
+	help
+	  This option determines the size of the stack within the SMM handler
+	  modules.
+
+endif
+
+config SMM_LAPIC_REMAP_MITIGATION
+	bool
+	default y if NORTHBRIDGE_INTEL_I945 || NORTHBRIDGE_INTEL_GM45 \
+		|| NORTHBRIDGE_INTEL_X4X || NORTHBRIDGE_INTEL_PINEVIEW \
+		|| NORTHBRIDGE_INTEL_E7505 || NORTHBRIDGE_INTEL_IRONLAKE
+	default n
+
+config SMM_PCI_RESOURCE_STORE
+	bool
+	default n
+	help
+	  This option enables support for storing PCI resources in SMRAM so
+	  SMM can tell if they've been altered.
+
+config SMM_PCI_RESOURCE_STORE_NUM_SLOTS
+	int
+	default 8
+	help
+	  Number of slots available to store PCI BARs in SMRAM
+
+config X86_AMD_FIXED_MTRRS
+	bool
+	default n
+	help
+	  This option informs the MTRR code to use the RdMem and WrMem fields
+	  in the fixed MTRR MSRs.
+
+config X86_INIT_NEED_1_SIPI
+	bool
+	default n
+	help
+	  This option limits the number of SIPI signals sent during the
+	  common AP setup.  Intel documentation specifies an INIT SIPI SIPI
+	  sequence, however this doesn't work on some AMD and Intel platforms.
+	  These newer AMD and Intel platforms don't need the 10ms wait between
+	  INIT and SIPI, so skip that too to save some time.
+
+config SOC_SETS_MSRS
+	bool
+	default n
+	help
+	  The SoC requires different access methods for reading and writing
+	  the MSRs.  Use SoC specific routines to handle the MSR access.
+
+config RESERVE_MTRRS_FOR_OS
+	bool
+	default n
+	help
+	  This option allows a platform to reserve 2 MTRRs for the OS usage.
+	  The Intel SDM documents that the first 6 MTRRs are intended for
+	  the system BIOS and the last 2 are to be reserved for OS usage.
+	  However, modern OSes use PAT to control cacheability instead of
+	  using MTRRs.
+
+config AP_STACK_SIZE
+	hex
+	default 0x800
+	help
+	  This is the amount of stack each AP needs. The BSP stack size can be
+	  larger and is set with STACK_SIZE.
+
+config RUNTIME_CONFIGURABLE_SMM_LOGLEVEL
+	bool
+	default n
+	depends on DEBUG_SMI && CONSOLE_OVERRIDE_LOGLEVEL
+	help
+	  This enables setting the SMM console log level at runtime for more
+	  flexibility to use different log levels for each stage. Another reason
+	  is that reading the log level from non-volatile memory such as flash
+	  VPD or CMOS is not very ideal to be done in SMM, with this option the
+	  value can be passed via the member variable in struct smm_runtime and
+	  be referenced directly in SMM.
+
+endif # ARCH_X86

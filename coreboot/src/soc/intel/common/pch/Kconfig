@@ -1,0 +1,110 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_INTEGRATED_SOUTHCLUSTER
+	bool
+	help
+	  Apollo Lake and Gemini Lake are single-chip platforms with a south
+	  cluster instead of a PCH. Most of the IP blocks are the same as in
+	  PCH platforms, but there are several differences that need to be
+	  accounted for.
+
+config SOC_INTEL_COMMON_PCH_CLIENT
+	bool
+	select SOC_INTEL_COMMON_PCH_BASE
+	help
+	  Selected by "Client" platforms, i.e. desktops, workstations,
+	  laptops, tablets... This also includes uniprocessor servers
+	  based on the same silicon as desktops and workstations. The
+	  "Client" platforms include additional IP blocks that are of
+	  little to no use on servers.
+
+config SOC_INTEL_COMMON_PCH_SERVER
+	bool
+	select SOC_INTEL_COMMON_PCH_BASE
+	help
+	  Selected by "Server" platforms, i.e. multi-socket capable
+	  platforms used in large servers and workstations, such as
+	  those using the Lewisburg (C620) PCH.
+
+config SOC_INTEL_COMMON_PCH_BASE
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK
+	help
+	  This option is meant to be selected by the specific options above.
+
+if SOC_INTEL_COMMON_PCH_BASE
+
+source "src/soc/intel/common/pch/*/Kconfig"
+
+config PCH_SPECIFIC_BASE_OPTIONS
+	def_bool y
+	select SOC_INTEL_COMMON_BLOCK_CHIP_CONFIG
+	select SOC_INTEL_COMMON_BLOCK_CSE
+	select SOC_INTEL_COMMON_BLOCK_FAST_SPI
+	select SOC_INTEL_COMMON_BLOCK_GPIO
+	select SOC_INTEL_COMMON_BLOCK_GPIO_ITSS_POL_CFG
+	select SOC_INTEL_COMMON_BLOCK_ITSS
+	select SOC_INTEL_COMMON_BLOCK_LPC
+	select SOC_INTEL_COMMON_BLOCK_P2SB
+	select SOC_INTEL_COMMON_BLOCK_PCR
+	select SOC_INTEL_COMMON_BLOCK_PMC
+	select SOC_INTEL_COMMON_BLOCK_RTC
+	select SOC_INTEL_COMMON_BLOCK_SMBUS
+	select SOC_INTEL_COMMON_BLOCK_SPI
+	select SOC_INTEL_COMMON_BLOCK_TCO
+	select SOC_INTEL_COMMON_BLOCK_TIMER
+	select SOC_INTEL_COMMON_BLOCK_XHCI
+	select SOC_INTEL_COMMON_PCH_LOCKDOWN
+	select SOUTHBRIDGE_INTEL_COMMON_SMBUS
+
+config PCH_SPECIFIC_DISCRETE_OPTIONS
+	def_bool !SOC_INTEL_INTEGRATED_SOUTHCLUSTER
+	select SOC_INTEL_COMMON_BLOCK_GPMR
+	select SOC_INTEL_COMMON_BLOCK_LPC_MIRROR_TO_GPMR
+	select SOC_INTEL_COMMON_BLOCK_SATA
+	select SOC_INTEL_COMMON_BLOCK_TCO_ENABLE_THROUGH_SMBUS
+
+config PCH_SPECIFIC_CLIENT_OPTIONS
+	def_bool SOC_INTEL_COMMON_PCH_CLIENT
+	select SOC_INTEL_COMMON_BLOCK_DSP
+	select SOC_INTEL_COMMON_BLOCK_GRAPHICS
+	select SOC_INTEL_COMMON_BLOCK_I2C
+	select SOC_INTEL_COMMON_BLOCK_LPSS
+	select SOC_INTEL_COMMON_BLOCK_PCIE
+	select SOC_INTEL_COMMON_BLOCK_UART
+	select SOC_INTEL_COMMON_BLOCK_XDCI
+
+endif # SOC_INTEL_COMMON_PCH_BASE
+
+config SOC_INTEL_COMMON_IBL_BASE
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK
+	depends on !SOC_INTEL_COMMON_PCH_BASE
+	help
+	  Common code blocks for integrated boot logic known as IBL. IBL is still
+	  compatible with PCH interfaces, but with limited features/registers
+	  exposed and certain revises.
+
+if SOC_INTEL_COMMON_IBL_BASE
+
+source "src/soc/intel/common/pch/*/Kconfig"
+
+config IBL_SPECIFIC_BASE_OPTIONS
+	def_bool y
+	select SOC_INTEL_COMMON_BLOCK_CHIP_CONFIG
+	select SOC_INTEL_COMMON_BLOCK_FAST_SPI
+	select SOC_INTEL_COMMON_BLOCK_GPIO
+	select SOC_INTEL_COMMON_BLOCK_GPIO_ITSS_POL_CFG
+	select SOC_INTEL_COMMON_BLOCK_ITSS
+	select SOC_INTEL_COMMON_BLOCK_LPC
+	select SOC_INTEL_COMMON_BLOCK_P2SB
+	select SOC_INTEL_COMMON_BLOCK_PCR
+	select SOC_INTEL_COMMON_BLOCK_PMC
+	select SOC_INTEL_COMMON_BLOCK_RTC
+	select SOC_INTEL_COMMON_BLOCK_SMBUS
+	select SOC_INTEL_COMMON_BLOCK_SPI
+	select SOC_INTEL_COMMON_BLOCK_TIMER
+	select SOC_INTEL_COMMON_PCH_LOCKDOWN
+	select SOUTHBRIDGE_INTEL_COMMON_SMBUS
+
+endif # SOC_INTEL_COMMON_IBL_BASE

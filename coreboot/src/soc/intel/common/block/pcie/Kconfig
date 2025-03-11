@@ -1,0 +1,57 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_PCIE
+	bool
+	select PCIEXP_COMMON_CLOCK
+	help
+	  Intel Processor common PCIE support
+
+if SOC_INTEL_COMMON_BLOCK_PCIE
+
+source "src/soc/intel/common/block/pcie/*/Kconfig"
+
+config PCIEXP_ASPM
+	default y
+
+config PCIEXP_CLK_PM
+	default y
+
+config PCIEXP_L1_SUB_STATE
+	default y
+
+config PCIE_LTR_MAX_SNOOP_LATENCY
+	hex
+	default 0x1003
+	help
+	  Latency tolerance reporting, max snoop latency value defaults to 3.14 ms.
+
+config PCIE_LTR_MAX_NO_SNOOP_LATENCY
+	hex
+	default 0x1003
+	help
+	  Latency tolerance reporting, max non-snoop latency value defaults to 3.14 ms.
+
+endif # SOC_INTEL_COMMON_BLOCK_PCIE
+
+config PCIE_DEBUG_INFO
+	bool
+	help
+	  Enable debug logs in PCIe module. Allows debug information on memory
+	  base and limit, prefetchable memory base and limit, prefetchable memory
+	  base upper 32 bits and prefetchable memory limit upper 32 bits.
+
+config PCIE_CLOCK_CONTROL_THROUGH_P2SB
+	bool
+	default n
+	depends on SOC_INTEL_COMMON_BLOCK_PCIE_RTD3
+	help
+	  Enables PCIe CLK control (on/off) through P2SB. The mechanism is supported
+	  starting from MTL platform. In older platforms like ADL & TGL, PCIe CLK is
+	  controlled by sending IPC CMD to PMC.
+
+config IOE_DIE_CLOCK_START
+	int
+	depends on SOC_INTEL_COMMON_BLOCK_IOE_P2SB
+	default 0
+	help
+	  The beginning of IOE DIE pcie src clk number. IOE DIE is started from MTL.

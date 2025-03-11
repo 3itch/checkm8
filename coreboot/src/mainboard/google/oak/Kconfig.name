@@ -1,0 +1,12 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Oak"
+
+config BOARD_GOOGLE_OAK
+	bool "->  Oak"
+
+config BOARD_GOOGLE_ELM
+	bool "->  Elm (Acer Chromebook R13)"
+
+config BOARD_GOOGLE_HANA
+	bool "->  Hana (Lenovo N23 Yoga Chromebook)"

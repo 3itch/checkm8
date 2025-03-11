@@ -1,0 +1,3 @@
+prikey::api::1.0
+prikey::algorithm::11::RSA8192 SHA512
+prikey::sha1_sum::b11d74edd286c144e1135b49e7f0bc20cf041f10

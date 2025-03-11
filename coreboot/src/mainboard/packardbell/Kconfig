@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_PACKARDBELL
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/packardbell/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/packardbell/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "Packard Bell"
+
+endif # VENDOR_PACKARDBELL

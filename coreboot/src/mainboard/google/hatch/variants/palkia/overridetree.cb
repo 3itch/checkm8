@@ -1,0 +1,187 @@
+chip soc/intel/cannonlake
+	register "power_limits_config" = "{
+		.tdp_pl1_override = 15,
+		.tdp_pl2_override = 64,
+	}"
+
+	register "SerialIoDevMode" = "{
+		[PchSerialIoIndexI2C0] = PchSerialIoPci,
+		[PchSerialIoIndexI2C1] = PchSerialIoPci,
+		[PchSerialIoIndexI2C2] = PchSerialIoPci,
+		[PchSerialIoIndexI2C3] = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C4] = PchSerialIoPci,
+		[PchSerialIoIndexI2C5] = PchSerialIoDisabled,
+		[PchSerialIoIndexSPI0] = PchSerialIoPci,
+		[PchSerialIoIndexSPI1] = PchSerialIoDisabled,
+		[PchSerialIoIndexSPI2] = PchSerialIoDisabled,
+		[PchSerialIoIndexUART0] = PchSerialIoSkipInit,
+		[PchSerialIoIndexUART1] = PchSerialIoDisabled,
+		[PchSerialIoIndexUART2] = PchSerialIoDisabled,
+	}"
+
+	register "usb2_ports[2]" = "USB2_PORT_LONG(OC_SKIP)"    # SD CARD
+	register "usb3_ports[2]" = "USB3_PORT_DEFAULT(OC_SKIP)" # SD CARD
+
+	# No PCIe WiFi
+	register "PcieRpEnable[13]" = "0"
+
+	# Intel Common SoC Config
+	#+-------------------+---------------------------+
+	#| Field	     |	Value			 |
+	#+-------------------+---------------------------+
+	#| I2C0		     | Trackpad			 |
+	#| I2C1		     | Touchscreen		 |
+	#| I2C2              | 2nd Touchscreen		 |
+	#| I2C4		     | Audio			 |
+	#+-------------------+---------------------------+
+	register "common_soc_config" = "{
+		.i2c[0] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 50,
+			.fall_time_ns = 15,
+			.data_hold_time_ns = 330,
+		},
+		.i2c[1] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 60,
+			.fall_time_ns = 25,
+		},
+		.i2c[2] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 60,
+			.fall_time_ns = 25,
+		},
+		.i2c[4] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 120,
+			.fall_time_ns = 120,
+		},
+	}"
+
+	device domain 0 on
+		device ref igpu		on
+			register "gfx" = "GMA_DEFAULT_PANEL(0)"
+		end
+		device ref xhci		on
+			chip drivers/usb/acpi
+				device ref xhci_root_hub on
+					chip drivers/usb/acpi
+						register "desc" = ""Micro SD Card""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device ref usb2_port3 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Left Type-A Port""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(1, 2)"
+						device ref usb2_port4 on end
+					end
+					chip drivers/usb/acpi
+						# No WWAN
+						device ref usb2_port6 off end
+					end
+					chip drivers/usb/acpi
+						# No Right Tpype-C port
+						device ref usb3_port2 off end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Micro SD card""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device ref usb3_port3 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Left Type-A Port 1""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(1, 2)"
+						device ref usb3_port4 on end
+					end
+				end
+			end
+		end
+		device ref i2c0		on
+			chip drivers/i2c/generic
+				register "hid" = ""ELAN0000""
+				register "desc" = ""ELAN Touchpad""
+				register "irq" = "ACPI_IRQ_WAKE_LEVEL_LOW(GPP_A21_IRQ)"
+				register "wake" = "GPE0_DW0_21"
+				device i2c 15 on end
+			end
+		end
+		device ref i2c1		on
+			chip drivers/i2c/hid
+				register "generic.hid" = ""ELAN9008""
+				register "generic.desc" = ""ELAN Touchscreen USI""
+				register "generic.irq" =
+					"ACPI_IRQ_EDGE_LOW(GPP_D16_IRQ)"
+				register "generic.detect" = "1"
+				register "generic.enable_gpio" =
+					"ACPI_GPIO_OUTPUT_ACTIVE_HIGH(GPP_D9)"
+				register "generic.enable_delay_ms" = "12"
+				register "generic.enable_off_delay_ms" = "10"
+				register "generic.has_power_resource" = "1"
+				register "generic.stop_gpio" =
+					"ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_C4)"
+				register "generic.stop_delay_ms" = "15"
+				register "generic.stop_off_delay_ms" = "5"
+				register "hid_desc_reg_offset" = "0x01"
+				device i2c 10 on end
+			end
+		end
+		device ref i2c2		on
+			chip drivers/i2c/hid
+				register "generic.hid" = ""ELAN9009""
+				register "generic.desc" = ""ELAN Touchscreen USI""
+				register "generic.irq" =
+					"ACPI_IRQ_EDGE_LOW(GPP_C7_IRQ)"
+				register "generic.detect" = "1"
+				register "generic.enable_gpio" =
+					"ACPI_GPIO_OUTPUT_ACTIVE_HIGH(GPP_D10)"
+				register "generic.enable_delay_ms" = "12"
+				register "generic.enable_off_delay_ms" = "10"
+				register "generic.has_power_resource" = "1"
+				register "generic.stop_gpio" =
+					"ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_D4)"
+				register "generic.stop_delay_ms" = "15"
+				register "generic.stop_off_delay_ms" = "5"
+				register "hid_desc_reg_offset" = "0x01"
+				device i2c 10 on end
+			end
+		end
+		device ref i2c4		on
+			chip drivers/i2c/generic
+				register "hid" = ""10EC5682""
+				register "name" = ""RT58""
+				register "desc" = ""Realtek RT5682""
+				register "irq_gpio" = "ACPI_GPIO_IRQ_EDGE_BOTH(GPP_H0)"
+				register "property_count" = "1"
+				# Set the jd_src to RT5668_JD1 for jack detection
+				register "property_list[0].type" = "ACPI_DP_TYPE_INTEGER"
+				register "property_list[0].name" = ""realtek,jd-src""
+				register "property_list[0].integer" = "1"
+				device i2c 1a on end
+			end
+			chip drivers/i2c/generic
+				register "hid" = ""10EC1011""
+				register "desc" = ""RT1011 Tweeter Left Speaker Amp""
+				register "uid" = "0"
+				register "name" = ""TL""
+				device i2c 38 on end
+			end
+			chip drivers/i2c/generic
+				register "hid" = ""10EC1011""
+				register "desc" = ""RT1011 Tweeter Right Speaker Amp""
+				register "uid" = "1"
+				register "name" = ""TR""
+				device i2c 39 on end
+			end
+		end
+		device ref hda		on
+			chip drivers/generic/max98357a
+				register "hid" = ""MX98357A""
+				register "sdmode_gpio" =  "ACPI_GPIO_OUTPUT_ACTIVE_HIGH(GPP_H3)"
+				register "sdmode_delay" = "5"
+				device generic 0 on end
+			end
+		end
+	end
+end

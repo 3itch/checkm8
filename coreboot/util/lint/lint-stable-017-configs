@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# DESCR: Check that saved config files are miniconfigs
+
+LINTDIR="$(
+  cd -- "$(dirname "$0")" > /dev/null 2>&1 || return
+  pwd -P
+)"
+
+# shellcheck source=helper_functions.sh
+. "${LINTDIR}/helper_functions.sh"
+
+SYMBOLS='CONFIG_MAINBOARD_DIR\|CONFIG_MAINBOARD_HAS_'
+
+#look for a couple of things that should only be set by select keywords
+for file in \
+	$(${GREP_FILES} -l "$SYMBOLS" configs) ; do \
+		echo "Error: $file seems to be a full config"; \
+	done

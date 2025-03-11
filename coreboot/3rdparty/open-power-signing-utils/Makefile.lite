@@ -1,0 +1,26 @@
+all: create-container print-container hashkeys
+
+create-container: create-container.c
+	$(CC) -g -Wall -Wextra -I. $^ -o $@ -lssl -lcrypto -std=gnu99
+
+print-container: print-container.c
+	$(CC) -g -Wall -Wextra -I. $^ -o $@ -lssl -lcrypto -std=gnu99
+
+hashkeys: hashkeys.c
+	$(CC) -g -Wall -Wextra -I. $^ -o $@ -lssl -lcrypto -std=gnu99
+
+clean:
+	$(RM) create-container print-container hashkeys
+
+prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
+
+install:
+	cp create-container print-container hashkeys "$(bindir)"
+	cp bulkSign.sh crtSignedContainer.sh sign-with-local-keys.sh "$(bindir)"
+
+uninstall:
+	cd "$(bindir)" && $(RM) create-container print-container hashkeys
+	cd "$(bindir)" && $(RM) bulkSign.sh crtSignedContainer.sh sign-with-local-keys.sh
+

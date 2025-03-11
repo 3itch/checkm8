@@ -1,0 +1,171 @@
+chip soc/intel/cannonlake
+	# Lock Down
+	register "common_soc_config" = "{
+		/* Touchpad */
+		.i2c[0] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 80,
+			.fall_time_ns = 110,
+		},
+	}"
+
+# CPU (soc/intel/cannonlake/cpu.c)
+	register "power_limits_config" = "{
+		.tdp_pl1_override = 15,
+		.tdp_pl2_override = 20,
+	}"
+
+# FSP Silicon (soc/intel/cannonlake/fsp_params.c)
+
+	# Serial I/O
+	register "SerialIoDevMode" = "{
+		[PchSerialIoIndexI2C0] = PchSerialIoPci,
+	}"
+
+# Actual device tree
+	device domain 0 on
+		device ref igpu on
+			register "gfx" = "GMA_DEFAULT_PANEL(0)"
+			register "panel_cfg" = "{
+				.up_delay_ms		=  200,
+				.down_delay_ms		=   50,
+				.cycle_delay_ms		=  500,
+				.backlight_pwm_hz	= 1000,
+				.backlight_on_delay_ms	=    1,
+				.backlight_off_delay_ms	=    1,
+			}"
+		end
+		device ref xhci on
+			chip drivers/usb/acpi
+				device usb 0.0 on
+					chip drivers/usb/acpi
+						register "desc" = ""Right Type-A Port""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(0, 0)"
+						device usb 2.0 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Camera""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device usb 2.1 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Bluetooth""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device usb 2.2 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Right Type-C Port""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						register "group" = "ACPI_PLD_GROUP(0, 1)"
+						device usb 2.7 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Left Type-C Port""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						register "group" = "ACPI_PLD_GROUP(1, 1)"
+						device usb 2.8 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Right Type-A Port""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(0, 0)"
+						device usb 3.0 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Left Type-A Port""
+						register "type" = "UPC_TYPE_A"
+						register "group" = "ACPI_PLD_GROUP(1, 0)"
+						device usb 3.1 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Left Type-C Port""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						register "group" = "ACPI_PLD_GROUP(1, 1)"
+						device usb 3.4 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Card Reader""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device usb 3.5 on end
+					end
+				end
+			end
+			register "usb2_ports[0]" = "USB2_PORT_MID(OC0)"		# Type-A right
+			register "usb2_ports[1]" = "USB2_PORT_MAX(OC_SKIP)"	# Webcam
+			register "usb2_ports[2]" = "USB2_PORT_MID(OC_SKIP)"	# m.2-2230/Bluetooth
+			register "usb2_ports[6]" = "USB2_PORT_MID(OC1)"		# Type-A left
+			register "usb2_ports[7]" = "USB2_PORT_TYPE_C(OC2)"	# Type-C right
+			register "usb2_ports[8]" = "USB2_PORT_TYPE_C(OC2)"	# Type-C left
+			register "usb3_ports[0]" = "USB3_PORT_DEFAULT(OC0)"	# Type-A right
+			register "usb3_ports[1]" = "USB3_PORT_DEFAULT(OC1)"	# Type-A left
+			register "usb3_ports[2]" = "USB3_PORT_DEFAULT(OC2)"	# Type-C right
+			register "usb3_ports[3]" = "USB3_PORT_DEFAULT(OC2)"	# Type-C left
+			register "usb3_ports[4]" = "USB3_PORT_DEFAULT(OC2)"	# Type-C left
+			register "usb3_ports[5]" = "USB3_PORT_DEFAULT(OC_SKIP)"	# Card Reader
+		end
+		device ref i2c0 on
+			chip drivers/i2c/hid
+				register "generic.hid" = ""HTIX5288""
+				register "generic.name" = ""TPD0""
+				register "generic.uid" = "1"
+				register "generic.irq" = "ACPI_IRQ_LEVEL_LOW(GPP_B3_IRQ)"
+				register "hid_desc_reg_offset" = "0x20"
+				device i2c 2c on end
+			end
+		end
+		device ref sata on
+			register "satapwroptimize" = "1"
+			register "SataSalpSupport" = "1"
+			# Port 2 (M.2 / inner)
+			register "SataPortsEnable[1]" = "1"
+			register "SataPortsDevSlp[1]" = "1"
+			# Port 3 (M.2 / outer)
+			register "SataPortsEnable[2]" = "1"
+			register "SataPortsDevSlp[2]" = "1"
+		end
+		device ref pcie_rp7 on	# x1 M.2/E 2230 (WLAN)
+			register "PcieRpEnable[6]" = "1"
+			register "PcieRpSlotImplemented[6]" = "1"
+			register "PcieRpLtrEnable[6]" = "1"
+			register "PcieRpHotPlug[6]" = "1"
+			register "PcieClkSrcUsage[2]" = "6"
+			register "PcieClkSrcClkReq[2]" = "2"
+			smbios_slot_desc "SlotTypeM2Socket1_SD" "SlotLengthOther" "M.2/E 2230" "SlotDataBusWidth1X"
+		end
+		device ref pcie_rp8 on
+			device pci 00.0 on end # x1 (LAN)
+			register "PcieRpEnable[7]" = "1"
+			register "PcieClkSrcUsage[3]" = "7"
+			register "PcieClkSrcClkReq[3]" = "3"
+		end
+		device ref pcie_rp9 on	# x4 M.2/M 2280 (NVMe)
+			register "PcieRpEnable[8]" = "1"
+			register "PcieRpSlotImplemented[8]" = "1"
+			register "PcieRpLtrEnable[8]" = "1"
+			register "PcieClkSrcUsage[0]" = "8"
+			register "PcieClkSrcClkReq[0]" = "0"
+			smbios_slot_desc "SlotTypeM2Socket3" "SlotLengthOther" "M.2/M 2280" "SlotDataBusWidth4X"
+		end
+		device ref pcie_rp13 on	# x4 M.2/M 2280 (NVMe)
+			register "PcieRpEnable[12]" = "1"
+			register "PcieRpSlotImplemented[12]" = "1"
+			register "PcieRpLtrEnable[12]" = "1"
+			register "PcieClkSrcUsage[1]" = "12"
+			register "PcieClkSrcClkReq[1]" = "1"
+			smbios_slot_desc "SlotTypeM2Socket3" "SlotLengthOther" "M.2/M 2280" "SlotDataBusWidth4X"
+		end
+		device ref lpc_espi on
+			# LPC configuration from lspci -s 1f.0 -xxx
+			# Address 0x88: Decode 0x68 - 0x6F (EC PM channel)
+			register "gen1_dec" = "0x00040069"
+			# Address 0x8C: Decode 0xE00 - 0xEFF (AP/EC command)
+			register "gen2_dec" = "0x00fc0e01"
+			# Address 0x90: Decode 0xF00 - 0xFFF (AP/EC debug)
+			register "gen3_dec" = "0x00fc0f01"
+			chip drivers/pc80/tpm
+				device pnp 0c31.0 on  end
+			end
+		end
+	end
+end

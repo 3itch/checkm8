@@ -1,0 +1,20 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_TIMER
+	bool
+	help
+	  Intel Processor common TIMER support
+
+config USE_LEGACY_8254_TIMER
+	bool "Use Legacy 8254 Timer"
+	default y if PAYLOAD_SEABIOS || VGA_ROM_RUN
+	default n
+	help
+	  Setting this makes the Legacy 8254 Timer available by disabling
+	  clock gating. This needs to be enabled in order to boot a legacy
+	  BIOS or OS not supporting other timers like PM timer or TSC.
+
+	  While SeaBIOS does not require this timer anymore, it is needed
+	  when OpRoms are being used.
+
+	  Disable this setting to save power, when the timer is not needed.

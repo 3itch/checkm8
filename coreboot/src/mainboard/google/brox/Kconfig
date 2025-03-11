@@ -1,0 +1,206 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_BROX_COMMON
+	def_bool n
+	select DRIVERS_GENERIC_GPIO_KEYS
+	select DRIVERS_I2C_GENERIC
+	select DRIVERS_I2C_HID
+	select DRIVERS_INTEL_DPTF
+	select DRIVERS_INTEL_DPTF_SUPPORTS_TPCH
+	select DRIVERS_INTEL_PMC
+	select DRIVERS_INTEL_SOUNDWIRE
+	select DRIVERS_INTEL_USB4_RETIMER
+	select DRIVERS_SPI_ACPI
+	select DRIVERS_WIFI_GENERIC
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_BOARDID
+	select EC_GOOGLE_CHROMEEC_ESPI
+	select EC_GOOGLE_CHROMEEC_SKUID
+	select ENABLE_TCSS_USB_DETECTION if !(SOC_INTEL_TCSS_USE_PDC_PMC_USBC_MUX_CONFIGURATION || CHROMEOS)
+	select FW_CONFIG
+	select FW_CONFIG_SOURCE_CHROMEEC_CBI
+	select GOOGLE_SMBIOS_MAINBOARD_VERSION
+	select HAVE_ACPI_TABLES
+	select HAVE_FSP_LOGO_SUPPORT if RUN_FSP_GOP
+	select I2C_TPM
+	select INTEL_LPSS_UART_FOR_CONSOLE
+	select MAINBOARD_HAS_CHROMEOS
+	select MAINBOARD_HAS_TPM2
+	select PMC_IPC_ACPI_INTERFACE
+	select SOC_INTEL_CSE_LITE_SKU
+	select SOC_INTEL_CSE_SEND_EOP_ASYNC
+	select SOC_INTEL_COMMON_BLOCK_USB4
+	select SOC_INTEL_COMMON_BLOCK_TCSS
+	select SOC_INTEL_ENABLE_USB4_PCIE_RESOURCES
+	select SOC_INTEL_COMMON_BASECODE_DEBUG_FEATURE
+	select SOC_INTEL_CSE_PRE_CPU_RESET_TELEMETRY_V1
+	select SOC_INTEL_STORE_ISH_FW_VERSION if DRIVERS_INTEL_ISH
+
+config BOARD_GOOGLE_BASEBOARD_BROX
+	def_bool n
+	select BOARD_GOOGLE_BROX_COMMON
+	select BOARD_ROMSIZE_KB_32768
+	select DRIVERS_AUDIO_SOF
+	select DRIVERS_GFX_GENERIC
+	select HAVE_SLP_S0_GATE
+	select MEMORY_SOLDERDOWN if !BOARD_GOOGLE_GREENBAYUPOC
+	select SOC_INTEL_COMMON_BLOCK_IPU
+	select SOC_INTEL_RAPTORLAKE
+	select SOC_INTEL_ALDERLAKE_PCH_P
+	select SOC_INTEL_COMMON_BLOCK_HDA_VERB
+	select SOC_INTEL_TCSS_USE_PDC_PMC_USBC_MUX_CONFIGURATION
+	select DRIVERS_INTEL_ISH
+	select MAINBOARD_HAS_EARLY_LIBGFXINIT
+	select SYSTEM_TYPE_LAPTOP
+	select TPM_GOOGLE_TI50
+
+config BOARD_GOOGLE_BROX
+	select BOARD_GOOGLE_BASEBOARD_BROX
+	select CHROMEOS_WIFI_SAR if CHROMEOS
+	select USE_UNIFIED_AP_FIRMWARE_FOR_UFS_AND_NON_UFS
+
+config BOARD_GOOGLE_BROX_TI_PDC
+	select BOARD_GOOGLE_BASEBOARD_BROX
+	select CHROMEOS_WIFI_SAR if CHROMEOS
+	select USE_UNIFIED_AP_FIRMWARE_FOR_UFS_AND_NON_UFS
+
+config BOARD_GOOGLE_BROX_EC_ISH
+	select BOARD_GOOGLE_BASEBOARD_BROX
+	select CHROMEOS_WIFI_SAR if CHROMEOS
+	select SOC_INTEL_STORE_ISH_FW_VERSION
+
+config BOARD_GOOGLE_LOTSO
+	select BOARD_GOOGLE_BASEBOARD_BROX
+	select CHROMEOS_WIFI_SAR if CHROMEOS
+	select MAINBOARD_HAS_GOOGLE_STRAUSS_KEYBOARD
+	select USE_UNIFIED_AP_FIRMWARE_FOR_UFS_AND_NON_UFS
+
+config BOARD_GOOGLE_GREENBAYUPOC
+	select BOARD_GOOGLE_BASEBOARD_BROX
+	select CHROMEOS_WIFI_SAR if CHROMEOS
+	select MEMORY_SODIMM
+
+config BOARD_GOOGLE_JUBILANT
+	select BOARD_GOOGLE_BASEBOARD_BROX
+	select CHROMEOS_WIFI_SAR if CHROMEOS
+	select DRIVERS_GENERIC_ALC1015
+	select DRIVERS_I2C_SX9324
+	select MAINBOARD_HAS_GOOGLE_STRAUSS_KEYBOARD
+	select USE_UNIFIED_AP_FIRMWARE_FOR_UFS_AND_NON_UFS
+
+if BOARD_GOOGLE_BROX_COMMON
+
+config BASEBOARD_DIR
+	string
+	default "brox" if BOARD_GOOGLE_BASEBOARD_BROX
+
+config CHROMEOS
+	select EC_GOOGLE_CHROMEEC_SWITCHES
+	select GBB_FLAG_DISABLE_PD_SOFTWARE_SYNC
+	select HAS_RECOVERY_MRC_CACHE
+
+config CHROMEOS_WIFI_SAR
+	bool "Enable SAR options for ChromeOS build"
+	depends on CHROMEOS
+	select DSAR_ENABLE
+	select GEO_SAR_ENABLE
+	select SAR_ENABLE
+	select USE_SAR
+
+config DEVICETREE
+	default "variants/baseboard/\$(CONFIG_BASEBOARD_DIR)/devicetree.cb"
+
+config DRIVER_TPM_I2C_BUS
+	hex
+	default 0x4 if BOARD_GOOGLE_BASEBOARD_BROX
+
+config PL4_LIMIT_FOR_CRITICAL_BAT_BOOT
+	int
+	default 9 if BOARD_GOOGLE_BROX
+	default 14 if BOARD_GOOGLE_JUBILANT
+	default 40 if BOARD_GOOGLE_LOTSO
+	help
+	  Select this if the variant has to boot even with low battery, critical battery
+	  threshold, or when the battery is physically disconnected. PL4, which stands for
+	  Processor Instantaneous Power or Absolute Peak Power, controls the highest power draw
+	  from the processor at any given moment within the Pl1Tau duration. Therefore, PL4
+	  acts as a failsafe mechanism to set an upper threshold limit for the processor's
+	  instantaneous power draw. For a 30W adapter, the maximum peak power is set at 9
+	  watts, which is 30W multiplied by 32% efficiency. This default pl4 value is set for
+	  30W or any higher adapter rating, such as 45W or 65W.
+
+config DRIVER_TPM_I2C_ADDR
+	hex
+	default 0x50
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/chromeos.fmd" if CHROMEOS
+
+config TPM_TIS_ACPI_INTERRUPT
+	int
+	default 66 # GPE0_DW2_02 (GPP_E2)
+
+config OVERRIDE_DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/overridetree.cb"
+
+config MAINBOARD_DIR
+	default "google/brox"
+
+config MAINBOARD_FAMILY
+	string
+	default "Google_Brox" if BOARD_GOOGLE_BASEBOARD_BROX
+
+config MAINBOARD_PART_NUMBER
+	default "Brox" if BOARD_GOOGLE_BROX
+	default "Brox_Ec_Ish" if BOARD_GOOGLE_BROX_EC_ISH
+	default "Brox_Ti_Pdc" if BOARD_GOOGLE_BROX_TI_PDC
+	default "Greenbayupoc" if BOARD_GOOGLE_GREENBAYUPOC
+	default "Jubilant" if BOARD_GOOGLE_JUBILANT
+	default "Lotso" if BOARD_GOOGLE_LOTSO
+
+config VARIANT_DIR
+	default "brox" if BOARD_GOOGLE_BROX || BOARD_GOOGLE_BROX_EC_ISH || BOARD_GOOGLE_BROX_TI_PDC
+	default "lotso" if BOARD_GOOGLE_LOTSO
+	default "greenbayupoc" if BOARD_GOOGLE_GREENBAYUPOC
+	default "jubilant" if BOARD_GOOGLE_JUBILANT
+
+config VBOOT
+	select VBOOT_LID_SWITCH
+
+config UART_FOR_CONSOLE
+	int
+	default 0
+
+config HAVE_WWAN_POWER_SEQUENCE
+	def_bool n
+	help
+	  Select this if the variant has a WWAN module and requires the poweroff sequence
+	  to be performed on shutdown. Must define WWAN_FCPO, WWAN_RST and WWAN_PERST GPIOs
+	  in variant.h, as well as T1_OFF_MS (time between PERST & RST) and T2_OFF_MS (time
+	  between RST and FCPO). WWAN_PERST and T1_OFF_MS are only necessary for PCIe WWAN
+	  (when HAVE_PCIE_WWAN is also selected).
+
+config HAVE_PCIE_WWAN
+	def_bool n
+
+config USE_PM_ACPI_TIMER
+	default n
+
+config MEMORY_SODIMM
+	def_bool n
+	select SPD_CACHE_ENABLE
+	select SPD_CACHE_IN_FMAP
+
+config MEMORY_SOLDERDOWN
+	def_bool n
+	select CHROMEOS_DRAM_PART_NUMBER_IN_CBI if CHROMEOS
+	select HAVE_SPD_IN_CBFS
+
+config HAVE_SLP_S0_GATE
+	def_bool n
+
+config PCIEXP_DEFAULT_MAX_RESIZABLE_BAR_BITS
+	int
+	default 33
+
+endif # BOARD_GOOGLE_BROX_COMMON

@@ -1,0 +1,25 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_INTEL_WTM2
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select SOC_INTEL_BROADWELL
+	select BOARD_ROMSIZE_KB_8192
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select HAVE_ACPI_RESUME
+	select MAINBOARD_HAS_CHROMEOS
+	select MEMORY_MAPPED_TPM
+	select INTEL_INT15
+
+config VBOOT
+	select VBOOT_VBNV_CMOS
+
+config MAINBOARD_DIR
+	default "intel/wtm2"
+
+config MAINBOARD_PART_NUMBER
+	default "WHITETIP MOUNTAIN 2"
+
+endif # BOARD_INTEL_WTM2

@@ -1,0 +1,98 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_EMULATION_QEMU_X86_Q35
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select CPU_QEMU_X86
+	select SOUTHBRIDGE_INTEL_I82801IX
+	select HAVE_CMOS_DEFAULT
+	select HAVE_OPTION_TABLE
+#	select HAVE_PIRQ_TABLE
+	select HAVE_ACPI_TABLES
+	select BOARD_ROMSIZE_KB_8192
+	select MAINBOARD_HAS_NATIVE_VGA_INIT
+	select MAINBOARD_FORCE_NATIVE_VGA_INIT if !CHROMEOS
+	select MEMORY_MAPPED_TPM
+	select MAINBOARD_HAS_CHROMEOS
+	select BOOT_DEVICE_NOT_SPI_FLASH
+	select BOOT_DEVICE_MEMORY_MAPPED
+	select BOOT_DEVICE_SUPPORTS_WRITES
+
+config VBOOT
+	select VBOOT_MUST_REQUEST_DISPLAY
+	select VBOOT_STARTS_IN_BOOTBLOCK
+	select VBOOT_VBNV_CMOS
+	select GBB_FLAG_DISABLE_LID_SHUTDOWN
+	select GBB_FLAG_DISABLE_PD_SOFTWARE_SYNC
+	select GBB_FLAG_DISABLE_EC_SOFTWARE_SYNC
+	select GBB_FLAG_DISABLE_FWMP
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/vboot-rwa-8M.fmd" if VBOOT_SLOTS_RW_A && !VBOOT_SLOTS_RW_AB
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/vboot-rwab-8M.fmd" if VBOOT_SLOTS_RW_AB
+
+if ARCH_BOOTBLOCK_X86_64
+
+config PAGE_TABLES_IN_CBFS
+	bool
+	default y
+
+# Need to install page tables in DRAM as the virtual MMU has problems translating paging
+# request when the page table resides in emulated ROM. This causes undefined behaviour
+# when handling data requests, as well as fetching and decoding instructions
+# Real hardware didn't show any problems until now.
+config ARCH_X86_64_PGTBL_LOC
+	default 0x8000
+endif
+
+if VBOOT
+
+config VBOOT_SLOTS_RW_A
+	default y
+
+endif
+
+config VBOOT_VBNV_OFFSET
+	hex
+	default 0x2c
+
+config MAINBOARD_DIR
+	default "emulation/qemu-q35"
+
+config MAINBOARD_PART_NUMBER
+	default "QEMU x86 q35/ich9"
+
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0xb0000000
+
+config ECAM_MMCONF_BUS_NUMBER
+	int
+	default 256
+
+# fw_cfg tables can be larger than the default when TPM is enabled
+config MAX_ACPI_TABLE_SIZE_KB
+	int
+	default 224
+
+# Skip the first 64KiB as coreboot table pointer is installed
+# at address 0
+config DCACHE_RAM_BASE
+	hex
+	default 0x10000
+
+# Memory at 0xa0000 decodes to VGA
+config DCACHE_RAM_SIZE
+	hex
+	default 0x90000
+
+# Do not show IFD/blob options since QEMU doesn't care
+config HAVE_INTEL_FIRMWARE
+	bool
+	default n
+
+config DCACHE_BSP_STACK_SIZE
+	hex
+	default 0x4000
+
+endif # BOARD_EMULATION_QEMU_X86_Q35

@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# DESCR: Check that variables have fully qualified types
+
+LINTDIR="$(
+  cd -- "$(dirname "$0")" > /dev/null 2>&1 || return
+  pwd -P
+)"
+
+# shellcheck source=helper_functions.sh
+. "${LINTDIR}/helper_functions.sh"
+
+INCLUDED_DIRS='^src/\|^util/\|payloads/libpayload\|payloads/coreinfo'
+EXCLUDED_DIRS='^src/vendorcode\|cbfstool/lzma\|cbfstool/lz4'
+INCLUDED_FILES='\.[ch]:'
+
+${GREP_FILES} -n 'unsigned[[:space:]]' | \
+	grep "$INCLUDED_DIRS" | \
+	grep -v "$EXCLUDED_DIRS" | \
+	grep "$INCLUDED_FILES" | \
+	grep -v 'unsigned[[:space:]]*int\|unsigned[[:space:]]*long\|unsigned[[:space:]]*char\|unsigned[[:space:]]*short' | \
+	grep -v ':[[:space:]]*/\*\|:[[:space:]]*\*'

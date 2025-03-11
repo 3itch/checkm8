@@ -1,0 +1,98 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+chip soc/intel/tigerlake
+	# Power limits
+	register "power_limits_config[POWER_LIMITS_H_8_CORE]" = "{
+		.tdp_pl1_override = 45,
+		.tdp_pl2_override = 90,
+	}"
+	register "power_limits_config[POWER_LIMITS_H_6_CORE]" = "{
+		.tdp_pl1_override = 45,
+		.tdp_pl2_override = 90,
+	}"
+
+	# Thermal
+	register "tcc_offset" = "10"
+
+	device domain 0 on
+		subsystemid 0x1558 0x65f1 inherit
+
+		device ref peg1 on
+			# PCIe PEG1 x16, Clock 9 (DGPU)
+			register "PcieClkSrcUsage[9]" = "0x41"
+			register "PcieClkSrcClkReq[9]" = "9"
+			chip soc/intel/common/block/pcie/rtd3
+				register "enable_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_HIGH(GPP_F9)" # DGPU_PWR_EN
+				register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_F8)" # DGPU_RST#_PCH
+				register "enable_delay_ms" = "16"
+				register "enable_off_delay_ms" = "4"
+				register "reset_delay_ms" = "10"
+				register "reset_off_delay_ms" = "4"
+				register "srcclk_pin" = "9" # PEG_CLKREQ#
+				device generic 0 on end
+			end
+		end
+		device ref peg0 on
+			# PCIe PEG0 x4, Clock 7 (SSD1)
+			register "PcieClkSrcUsage[7]" = "0x40"
+			register "PcieClkSrcClkReq[7]" = "7"
+		end
+		device ref tbt_pcie_rp0 on end # TYPEC1
+		device ref north_xhci on # TYPEC1
+			register "TcssXhciEn" = "1"
+		end
+		device ref tbt_dma0 on end # TYPEC1
+		device ref south_xhci on
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_MID(OC_SKIP),		/* USB 3.2 Gen 1 (Left) */
+				[2] = USB2_PORT_MID(OC_SKIP),		/* USB 3.2 Gen 1 (Right 1) */
+				[3] = USB2_PORT_MID(OC_SKIP),		/* USB 3.2 Gen 1 (Right 2) */
+				[4] = USB2_PORT_MID(OC_SKIP),		/* Per-Key */
+				[7] = USB2_PORT_MID(OC_SKIP),		/* Camera */
+				[8] = USB2_PORT_TYPE_C(OC_SKIP),	/* TYPEC1 */
+				[9] = USB2_PORT_MID(OC_SKIP),		/* Fingerprint */
+				[13] = USB2_PORT_MID(OC_SKIP),		/* Bluetooth */
+			}"
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB 3.2 Gen 1 (Left) */
+				[2] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB 3.2 Gen 1 (Right 1) */
+				[3] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB 3.2 Gen 1 (Right 2) */
+			}"
+		end
+		device ref sata on
+			register "SataPortsEnable[1]" = "1" # SSD2 (SATA1A)
+		end
+		device ref pcie_rp5 on
+			# PCIe root port #5 x1, Clock 8 (GLAN)
+			register "PcieRpLtrEnable[4]" = "1"
+			register "PcieClkSrcUsage[8]" = "4"
+			register "PcieClkSrcClkReq[8]" = "8"
+		end
+		device ref pcie_rp6 on
+			# PCIe root port #6 x1, Clock 10 (CARD)
+			register "PcieRpLtrEnable[5]" = "1"
+			register "PcieClkSrcUsage[10]" = "5"
+			register "PcieClkSrcClkReq[10]" = "10"
+		end
+		device ref pcie_rp8 on
+			# PCIe root port #8 x1, Clock 2 (WLAN)
+			register "PcieRpLtrEnable[7]" = "1"
+			register "PcieClkSrcUsage[2]" = "7"
+			register "PcieClkSrcClkReq[2]" = "2"
+			register "PcieRpSlotImplemented[7]" = "1"
+		end
+		device ref pcie_rp9 on
+			# PCIe root port #9 x4, Clock 6 (SSD2)
+			register "PcieRpLtrEnable[8]" = "1"
+			register "PcieClkSrcUsage[6]" = "8"
+			register "PcieClkSrcClkReq[6]" = "6"
+			register "PcieRpSlotImplemented[8]" = "1"
+		end
+		device ref smbus on
+			chip drivers/i2c/tas5825m
+				register "id" = "0"
+				device i2c 4e on end # (8bit address: 0x9c)
+			end
+		end
+	end
+end

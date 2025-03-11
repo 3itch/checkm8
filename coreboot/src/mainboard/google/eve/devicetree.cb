@@ -1,0 +1,385 @@
+chip soc/intel/skylake
+
+	# IGD Displays
+	register "gfx" = "GMA_STATIC_DISPLAYS(0)"
+
+	register "panel_cfg" = "{
+		.up_delay_ms		=  100,
+		.down_delay_ms		=  500,
+		.cycle_delay_ms		=  500,
+		.backlight_on_delay_ms	=    1,
+		.backlight_off_delay_ms	=  200,
+		.backlight_pwm_hz	= 1000,
+	}"
+
+	# Enable deep Sx states
+	register "deep_s3_enable_ac" = "false"
+	register "deep_s3_enable_dc" = "true"
+	register "deep_s5_enable_ac" = "true"
+	register "deep_s5_enable_dc" = "true"
+	register "deep_sx_config" = "DSX_EN_LAN_WAKE_PIN | DSX_EN_WAKE_PIN"
+
+	register "eist_enable" = "true"
+
+	# GPE configuration
+	# Note that GPE events called out in ASL code rely on this
+	# route. i.e. If this route changes then the affected GPE
+	# offset bits also need to be changed.
+	register "gpe0_dw0" = "GPP_B"
+	register "gpe0_dw1" = "GPP_D"
+	register "gpe0_dw2" = "GPP_E"
+
+	# FSP Configuration
+	register "DspEnable" = "1"
+	register "IoBufferOwnership" = "3"
+	register "ScsEmmcHs400Enabled" = "1"
+	register "SkipExtGfxScan" = "1"
+	register "SaGv" = "SaGv_Enabled"
+	register "PmConfigSlpS3MinAssert" = "2"        # 50ms
+	register "PmConfigSlpS4MinAssert" = "1"        # 1s
+	register "PmConfigSlpSusMinAssert" = "1"       # 500ms
+	register "PmConfigSlpAMinAssert" = "3"         # 2s
+
+	# VR Settings Configuration for 4 Domains
+	#+----------------+-------+-------+-------+-------+
+	#| Domain/Setting |  SA   |  IA   | GTUS  |  GTS  |
+	#+----------------+-------+-------+-------+-------+
+	#| Psi1Threshold  | 20A   | 20A   | 20A   | 20A   |
+	#| Psi2Threshold  | 2A    | 2A    | 2A    | 2A    |
+	#| Psi3Threshold  | 1A    | 1A    | 1A    | 1A    |
+	#| Psi3Enable     | 1     | 1     | 1     | 1     |
+	#| Psi4Enable     | 1     | 1     | 1     | 1     |
+	#| ImonSlope      | 0     | 0     | 0     | 0     |
+	#| ImonOffset     | 0     | 0     | 0     | 0     |
+	#| IccMax         | 4A    | 24A   | 24A   | 24A   |
+	#| VrVoltageLimit | 1.52V | 1.52V | 1.52V | 1.52V |
+	#| AcLoadline     | 14.9  | 5     | 5.7   | 4.57  |
+	#| DcLoadline     | 14.2  | 4.86  | 4.2   | 4.3   |
+	#+----------------+-------+-------+-------+-------+
+	register "domain_vr_config[VR_SYSTEM_AGENT]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(2),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(4),
+		.voltage_limit = 1520,
+		.ac_loadline = 1490,
+		.dc_loadline = 1420,
+	}"
+
+	register "domain_vr_config[VR_IA_CORE]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(2),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(24),
+		.voltage_limit = 1520,
+		.ac_loadline = 500,
+		.dc_loadline = 486,
+	}"
+
+	register "domain_vr_config[VR_GT_UNSLICED]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(2),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(24),
+		.voltage_limit = 1520,
+		.ac_loadline = 570,
+		.dc_loadline = 420,
+	}"
+
+	register "domain_vr_config[VR_GT_SLICED]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(2),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(24),
+		.voltage_limit = 1520,
+		.ac_loadline = 457,
+		.dc_loadline = 430,
+	}"
+
+	# Intel Common SoC Config
+	#+-------------------+---------------------------+
+	#| Field             |  Value                    |
+	#+-------------------+---------------------------+
+	#| I2C0              | Touchscreen               |
+	#| I2C1              | Early TPM access          |
+	#| I2C2              | Touchpad                  |
+	#| I2C4              | Audio                     |
+	#+-------------------+---------------------------+
+	register "common_soc_config" = "{
+		.i2c[0] = {
+			.speed = I2C_SPEED_FAST_PLUS,
+			.rise_time_ns = 98,
+			.fall_time_ns = 38,
+		},
+		.i2c[1] = {
+			.early_init = 1,
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 112,
+			.fall_time_ns = 34,
+		},
+		.i2c[2] = {
+			.speed = I2C_SPEED_FAST,
+			.speed_config[0] = {
+				.speed = I2C_SPEED_FAST,
+				.scl_lcnt = 186,
+				.scl_hcnt = 93,
+				.sda_hold = 36,
+			}
+		},
+		.i2c[4] = {
+			.speed = I2C_SPEED_FAST,
+			.speed_config[0] = {
+				.speed = I2C_SPEED_FAST,
+				.scl_lcnt = 176,
+				.scl_hcnt = 95,
+				.sda_hold = 36,
+			}
+		},
+	}"
+
+	# Touchscreen
+	register "i2c_voltage[0]" = "I2C_VOLTAGE_3V3"
+
+	# Enable I2C1 bus early for TPM access
+	register "i2c_voltage[1]" = "I2C_VOLTAGE_3V3"
+
+	# Touchpad
+	register "i2c_voltage[2]" = "I2C_VOLTAGE_1V8"
+
+	# Audio
+	register "i2c_voltage[4]" = "I2C_VOLTAGE_1V8"
+
+	# Must leave UART0 enabled or SD/eMMC will not work as PCI
+	register "SerialIoDevMode" = "{
+		[PchSerialIoIndexI2C0]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C1]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C2]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C3]  = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C4]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C5]  = PchSerialIoDisabled,
+		[PchSerialIoIndexSpi0]  = PchSerialIoPci,
+		[PchSerialIoIndexSpi1]  = PchSerialIoDisabled,
+		[PchSerialIoIndexUart0] = PchSerialIoSkipInit,
+		[PchSerialIoIndexUart1] = PchSerialIoDisabled,
+		[PchSerialIoIndexUart2] = PchSerialIoSkipInit,
+	}"
+
+	register "dptf_enable" = "1"
+	register "power_limits_config" = "{
+		.tdp_pl1_override = 7,
+		.tdp_pl2_override = 15,
+	}"
+	register "tcc_offset" = "10"
+
+	device domain 0 on
+		device ref igpu		on  end
+		device ref sa_thermal	on  end
+		device ref south_xhci	on
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_LONG(OC0),	// Type-C Port 1
+				[1] = USB2_PORT_FLEX(OC_SKIP),	// Camera
+				[2] = USB2_PORT_MID(OC_SKIP),	// Bluetooth
+				[4] = USB2_PORT_LONG(OC1),	// Type-C Port 2
+				[6] = USB2_PORT_MID(OC_SKIP),	// H1
+			}"
+
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC0),	// Type-C Port 1
+				[1] = USB3_PORT_DEFAULT(OC1),	// Type-C Port 2
+			}"
+			chip drivers/usb/acpi
+				register "desc" = ""Root Hub""
+				register "type" = "UPC_TYPE_HUB"
+				device usb 0.0 on
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-C Left""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						register "group" = "ACPI_PLD_GROUP(1, 1)"
+						device usb 2.0 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Camera""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device usb 2.1 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Bluetooth""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device usb 2.2 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-C Right""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						register "group" = "ACPI_PLD_GROUP(2, 1)"
+						device usb 2.4 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 H1 TPM""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device usb 2.6 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB3 Type-C Left""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						register "group" = "ACPI_PLD_GROUP(1, 1)"
+						device usb 3.0 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB3 Type-C Right""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						register "group" = "ACPI_PLD_GROUP(2, 1)"
+						device usb 3.1 on end
+					end
+				end
+			end
+		end
+		device ref thermal	on  end
+		device ref i2c0		on
+			chip drivers/i2c/hid
+				register "generic.hid" = ""WCOM50C1""
+				register "generic.desc" = ""WCOM Digitizer""
+				register "generic.irq" = "ACPI_IRQ_LEVEL_LOW(GPP_E7_IRQ)"
+				register "generic.speed" = "I2C_SPEED_FAST_PLUS"
+				register "hid_desc_reg_offset" = "0x1"
+				device i2c 0a on end
+			end
+		end
+		device ref i2c1		on
+			chip drivers/i2c/tpm
+				register "hid" = ""GOOG0005""
+				register "irq" = "ACPI_IRQ_EDGE_LOW(GPP_E0_IRQ)"
+				device i2c 50 on end
+			end
+		end
+		device ref i2c2		on
+			chip drivers/i2c/hid
+				register "generic.hid" = ""ACPI0C50""
+				register "generic.sub" = ""1AE0006B""
+				register "generic.desc" = ""Touchpad""
+				register "generic.irq" = "ACPI_IRQ_LEVEL_LOW(GPP_B3_IRQ)"
+				register "hid_desc_reg_offset" = "0x1"
+				device i2c 49 on end
+			end
+			chip drivers/i2c/generic
+				register "hid" = ""GOOG0008""
+				register "desc" = ""Touchpad EC Interface""
+				device i2c 1e on end
+			end
+		end
+		device ref heci1	on  end
+		device ref uart2	on  end
+		device ref i2c4		on
+			chip drivers/i2c/max98927
+				register "interleave_mode" = "1"
+				register "vmon_slot_no" = "4"
+				register "imon_slot_no" = "5"
+				register "uid" = "0"
+				register "desc" = ""Right Speaker Amp""
+				register "name" = ""MAXR""
+				device i2c 39 on end
+			end
+			chip drivers/i2c/max98927
+				register "interleave_mode" = "1"
+				register "vmon_slot_no" = "6"
+				register "imon_slot_no" = "7"
+				register "uid" = "1"
+				register "desc" = ""Left Speaker Amp""
+				register "name" = ""MAXL""
+				device i2c 3a on end
+			end
+			chip drivers/i2c/rt5663
+				register "irq_gpio" = "ACPI_GPIO_IRQ_EDGE_BOTH_WAKE(GPP_D9)"
+				register "dc_offset_l_manual" = "0xffd160"
+				register "dc_offset_r_manual" = "0xffd1c0"
+				register "dc_offset_l_manual_mic" = "0xff8a10"
+				register "dc_offset_r_manual_mic" = "0xff8ab0"
+				device i2c 13 on end
+			end
+			chip drivers/i2c/generic
+				register "hid" = ""10EC5514""
+				register "name" = ""RT54""
+				register "desc" = ""Realtek RT5514""
+				register "property_count" = "3"
+				# Set the DMIC initial delay to 16ms to avoid pop noise
+				register "property_list[0].type" = "ACPI_DP_TYPE_INTEGER"
+				register "property_list[0].name" = ""realtek,dmic-init-delay""
+				register "property_list[0].integer" = "16"
+				# Set clock name for RT5514 to calibrate DSP clock.
+				register "property_list[1].type" = "ACPI_DP_TYPE_STRING"
+				register "property_list[1].name" = ""realtek,dsp-calib-clk-name""
+				register "property_list[1].string" = ""ssp1_mclk""
+				# Set clock rate for RT5514 to calibrate DSP clock.
+				register "property_list[2].type" = "ACPI_DP_TYPE_INTEGER"
+				register "property_list[2].name" = ""realtek,dsp-calib-clk-rate""
+				register "property_list[2].integer" = "24000000"
+				device i2c 57 on end
+			end
+		end # I2C #4
+		device ref pcie_rp1	on
+			register "PcieRpEnable[0]" = "1"
+			register "PcieRpClkReqSupport[0]" = "1"
+			register "PcieRpClkReqNumber[0]" = "1"
+			register "PcieRpAdvancedErrorReporting[0]" = "1"
+			register "PcieRpLtrEnable[0]" = "1"
+			register "PcieRpHotPlug[0]" = "1"
+			register "PcieRpClkSrcNumber[0]" = "1"
+			chip drivers/wifi/generic
+				register "wake" = "GPE0_PCI_EXP"
+				device pci 00.0 on end
+			end
+		end
+		device ref pcie_rp5	on
+			register "PcieRpEnable[4]" = "1"
+			register "PcieRpClkReqSupport[4]" = "1"
+			register "PcieRpClkReqNumber[4]" = "4"
+			register "PcieRpAdvancedErrorReporting[4]" = "1"
+			register "PcieRpLtrEnable[4]" = "1"
+			register "PcieRpClkSrcNumber[4]" = "4"
+		end
+		device ref uart0	on  end
+		device ref gspi0	on
+			chip drivers/spi/acpi
+				register "hid" = "ACPI_DT_NAMESPACE_HID"
+				register "compat_string" = ""realtek,rt5514""
+				register "irq" = "ACPI_IRQ_EDGE_HIGH(GPP_F10_IRQ)"
+				register "speed" = "12 * MHz"
+				device spi 0 on end
+			end
+		end
+		device ref emmc		on  end
+		device ref lpc_espi	on
+			# EC host command ranges are in 0x800-0x8ff & 0x200-0x20f
+			register "gen1_dec" = "0x00fc0801"
+			register "gen2_dec" = "0x000c0201"
+			# EC memory map range is 0x900-0x9ff
+			register "gen3_dec" = "0x00fc0901"
+
+			chip ec/google/chromeec
+				device pnp 0c09.0 on end
+			end
+		end
+		device ref hda		on  end
+		device ref smbus	on  end
+		device ref fast_spi	on  end
+	end
+end

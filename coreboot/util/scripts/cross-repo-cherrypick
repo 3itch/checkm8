@@ -1,0 +1,74 @@
+#!/usr/bin/env sh
+# cross-repo-cherrypick - rebase helper script
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# Adapt to your remote branch:
+BRANCH="origin/main"
+
+# When pulling in patches from another tree from a gerrit repository,
+# do the following at the end of a larger cherry-pick series:
+#  git remote add ...
+#  git checkout -b upstreaming
+#  git cherry-pick ...
+#  git rebase -i --exec util/scripts/cross-repo-cherrypick master
+# Alternatively, you can run util/scripts/cross-repo-cherrypick after every
+# individual cherry-pick.
+
+# use $0 --cros to add a stub BUG/BRANCH/TEST block
+
+commit_message() {
+	git log -n 1 | grep "^    " | cut -c5-
+}
+
+ORIGIN_HOST=$( commit_message |grep "^Reviewed-on: " |head -1 |cut -d/ -f3 )
+case "${ORIGIN_HOST}" in
+	review.coreboot.org)
+		BRANCH="origin/main"
+		MESSAGE_PREFIX="UPSTREAM: "
+		;;
+	chromium-review.googlesource.com)
+		BRANCH="cros/main"
+		MESSAGE_PREFIX=""
+		;;
+esac
+
+# lines must be backwards due to tac(1)
+SPLICE_CMD=""
+if test "$1" = "--cros"; then
+	if test -z "$(commit_message | grep -E '^(BUG|TEST)=')"; then
+		SPLICE_CMD='print "\nTEST=none\nBRANCH=none\nBUG=none\n"'
+	fi
+fi
+
+CHID=$( commit_message | grep -i "^Change-Id: I" )
+CID=$( git log -n1 --grep "^$CHID$" --pretty=%H $BRANCH )
+GUID="$(git config user.name) <$(git config user.email)>"
+
+# TBD: Don't add Original- to empty lines, and possibly make script more
+# solid for commits with an unexpected order of meta data lines.
+
+(printf "${MESSAGE_PREFIX}"; commit_message) | tac | awk '/^$/ {
+		if (end==0) {
+			print "GitOrigin-RevId: '"${CID}"'\nSigned-off-by: '"${GUID}"'";
+			'"${SPLICE_CMD}"'
+		}
+		end=1
+	}; /^(BUG|BRANCH|TEST)=/ {
+		if (end==0) {
+			print "GitOrigin-RevId: '"${CID}"'\nSigned-off-by: '"${GUID}"'";
+			print "";
+		}
+		end=1
+	}; /^Cq-Depend:/ {
+		print $0;
+		next
+	}; /^Change-Id:/ {
+		print $0;
+		next
+	}; {
+		if (end==0)
+			print "Original-" $0;
+		else
+			print $0;
+	}' | tac | git commit --amend -F -

@@ -1,0 +1,57 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_SMM
+	bool
+	help
+	  Intel Processor common SMM support
+
+config SOC_INTEL_COMMON_BLOCK_SMM_IO_TRAP
+	bool
+	help
+	  Intel Processor trap flag if it is supported
+
+config SOC_INTEL_COMMON_BLOCK_SMM_LOCK_GPIO_PADS
+	bool
+	help
+	  Enable locking of security-sensitive SoC and mainboard GPIOs.
+	  An SoC may provide a list of gpios to lock, and the mainboard
+	  may also provide a list of gpios to lock.
+
+config SOC_INTEL_COMMON_BLOCK_SMM_ESPI_DISABLE
+	bool
+	default n
+	help
+	  Disable eSPI SMI source to prevent the embedded controller
+	  from asserting SMI while in firmware.
+
+config SOC_INTEL_COMMON_BLOCK_SMM_TCO_ENABLE
+	bool "Enable TCO SMI"
+	default n
+	help
+	  Enable TCO SMI source to e.g. handle case instrusion.
+
+config SOC_INTEL_COMMON_BLOCK_SMM_S5_DELAY_MS
+	int
+	default 100 if CHROMEOS
+	default 0
+	help
+	  Time in milliseconds that SLP_SMI for S5 waits for before
+	  enabling sleep. This is required to avoid any race between
+	  SLP_SMI and PWRBTN SMI.
+
+config HECI_DISABLE_USING_SMM
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK_SMM
+	default n
+	help
+	  HECI disable using SMM. Select this option to make HECI disable
+	  using SMM mode, independent of dedicated UPD to perform HECI disable.
+
+config PERIODIC_SMI_RATE_SELECTION_IN_GEN_PMCON_B
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK_SMM
+	default n
+	help
+	  Intel Core processors select the periodic SMI rate via GEN_PMCON_A.
+	  On Intel Atom processors the register is different and they use
+	  GEN_PMCON_B/GEN_PMCON2 with different address.

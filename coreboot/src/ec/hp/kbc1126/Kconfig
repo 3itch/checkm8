@@ -1,0 +1,65 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config EC_HP_KBC1126
+	bool
+	select EC_ACPI
+	help
+	  Interface to SMSC KBC1126 embedded controller in HP laptops.
+
+config EC_HP_KBC1126_GPE
+	hex
+	depends on EC_HP_KBC1126
+	default 0x16
+
+config EC_HP_KBC1126_ECFW_IN_CBFS
+	bool
+	depends on EC_HP_KBC1126
+	default y
+
+if EC_HP_KBC1126_ECFW_IN_CBFS
+
+comment "Please select the following otherwise your laptop cannot be powered on."
+
+config KBC1126_FIRMWARE
+	bool "Add firmware images for KBC1126 EC"
+	depends on EC_HP_KBC1126
+	default n
+	help
+	  Select this option to add the two firmware blobs for KBC1126.
+	  You need these two blobs to power on your machine.
+
+config ECFW_PTR_ADDR
+	default 0xffffff00
+
+config ECFW_PTR_SIZE
+	default 8
+
+config KBC1126_FW1
+	string "KBC1126 firmware #1 path and filename"
+	depends on KBC1126_FIRMWARE
+	default "fw1.bin"
+	help
+	  The path and filename of the file to use as KBC1126 firmware #1.
+	  You can use util/kbc1126/kbc1126_ec_dump to dump it from the
+	  vendor firmware.
+
+config KBC1126_FW1_OFFSET
+	hex "Offset of KBC1126 firmware #1"
+	depends on KBC1126_FIRMWARE
+	default 0xfffe8000
+
+config KBC1126_FW2
+	string "KBC1126 filename #2 path and filename"
+	depends on KBC1126_FIRMWARE
+	default "fw2.bin"
+	help
+	  The path and filename of the file to use as KBC1126 firmware #2.
+	  You can use util/kbc1126/kbc1126_ec_dump to dump it from the
+	  vendor firmware.
+
+config KBC1126_FW2_OFFSET
+	hex "Offset of KBC1126 firmware #2"
+	depends on KBC1126_FIRMWARE
+	default 0xfffd0000
+
+endif

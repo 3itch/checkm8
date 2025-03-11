@@ -1,0 +1,13 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#ifndef MAINBOARD_EC_H
+#define MAINBOARD_EC_H
+
+#include <baseboard/ec.h>
+
+#undef MAINBOARD_EC_S0IX_WAKE_EVENTS
+#define MAINBOARD_EC_S0IX_WAKE_EVENTS \
+	(MAINBOARD_EC_S3_WAKE_EVENTS |\
+	 EC_HOST_EVENT_MASK(EC_HOST_EVENT_BATTERY_CRITICAL))
+
+#endif

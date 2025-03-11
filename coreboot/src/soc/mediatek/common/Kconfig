@@ -1,0 +1,118 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_MEDIATEK_COMMON
+	bool
+	select NO_ECAM_MMCONF_SUPPORT if PCI
+	help
+	  common code blocks for Mediatek SOCs
+
+if SOC_MEDIATEK_COMMON
+
+config MEDIATEK_DRAM_ADAPTIVE
+	bool
+	default n if SOC_MEDIATEK_MT8173
+	default n if SOC_MEDIATEK_MT8183
+	default n if SOC_MEDIATEK_MT8192
+	default y
+	help
+	  Starting from MT8195, MediaTek platform supports "dram adaptive" to
+	  automatically detect dram information, including channel, rank, die
+	  size..., and can automatically configure EMI settings. So we can just
+	  pass a placeholder param blob to `mt_mem_init_run` by enabling this
+	  option.
+	  Platforms (MT8173, MT8183, MT8192) which do not support "dram adaptive"
+	  need to implement `get_sdram_config` to get the DRAM configuration info.
+
+config MEDIATEK_DRAM_DVFS
+	bool
+	default n
+	help
+	  This option enables DRAM calibration with multiple frequencies (low,
+	  medium and high frequency groups, with total 7 frequencies) for DVFS
+	  feature. All supported data rates are: 800, 1200, 1600, 1866, 2400,
+	  3200, 4266.
+
+config MEDIATEK_DRAM_DVFS_LIMIT_FREQ_CNT
+	bool
+	default y
+	depends on MEDIATEK_DRAM_DVFS
+	help
+	  This options limit DRAM frequency calibration count from total 7 to 3,
+	  other frequency will directly use the low frequency shu result.
+
+config MEDIATEK_DRAM_BLOB_FAST_INIT
+	bool "Enable running fast calibration by blob"
+	default n
+	help
+	  This option allows performing fast calibration through different
+	  open-source policy.
+
+config MEDIATEK_DRAM_SCRAMBLE
+	bool "Enable DRAM scramble feature"
+	default n
+	help
+	  This option enables DRAM data scramble, which can prevent DRAM data from
+	  being hacked.
+
+config MEMORY_TEST
+	bool
+	default y
+	help
+	  This option enables memory basic compare test to verify the DRAM read
+	  or write is as expected.
+
+config DPM_FOUR_CHANNEL
+	bool
+	default n
+	help
+	  This option enables four channel configuration for DPM.
+
+config MTK_DFD
+	bool "Enable MediaTek DFD (Design For Debug) settings"
+	help
+	  DFD (Design for Debug) is a debugging tool, which scans flip-flops
+	  and dumps to internal RAM on the WDT reset. We reserve 1MB on DRAM
+	  to store logs of DFD.
+
+config USE_CBMEM_DRAM_INFO
+	bool "Support filling dram information to cbmem"
+	help
+	  The DRAM initialization will keep and return DRAM information (size,
+	  geometry and other DDR info) so we can fill that into the CBMEM.
+
+config FLASH_DUAL_IO_READ
+	bool
+	default n
+	help
+	  When this option is enabled, the flash controller provides the ability
+	  to dual IO read mode.
+
+config PWRAP_WITH_PMIF_SPMI
+	bool
+	default n
+	help
+	  When this option is enabled, the PMIC interface only supports PWRAP
+	  and PMIF_SPMI.
+
+config PMIF_SPMI_IOCFG_DEFAULT_SETTING
+	bool
+	default n
+	help
+	  For SoCs where IO pins default to PMIF_SPMI mode, enable this option
+	  to skip software PMIF_SPMI IO pins configuration.
+
+config DEVAPC_DEBUG
+	bool
+	default n
+	help
+	  When this option is enabled, the DEVAPC driver prints the settings after
+	  initialization.
+
+config EARLY_MMU_INIT
+	bool
+	default n
+	help
+	  When this option is enabled, `mtk_mmu_init()` will be done in
+	  `bootblock_soc_early_init()` to reduce the boot time.
+
+endif

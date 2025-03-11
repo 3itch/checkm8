@@ -1,0 +1,341 @@
+chip soc/intel/tigerlake
+
+	# GPE configuration
+	# Note that GPE events called out in ASL code rely on this
+	# route. i.e. If this route changes then the affected GPE
+	# offset bits also need to be changed.
+	register "pmc_gpe0_dw0" = "GPP_B"
+	register "pmc_gpe0_dw1" = "GPP_C"
+	register "pmc_gpe0_dw2" = "GPP_D"
+
+	# FSP configuration
+	register "SaGv" = "SaGv_Enabled"
+
+	# CNVi BT enable/disable
+	register "CnviBtCore" = "true"
+
+	# CPU replacement check
+	register "CpuReplacementCheck" = "1"
+
+	# Hybrid storage mode
+	register "HybridStorageMode" = "1"
+
+	# enabling EDP in PortA
+	register "DdiPortAConfig" = "DDI_PORT_CFG_EDP"
+
+	register "DdiPortBHpd" = "1"
+	register "DdiPort1Hpd" = "1"
+	register "DdiPort1Ddc" = "1"
+
+	register "SerialIoI2cMode" = "{
+		[PchSerialIoIndexI2C0]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C1]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C2]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C3]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C4]  = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C5]  = PchSerialIoPci,
+	}"
+
+	register "SerialIoGSpiMode" = "{
+		[PchSerialIoIndexGSPI0] = PchSerialIoDisabled,
+		[PchSerialIoIndexGSPI1] = PchSerialIoPci,
+		[PchSerialIoIndexGSPI2] = PchSerialIoDisabled,
+		[PchSerialIoIndexGSPI3] = PchSerialIoDisabled,
+	}"
+
+	register "SerialIoGSpiCsMode" = "{
+		[PchSerialIoIndexGSPI0] = 0,
+		[PchSerialIoIndexGSPI1] = 1,
+		[PchSerialIoIndexGSPI2] = 0,
+		[PchSerialIoIndexGSPI3] = 0,
+	}"
+
+	register "SerialIoGSpiCsState" = "{
+		[PchSerialIoIndexGSPI0] = 0,
+		[PchSerialIoIndexGSPI1] = 0,
+		[PchSerialIoIndexGSPI2] = 0,
+		[PchSerialIoIndexGSPI3] = 0,
+	}"
+
+	register "SerialIoUartMode" = "{
+		[PchSerialIoIndexUART0] = PchSerialIoDisabled,
+		[PchSerialIoIndexUART1] = PchSerialIoDisabled,
+		[PchSerialIoIndexUART2] = PchSerialIoPci,
+	}"
+
+	# TCSS USB3
+	register "TcssXhciEn" = "1"
+	register "TcssAuxOri" = "0"
+
+	# Enable S0ix
+	register "s0ix_enable" = "true"
+
+	# Enable DPTF
+	register "dptf_enable" = "1"
+
+	# Add PL1 and PL2 values
+	register "power_limits_config[POWER_LIMITS_U_2_CORE]" = "{
+		.tdp_pl1_override = 15,
+		.tdp_pl2_override = 38,
+		.tdp_pl4 = 71,
+	}"
+	register "power_limits_config[POWER_LIMITS_U_4_CORE]" = "{
+		.tdp_pl1_override = 15,
+		.tdp_pl2_override = 60,
+		.tdp_pl4 = 105,
+	}"
+
+	# Intel Common SoC Config
+	register "common_soc_config" = "{
+		.gspi[1] = {
+			.speed_mhz = 1,
+			.early_init = 1,
+		},
+		.i2c[0] = {
+			.speed = I2C_SPEED_FAST,
+		},
+		.i2c[1] = {
+			.speed = I2C_SPEED_FAST,
+		},
+		.i2c[2] = {
+			.speed = I2C_SPEED_FAST,
+		},
+		.i2c[3] = {
+			.speed = I2C_SPEED_FAST,
+		},
+		.i2c[5] = {
+			.speed = I2C_SPEED_FAST,
+		},
+	}"
+
+	device domain 0 on
+		device ref system_agent on  end
+		device ref igpu on  end
+		device ref dptf on
+			# Default DPTF Policy for all tglrvp_up3 boards if not overridden
+			chip drivers/intel/dptf
+				register "policies.passive[0]" = "DPTF_PASSIVE(CPU, CPU, 95, 1000)"
+				register "policies.critical[0]" = "DPTF_CRITICAL(CPU, 105, SHUTDOWN)"
+
+				# Power Limits Control
+				register "controls.power_limits.pl1" = "{
+					.min_power = 3000,
+					.max_power = 15000,
+					.time_window_min = 28 * MSECS_PER_SEC,
+					.time_window_max = 32 * MSECS_PER_SEC,
+					.granularity = 200,}"
+				register "controls.power_limits.pl2" = "{
+					.min_power = 60000,
+					.max_power = 60000,
+					.time_window_min = 28 * MSECS_PER_SEC,
+					.time_window_max = 32 * MSECS_PER_SEC,
+					.granularity = 1000,}"
+				device generic 0 on end
+			end
+		end
+
+		device ref ipu on  end
+		device ref peg on  end
+		device ref tbt_pcie_rp0 on  end
+		device ref tbt_pcie_rp1 on  end
+		device ref tbt_pcie_rp2 on  end
+		device ref tbt_pcie_rp3 on  end
+		device ref gna off end
+		device ref npk off end
+		device ref crashlog off end
+		device ref north_xhci on  end
+		device ref north_xdci on  end
+		device ref tbt_dma0 on  end
+		device ref tbt_dma1 on  end
+		device ref vmd off end
+
+		device ref thc0 off end
+		device ref thc1 off end
+		device ref ish on
+			chip drivers/intel/ish
+				register "firmware_name" = ""tglrvp_ish.bin""
+				device generic 0 on end
+			end
+		end
+		device ref gspi2 off end
+		device ref gspi3 off end
+		device ref south_xhci on
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_MID(OC0),	// Type-C Port1
+				[2] = USB2_PORT_MID(OC3),	// M.2 Bluetooth
+				[3] = USB2_PORT_MID(OC0),	// USB3/2 Type A port1
+				[4] = USB2_PORT_MID(OC0),	// Type-C Port2
+				[5] = USB2_PORT_MID(OC3),	// Type-C Port3
+				[6] = USB2_PORT_MID(OC3),	// Type-C Port4
+				[7] = USB2_PORT_MID(OC0),	// USB3/2 Type A port2
+				[8] = USB2_PORT_MID(OC3),	// USB2 Type A port3
+				[9] = USB2_PORT_MID(OC3),	// USB2 Type A port4
+			}"
+
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC0),	// USB3/2 Type A port1
+				[1] = USB3_PORT_DEFAULT(OC0),	// USB3/2 Type A port2
+			}"
+		end
+		device ref south_xdci on  end
+		device ref shared_ram on  end
+		device ref cnvi_wifi on
+			chip drivers/wifi/generic
+				register "wake" = "GPE0_PME_B0"
+				device generic 0 on end
+			end
+		end
+
+		device ref i2c0 on
+			chip drivers/i2c/generic
+				register "hid" = ""10EC1308""
+				register "name" = ""RTAM""
+				register "desc" = ""Realtek RT1308 Codec""
+				device i2c 10 on end
+			end
+			chip drivers/i2c/max98373
+				register "vmon_slot_no" = "4"
+				register "imon_slot_no" = "5"
+				register "uid" = "0"
+				register "desc" = ""RIGHT SPEAKER AMP""
+				register "name" = ""MAXR""
+				device i2c 31 on end
+			end
+			chip drivers/i2c/max98373
+				register "vmon_slot_no" = "6"
+				register "imon_slot_no" = "7"
+				register "uid" = "1"
+				register "desc" = ""LEFT SPEAKER AMP""
+				register "name" = ""MAXL""
+				device i2c 32 on end
+			end
+			chip drivers/i2c/generic
+				register "hid" = ""10EC5682""
+				register "name" = ""RT58""
+				register "desc" = ""Realtek RT5682""
+				register "irq" = "ACPI_IRQ_EDGE_HIGH(GPP_C12_IRQ)"
+				register "probed" = "1"
+				# Set the jd_src to RT5668_JD1 for jack detection
+				register "property_list[0].type" = "ACPI_DP_TYPE_INTEGER"
+				register "property_list[0].name" = ""realtek,jd-src""
+				register "property_list[0].integer" = "1"
+				device i2c 1a on end
+			end
+		end
+		device ref i2c1 on  end
+		device ref i2c2 on  end
+		device ref i2c3 on  end
+		device ref heci1 on  end
+		device ref heci2 off end
+		device ref csme1 off end
+		device ref csme2 off end
+		device ref heci3 off end
+		device ref heci4 off end
+		device ref sata on
+			register "SataSalpSupport" = "1"
+			register "SataPortsEnable[0]" = "1"
+			register "SataPortsEnable[1]" = "1"
+		end
+		device ref i2c4 off end
+		device ref i2c5 on  end
+		device ref uart2 on  end
+		device ref pcie_rp1 off end
+		device ref pcie_rp2 off end
+		device ref pcie_rp3 on
+			register "PcieRpSlotImplemented[2]" = "1"
+			register "PcieRpLtrEnable[2]" = "1"
+			register "PcieClkSrcUsage[1]" = "0x2"
+			register "PcieClkSrcClkReq[1]" = "1"
+		end
+		device ref pcie_rp4 on
+			register "PcieRpSlotImplemented[3]" = "1"
+			register "PcieRpLtrEnable[3]" = "1"
+			register "PcieClkSrcUsage[2]" = "0x3"
+			register "PcieClkSrcClkReq[2]" = "2"
+			chip soc/intel/common/block/pcie/rtd3
+				register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_B17)"
+				register "srcclk_pin" = "2"
+				device generic 0 on end
+			end
+		end
+		device ref pcie_rp5 off end
+		device ref pcie_rp6 off end
+		device ref pcie_rp7 off end
+		device ref pcie_rp8 off end
+		device ref pcie_rp9 on
+			register "PcieRpSlotImplemented[8]" = "1"
+			register "PcieRpLtrEnable[8]" = "1"
+			register "PcieClkSrcUsage[3]" = "0x8"
+			register "PcieClkSrcClkReq[3]" = "3"
+		end
+		device ref pcie_rp10 off end
+		device ref pcie_rp11 on
+			register "PcieRpSlotImplemented[10]" = "1"
+			register "PcieRpLtrEnable[10]" = "1"
+		end
+		device ref pcie_rp12 off end
+		device ref uart0 off end
+		device ref uart1 off end
+		device ref gspi0 on end
+		device ref gspi1 on
+			chip drivers/spi/acpi
+				register "hid" = "ACPI_DT_NAMESPACE_HID"
+				register "compat_string" = ""google,cr50""
+				register "irq" = "ACPI_IRQ_EDGE_LOW(GPP_C22_IRQ)"
+				device spi 0 on end
+			end
+		end
+		device ref pch_espi on
+			# EC host command ranges are in 0x800-0x8ff & 0x200-0x20f
+			register "gen1_dec" = "0x00fc0801"
+			register "gen2_dec" = "0x000c0201"
+			# EC memory map range is 0x900-0x9ff
+			register "gen3_dec" = "0x00fc0901"
+
+			chip ec/google/chromeec
+				use conn0 as mux_conn[0]
+				use conn1 as mux_conn[1]
+				device pnp 0c09.0 on end
+			end
+		end
+		device ref p2sb on  end
+		device ref pmc hidden
+			# The pmc_mux chip driver is a placeholder for the
+			# PMC.MUX device in the ACPI hierarchy.
+			chip drivers/intel/pmc_mux
+				device generic 0 on
+					chip drivers/intel/pmc_mux/conn
+						use usb2_port6 as usb2_port
+						use tcss_usb3_port3 as usb3_port
+						# SBU is fixed, HSL follows CC
+						register "sbu_orientation" = "TYPEC_ORIENTATION_NORMAL"
+						device generic 0 alias conn0 on end
+					end
+					chip drivers/intel/pmc_mux/conn
+						use usb2_port7 as usb2_port
+						use tcss_usb3_port4 as usb3_port
+						# SBU is fixed, HSL follows CC
+						register "sbu_orientation" = "TYPEC_ORIENTATION_NORMAL"
+						device generic 1 alias conn1 on end
+					end
+				end
+			end
+		end
+		device ref hda on
+			register "PchHdaDspEnable" = "1"
+			register "PchHdaAudioLinkDmicEnable" = "{
+				[0] = 1,
+				[1] = 1,
+			}"
+			register "PchHdaAudioLinkSspEnable" = "{
+				[0] = 1,
+				[2] = 1,
+			}"
+			register "PchHdaAudioLinkSndwEnable[0]" = "1"
+		end
+		device ref smbus on  end
+		device ref fast_spi on  end
+		device ref gbe off end
+		device ref tracehub off end
+	end
+end

@@ -1,0 +1,164 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config INTEL_HAS_TOP_SWAP
+	bool
+	help
+	  Set this config if the Intel SoC supports top swap feature
+
+if INTEL_HAS_TOP_SWAP
+
+config INTEL_ADD_TOP_SWAP_BOOTBLOCK
+	bool "Include a Top swap bootblock"
+	default n
+	help
+	  Intel PCH/Southbridges have feature that it is possible to have
+	  the southbridge/PCH look for the bootblock at a 64K or
+	  128K/256K/512K/1MB (in case of newer SoCs) offset
+	  instead of the usual top of flash.
+	  Select this to put a 'second' bootblock.
+
+config INTEL_TOP_SWAP_BOOTBLOCK_SIZE
+	hex "Size of top swap boot block"
+	depends on INTEL_ADD_TOP_SWAP_BOOTBLOCK
+	default 0x10000
+	help
+	  Set this config to a supported topswap size.
+	  Valid sizes: 0x10000 0x20000 0x40000 0x80000 0x100000
+
+config INTEL_TOP_SWAP_FIT_ENTRY_FMAP_REG
+	string
+	depends on INTEL_ADD_TOP_SWAP_BOOTBLOCK
+	help
+	  Use this config to specify the name of a FMAP region (which should
+	  hold a microcode) whose address as the first entry in the topswap FIT.
+	  This is useful in creating a asymmetric FIT in top swap bootblock
+	  than the one in non-topswap bootblock. This string will be passed
+	  onto ifittool (-A -n option). ifittool will not parse the region for MCU
+	  entries, and only locate the region and insert its address into FIT.
+
+endif
+
+config SOC_INTEL_COMMON
+	bool
+	select AZALIA_HDA_CODEC_SUPPORT
+	select ACPI_SOC_NVS
+	help
+	  common code for Intel SOCs
+
+if SOC_INTEL_COMMON
+
+comment "Intel SoC Common Code for IP blocks"
+source "src/soc/intel/common/block/Kconfig"
+
+comment "Intel SoC Common PCH Code"
+source "src/soc/intel/common/pch/Kconfig"
+
+comment "Intel SoC Common coreboot stages and non-IP blocks"
+source "src/soc/intel/common/basecode/Kconfig"
+
+config SOC_INTEL_COMMON_RESET
+	bool
+	default n
+	select HAVE_CF9_RESET
+
+config SOC_INTEL_COMMON_ACPI_WAKE_SOURCE
+	bool
+	default n
+
+config ACPI_CONSOLE
+	bool
+	default n
+	help
+	  Provide a mechanism for serial console based ACPI debug.
+
+config PAVP
+	bool "Enable PAVP (Protected Audio-Video Path) support"
+	default y
+	help
+	  Protected Audio-Video Path is an Intel technology used to enforce digital
+	  rights protections on multimedia content. Streaming or other media playback
+	  services may require it to be enabled for correct functioning.
+
+	  Users might disable PAVP if the concept of digital rights management (DRM)
+	  offends them, or if they have concerns about the security of
+	  the Management Engine, which is where this technology is implemented.
+
+	  Set this option to n to disable support.
+
+config MMA
+	bool "Enable MMA (Memory Margin Analysis) support for Intel Core"
+	default n
+	depends on SOC_INTEL_KABYLAKE || SOC_INTEL_SKYLAKE
+	help
+	 Set this option to y to enable MMA (Memory Margin Analysis) support
+
+config MMA_BLOBS_PATH
+	string "Path to MMA blobs"
+	depends on MMA
+	default "3rdparty/blobs/soc/intel/kabylake/mma-blobs" if SOC_INTEL_KABYLAKE
+	default "3rdparty/blobs/soc/intel/skylake/mma-blobs" if SOC_INTEL_SKYLAKE
+
+config SOC_INTEL_COMMON_NHLT
+	bool
+	default n
+
+config TPM_TIS_ACPI_INTERRUPT
+	int
+	help
+	  acpi_get_gpe() is used to provide interrupt status to TPM layer.
+	  This option specifies the GPE number.
+
+config SOC_INTEL_DEBUG_CONSENT
+	bool "Enable SOC debug interface"
+	default n
+	help
+	  Set this option to enable default debug interface of SoC such as DBC
+	  or DCI.
+
+config HAVE_INTEL_COMPLIANCE_TEST_MODE
+	def_bool n
+
+config SOC_INTEL_COMPLIANCE_TEST_MODE
+	bool "Enable SoC hardware compliance test mode"
+	depends on HAVE_INTEL_COMPLIANCE_TEST_MODE
+	default n
+	help
+	  Set this option to configure hardware components in a way
+	  that supports compliance testing activities for various
+	  components such PCIe or USB. For example, PCI express
+	  implementation must comply with the hardware PCIe
+	  specification requirements: Electrical, Configuration, Link
+	  Protocol and Transaction Protocol. The hardware must be
+	  configured in a particular state to run the compliance
+	  tests: some feature related to power management needs to be
+	  turned off, hot plug should be enabled...
+
+config SMM_MODULE_STACK_SIZE
+	hex
+	default 0x800
+
+config SOC_INTEL_CRASHLOG
+	def_bool n
+	select SOC_INTEL_COMMON_BLOCK_CRASHLOG
+	select ACPI_BERT
+	help
+	  Enables Crashlog.
+
+config SOC_INTEL_CRASHLOG_ON_RESET
+	def_bool n
+	help
+	  Enables the PMC to collect crashlog records on every reset event. NOTE:
+	  This will result in a BERT table being populated containing a PMC
+	  crashlog record on every boot.
+
+config HAS_INTEL_CPU_ROOT_PORTS
+	def_bool n
+	help
+	  Enables helper functions for CPU root ports alongside PCH root ports.
+
+config SOC_INTEL_IOE_DIE_SUPPORT
+	def_bool n
+	help
+	  Enable this config if the SOC support IOE DIE.
+
+endif # SOC_INTEL_COMMON

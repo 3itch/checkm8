@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_SIFIVE_HIFIVE_UNLEASHED
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select SOC_SIFIVE_FU540
+	select BOARD_ROMSIZE_KB_32768
+	select MISSING_BOARD_RESET
+	select FLATTENED_DEVICE_TREE
+	select SPI_SDCARD
+
+config MAINBOARD_DIR
+	default "sifive/hifive-unleashed"
+
+config MAINBOARD_PART_NUMBER
+	default "HiFive Unleashed"
+
+endif

@@ -1,0 +1,134 @@
+chip northbridge/intel/sandybridge
+	register "gfx" = "GMA_STATIC_DISPLAYS(0)"
+	register "gpu_cpu_backlight" = "0x00000000"
+	register "gpu_dp_b_hotplug" = "0"
+	register "gpu_dp_c_hotplug" = "0"
+	register "gpu_dp_d_hotplug" = "0"
+	register "gpu_panel_port_select" = "PANEL_PORT_LVDS"
+	register "gpu_panel_power_backlight_off_delay" = "0"
+	register "gpu_panel_power_backlight_on_delay" = "0"
+	register "gpu_panel_power_cycle_delay" = "0"
+	register "gpu_panel_power_down_delay" = "0"
+	register "gpu_panel_power_up_delay" = "0"
+	register "gpu_pch_backlight" = "0x00000000"
+	register "spd_addresses" = "{0x50, 0, 0x52, 0}"
+	chip cpu/intel/model_206ax
+		# Values obtained from vendor BIOS
+		register "pp0_psi[VR12_PSI2]" = "{VR12_ALL_PHASES, 5}"
+		register "pp0_psi[VR12_PSI3]" = "{VR12_ALL_PHASES, 1}"
+		register "pp1_psi[VR12_PSI2]" = "{VR12_ALL_PHASES, 5}"
+		register "pp1_psi[VR12_PSI3]" = "{VR12_ALL_PHASES, 1}"
+		device cpu_cluster 0 on end
+	end
+	device domain 0 on
+		subsystemid 0x17aa 0x21dd inherit
+
+		device ref host_bridge on end # Host bridge
+		device ref peg10 on end # PCIe Bridge for discrete graphics
+		device ref igd on end # Internal graphics VGA controller
+
+		chip southbridge/intel/bd82x6x # Intel Series 6 Cougar Point PCH
+			register "docking_supported" = "true"
+			register "gen1_dec" = "0x007c1611"
+			register "gen2_dec" = "0x00040069"
+			register "gen3_dec" = "0x000c0701"
+			register "gen4_dec" = "0x00000000"
+			register "gpi13_routing" = "2"
+			register "gpi6_routing" = "2"
+			register "pcie_hotplug_map" = "{ 0, 0, 1, 1, 1, 0, 0, 0 }"
+			register "pcie_port_coalesce" = "true"
+			register "sata_interface_speed_support" = "0x3"
+			register "sata_port_map" = "0x3b"
+
+			register "spi_uvscc" = "0"
+			register "spi_lvscc" = "0x2005"
+
+			register "usb_port_config" = "{
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 },
+				{ 1, 0, -1 }
+			}"
+
+			device ref mei1 on end # Management Engine Interface 1
+			device ref mei2 off end # Management Engine Interface 2
+			device ref me_ide_r off end # Management Engine IDE-R
+			device ref me_kt off end # Management Engine KT
+			device ref gbe off end # Intel Gigabit Ethernet
+			device ref ehci2 on end # USB2 EHCI #2
+			device ref hda on end # High Definition Audio controller
+			device ref pcie_rp1 on end # PCIe Port #1
+			device ref pcie_rp2 on end # PCIe Port #2
+			device ref pcie_rp3 on end # PCIe Port #3
+			device ref pcie_rp4 on end # PCIe Port #4
+			device ref pcie_rp5 on end # PCIe Port #5
+			device ref pcie_rp6 on end # PCIe Port #6
+			device ref pcie_rp7 off end # PCIe Port #7
+			device ref pcie_rp8 off end # PCIe Port #8
+			device ref ehci1 on end # USB2 EHCI #1
+			device ref pci_bridge off end # PCI bridge
+			device ref lpc on # LPC bridge PCI-LPC bridge
+				chip ec/lenovo/pmh7
+					register "backlight_enable" = "true"
+					register "dock_event_enable" = "true"
+					device pnp ff.1 on end # dummy
+				end
+				chip ec/lenovo/h8
+					register "config0" = "0xa7"
+					register "config1" = "0x09"
+					register "config2" = "0xa0"
+					register "config3" = "0xc2"
+
+					register "beepmask0" = "0x00"
+					register "beepmask1" = "0x86"
+					register "has_power_management_beeps" = "0"
+					register "event2_enable" = "0xff"
+					register "event3_enable" = "0xff"
+					register "event4_enable" = "0xff"
+					register "event5_enable" = "0xff"
+					register "event6_enable" = "0xff"
+					register "event7_enable" = "0xff"
+					register "event8_enable" = "0xff"
+					register "event9_enable" = "0xff"
+					register "eventa_enable" = "0xff"
+					register "eventb_enable" = "0xff"
+					register "eventc_enable" = "0xff"
+					register "eventd_enable" = "0xff"
+					register "evente_enable" = "0xff"
+
+					device pnp ff.2 on # dummy
+						io 0x60 = 0x62
+						io 0x62 = 0x66
+						io 0x64 = 0x1600
+						io 0x66 = 0x1604
+					end
+				end
+			end # LPC bridge
+			device ref sata1 on end # SATA Controller 1
+			device ref smbus on # SMBus
+				chip drivers/i2c/at24rf08c # eeprom, 8 virtual devices, same chip
+					device i2c 54 on end
+					device i2c 55 on end
+					device i2c 56 on end
+					device i2c 57 on end
+					device i2c 5c on end
+					device i2c 5d on end
+					device i2c 5e on end
+					device i2c 5f on end
+				end
+			end # SMBus
+			device ref sata2 off end # SATA Controller 2
+			device ref thermal off end # Thermal
+		end
+	end
+end

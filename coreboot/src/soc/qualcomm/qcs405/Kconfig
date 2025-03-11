@@ -1,0 +1,28 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_QUALCOMM_QCS405
+	bool
+	default n
+	select ARCH_BOOTBLOCK_ARMV8_64
+	select ARCH_RAMSTAGE_ARMV8_64
+	select ARCH_ROMSTAGE_ARMV8_64
+	select ARCH_VERSTAGE_ARMV8_64
+	select GENERIC_GPIO_LIB
+	select ARM64_USE_ARCH_TIMER
+	select HAVE_UART_SPECIAL
+
+if SOC_QUALCOMM_QCS405
+
+config MEMLAYOUT_LD_FILE
+	string
+	default "src/soc/qualcomm/qcs405/memlayout.ld"
+
+config VBOOT
+	select VBOOT_SEPARATE_VERSTAGE
+	select VBOOT_RETURN_FROM_VERSTAGE
+	select VBOOT_STARTS_IN_BOOTBLOCK
+
+config BOOT_DEVICE_SPI_FLASH_BUS
+	int
+	default 5
+endif

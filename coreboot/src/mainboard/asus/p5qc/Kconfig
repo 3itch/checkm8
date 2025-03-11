@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_ASUS_P5QC || BOARD_ASUS_P5Q_PRO || BOARD_ASUS_P5QL_PRO || BOARD_ASUS_P5Q_SE || BOARD_ASUS_P5Q
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select CPU_INTEL_SOCKET_LGA775
+	select NORTHBRIDGE_INTEL_X4X
+	select SOUTHBRIDGE_INTEL_I82801JX
+	select SUPERIO_WINBOND_W83667HG_A
+	select HAVE_ACPI_TABLES
+	select BOARD_ROMSIZE_KB_1024
+	select HAVE_OPTION_TABLE
+	select HAVE_CMOS_DEFAULT
+	select HAVE_ACPI_RESUME
+	select ATHEROS_ATL1E_SETMAC
+
+config MAINBOARD_DIR
+	default "asus/p5qc"
+
+config VARIANT_DIR
+	default "p5qc" if BOARD_ASUS_P5QC
+	default "p5q_pro" if BOARD_ASUS_P5Q_PRO
+	default "p5ql_pro" if BOARD_ASUS_P5QL_PRO
+	default "p5q_se" if BOARD_ASUS_P5Q_SE
+	default "p5q" if BOARD_ASUS_P5Q
+
+config MAINBOARD_PART_NUMBER
+	default "P5QC" if BOARD_ASUS_P5QC
+	default "P5Q PRO" if BOARD_ASUS_P5Q_PRO
+	default "P5QL PRO" if BOARD_ASUS_P5QL_PRO
+	default "P5Q SE" if BOARD_ASUS_P5Q_SE
+	default "P5Q" if BOARD_ASUS_P5Q
+
+config DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/devicetree.cb"
+
+config GPIO_C
+	string
+	default "variants/p5q_se/gpio.c" if BOARD_ASUS_P5Q_SE
+	default "variants/p5ql_pro/gpio.c" if BOARD_ASUS_P5QL_PRO
+	default "gpio.c"
+
+# The MARVELL IDE controller delays SeaBIOS a lot and results in an unbootable
+# bogus disk. Compiling SeaBIOS without ATA support is a workaround.
+
+# The Asus P5QL PRO's Marvell controller (88SE6102-NNC2) does not need this, apparently.
+
+config PAYLOAD_CONFIGFILE
+	string
+	default "" if PAYLOAD_SEABIOS && (BOARD_ASUS_P5QL_PRO || BOARD_ASUS_P5Q_SE)
+	default "\$(top)/src/mainboard/\$(MAINBOARDDIR)/config_seabios" if PAYLOAD_SEABIOS
+
+endif # BOARD_ASUS_P5Q*

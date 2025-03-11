@@ -1,0 +1,7 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVER_PARADE_PS8625
+	bool
+	default n
+	help
+	  Parade ps8625 display port to lvds bridge

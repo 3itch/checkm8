@@ -1,0 +1,7 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVERS_I2C_TAS5825M
+	bool
+	default n
+	help
+	  Enable support for TI TAS5825M Amplifier.

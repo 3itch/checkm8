@@ -1,0 +1,101 @@
+## SPDX-License-Identifier: GPL-2.0-or-later
+
+chip northbridge/intel/sandybridge
+	register "spd_addresses" = "{0x50, 0x51, 0x52, 0x53}"
+	device domain 0 on
+		subsystemid 0x1043 0x844d inherit
+
+		device ref host_bridge on end
+		device ref peg10 on end # discrete graphics
+		device ref igd on end
+
+		chip southbridge/intel/bd82x6x
+			register "gen1_dec" = "0x00000295" # Super I/O HWM
+			register "sata_port_map" = "0x3f"
+			register "spi_lvscc" = "0x2005"
+			register "spi_uvscc" = "0x2005"
+
+			register "usb_port_config" = "{
+				{ 1, 0, 0 },
+				{ 1, 0, 0 },
+				{ 1, 0, 1 },
+				{ 1, 0, 1 },
+				{ 1, 0, 2 },
+				{ 1, 0, 2 },
+				{ 1, 0, 3 },
+				{ 1, 0, 3 },
+				{ 1, 0, 4 },
+				{ 1, 0, 4 },
+				{ 1, 0, 5 },
+				{ 1, 0, 5 },
+				{ 1, 0, 6 },
+				{ 1, 0, 6 }
+			}"
+
+			device ref mei1 on  end
+			device ref mei2 off end
+			device ref me_ide_r off end
+			device ref me_kt off end
+			device ref gbe on
+				subsystemid 0x1043 0x849c
+			end
+			device ref ehci2 on  end
+			device ref hda on
+				subsystemid 0x1043 0x84dc
+			end
+			device ref pcie_rp1 on  end
+			device ref pcie_rp2 off end
+			device ref pcie_rp3 off end
+			device ref pcie_rp4 off end
+			device ref pcie_rp5 on  end
+			device ref pcie_rp6 on  end
+			device ref pcie_rp7 on  end
+			device ref pcie_rp8 off end
+			device ref ehci1 on  end
+			device ref pci_bridge off end
+			device ref lpc on
+				chip superio/nuvoton/nct6776
+					device pnp 2e.0   off end # Floppy
+					device pnp 2e.1   off end # Parallel
+					device pnp 2e.2   off end # UART A
+					device pnp 2e.3   off end # UART B, IR
+					device pnp 2e.5   on      # PS/2 KBC
+						io  0x60 = 0x0060
+						io  0x62 = 0x0064
+						irq 0x70 = 1      # Keyboard
+						irq 0x72 = 12     # Mouse
+					end
+					device pnp 2e.6   off end # CIR
+					device pnp 2e.7   off end # GPIO8
+					device pnp 2e.107 off end # GPIO9
+					device pnp 2e.8   off end # WDT
+					device pnp 2e.108 off end # GPIO0
+					device pnp 2e.208 off end # GPIOA
+					device pnp 2e.308 off end # GPIO base
+					device pnp 2e.109 off end # GPIO1
+					device pnp 2e.209 off end # GPIO2
+					device pnp 2e.309 off end # GPIO3
+					device pnp 2e.409 off end # GPIO4
+					device pnp 2e.509 off end # GPIO5
+					device pnp 2e.609 off end # GPIO6
+					device pnp 2e.709 off end # GPIO7
+					device pnp 2e.a   off end # ACPI
+					device pnp 2e.b   on      # HWM, LED
+						io  0x60 = 0x0290
+						io  0x62 = 0x0200
+					end
+					device pnp 2e.d   off end # VID
+					device pnp 2e.e   off end # CIR wake-up
+					device pnp 2e.f   off end # GPIO PP/OD
+					device pnp 2e.14  off end # SVID
+					device pnp 2e.16  off end # Deep sleep
+					device pnp 2e.17  off end # GPIOA
+				end
+			end
+			device ref sata1 on  end
+			device ref smbus on  end
+			device ref sata2 off end
+			device ref thermal off end
+		end
+	end
+end

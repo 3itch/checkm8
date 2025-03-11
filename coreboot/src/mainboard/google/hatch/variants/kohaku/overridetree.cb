@@ -1,0 +1,242 @@
+chip soc/intel/cannonlake
+	register "power_limits_config" = "{
+		.tdp_pl1_override = 8,
+		.tdp_pl2_override = 51,
+	}"
+
+	register "SerialIoDevMode" = "{
+		[PchSerialIoIndexI2C0] = PchSerialIoPci,
+		[PchSerialIoIndexI2C1] = PchSerialIoPci,
+		[PchSerialIoIndexI2C2] = PchSerialIoPci,
+		[PchSerialIoIndexI2C3] = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C4] = PchSerialIoPci,
+		[PchSerialIoIndexI2C5] = PchSerialIoDisabled,
+		[PchSerialIoIndexSPI0] = PchSerialIoPci,
+		[PchSerialIoIndexSPI1] = PchSerialIoPci,
+		[PchSerialIoIndexSPI2] = PchSerialIoDisabled,
+		[PchSerialIoIndexUART0] = PchSerialIoSkipInit,
+		[PchSerialIoIndexUART1] = PchSerialIoDisabled,
+		[PchSerialIoIndexUART2] = PchSerialIoDisabled,
+	}"
+
+	# No PCIe WiFi
+	register "PcieRpEnable[13]" = "0"
+
+	# Enable DMIC1
+	register "PchHdaAudioLinkDmic1" = "1"
+
+	register "usb2_ports[0]" = "USB2_PORT_LONG(OC2)"        # Type-C Port 0
+	register "usb2_ports[1]" = "USB2_PORT_LONG(OC2)"        # Type-C Port 1
+	register "usb2_ports[3]" = "USB2_PORT_LONG(OC_SKIP)"    # SD CARD
+	register "usb2_ports[6]" = "USB2_PORT_LONG(OC_SKIP)"    # Camera
+	register "usb2_ports[9]" = "USB2_PORT_MID(OC_SKIP)"     # CnVi BT
+
+	register "usb3_ports[0]" = "USB3_PORT_DEFAULT(OC2)"     # Type-C Port 0
+	register "usb3_ports[1]" = "USB3_PORT_DEFAULT(OC2)"     # Type-C Port 1
+	register "usb3_ports[2]" = "USB3_PORT_DEFAULT(OC_SKIP)" # World facing camera
+	register "usb3_ports[3]" = "USB3_PORT_DEFAULT(OC_SKIP)" # SD CARD
+
+	# Intel Common SoC Config
+	#+-------------------+---------------------------+
+	#| Field	     |	Value			 |
+	#+-------------------+---------------------------+
+	#| I2C0		     | Trackpad			 |
+	#| I2C1		     | Touchscreen		 |
+	#| I2C2		     | Digitizer		 |
+	#| I2C4		     | Audio			 |
+	#+-------------------+---------------------------+
+	register "common_soc_config" = "{
+		.i2c[0] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 135,
+			.fall_time_ns = 45,
+		},
+		.i2c[1] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 60,
+			.fall_time_ns = 25,
+		},
+		.i2c[2] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 95,
+			.fall_time_ns = 55,
+		},
+		.i2c[4] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 104,
+			.fall_time_ns = 52,
+		},
+		.gspi[0] = {
+		       .speed_mhz = 1,
+		       .early_init = 1,
+		},
+	}"
+
+	device domain 0 on
+		device ref igpu		on
+			register "gfx" = "GMA_DEFAULT_PANEL(0)"
+		end
+		device ref xhci		on
+			chip drivers/usb/acpi
+				device ref xhci_root_hub on
+					chip drivers/usb/acpi
+						device ref usb2_port3 off end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Micro SD Card""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device ref usb2_port4  on end
+					end
+					chip drivers/usb/acpi
+						device ref usb2_port5 off end
+					end
+					chip drivers/usb/acpi
+						device ref usb2_port6 off end
+					end
+					chip drivers/usb/acpi
+						device ref usb2_port8 off end
+					end
+					chip drivers/usb/acpi
+						device ref usb2_port9 off end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Bluetooth""
+						register "type" = "UPC_TYPE_INTERNAL"
+						register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_C14)"
+						device ref usb2_port10 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""WF Camera""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device ref usb3_port3 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""Micro SD card""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device ref usb3_port4 on end
+					end
+					chip drivers/usb/acpi
+						device ref usb3_port5 off end
+					end
+				end
+			end
+		end # XHCI
+		device ref i2c0		on
+			chip drivers/i2c/hid
+				register "generic.hid" = ""SYNA0000""
+				register "generic.cid" = ""ACPI0C50""
+				register "generic.desc" = ""Synaptics Touchpad""
+				register "generic.irq" = "ACPI_IRQ_WAKE_LEVEL_LOW(GPP_A21_IRQ)"
+				register "generic.detect" = "1"
+				register "generic.wake" = "GPE0_DW0_21"
+				register "hid_desc_reg_offset" = "0x20"
+				device i2c 0x20 on end
+			end
+		end
+		device ref i2c1		on
+			chip drivers/i2c/generic
+				register "hid" = "ACPI_DT_NAMESPACE_HID"
+				register "compat_string" = ""atmel,maxtouch""
+				register "desc" = ""Atmel Touchscreen""
+				register "irq" = "ACPI_IRQ_LEVEL_LOW(GPP_D16_IRQ)"
+				register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_D15)"
+				register "reset_delay_ms" = "91" # 90.5 ms
+				register "enable_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_HIGH(GPP_C12)"
+				register "enable_delay_ms" = "1" # 90 ns
+				register "has_power_resource" = "true"
+				register "detect" = "1"
+				device i2c 4b on end
+			end
+
+			chip drivers/i2c/generic
+				register "hid" = ""ELAN0001""
+				register "desc" = ""ELAN Touchscreen""
+				register "irq" = "ACPI_IRQ_LEVEL_LOW(GPP_D16_IRQ)"
+				register "detect" = "1"
+				register "enable_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_HIGH(GPP_C12)"
+				register "enable_delay_ms" = "10"
+				register "enable_off_delay_ms" = "100"
+				register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_D15)"
+				register "reset_delay_ms" = "20"
+				register "reset_off_delay_ms" = "2"
+				register "has_power_resource" = "true"
+				device i2c 10 on end
+			end
+		end # I2C #1
+		device ref i2c2		on
+			chip drivers/i2c/hid
+				register "generic.hid" = ""WCOM50C1""
+				register "generic.desc" = ""WCOM Digitizer""
+				register "generic.irq" = "ACPI_IRQ_LEVEL_LOW(GPP_C7_IRQ)"
+				register "generic.enable_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_HIGH(GPP_C15)"
+				register "generic.reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_A19)"
+				register "generic.reset_delay_ms" = "100"
+				register "generic.enable_delay_ms" = "20"
+				register "generic.has_power_resource" = "1"
+				register "hid_desc_reg_offset" = "0x1"
+				device i2c 0x09 on end
+			end
+			chip drivers/generic/gpio_keys
+				register "name" = ""PENH""
+				# GPP_A16 is the IRQ source, and GPP_A8 is the wake source
+				register "gpio" = "ACPI_GPIO_INPUT_ACTIVE_LOW(GPP_A16)"
+				register "key.wake_gpe" = "GPE0_DW0_08"
+				register "key.wakeup_route" = "WAKEUP_ROUTE_SCI"
+				register "key.wakeup_event_action" = "EV_ACT_DEASSERTED"
+				register "key.dev_name" = ""EJCT""
+				register "key.linux_code" = "SW_PEN_INSERTED"
+				register "key.linux_input_type" = "EV_SW"
+				register "key.label" = ""pen_eject""
+				device generic 0 on end
+			end
+		end
+		device ref i2c4		on
+			chip drivers/i2c/da7219
+				# TODO: these settings were copied from another board
+				# with the same chip. verify the settings
+				register "irq_gpio" = "ACPI_GPIO_IRQ_EDGE_BOTH(GPP_H0)"
+				register "btn_cfg" = "50"
+				register "mic_det_thr" = "200"
+				register "jack_ins_deb" = "20"
+				register "jack_det_rate" = ""32ms_64ms""
+				register "jack_rem_deb" = "1"
+				register "a_d_btn_thr" = "0xa"
+				register "d_b_btn_thr" = "0x16"
+				register "b_c_btn_thr" = "0x21"
+				register "c_mic_btn_thr" = "0x3e"
+				register "btn_avg" = "4"
+				register "adc_1bit_rpt" = "1"
+				register "micbias_lvl" = "2600"
+				register "mic_amp_in_sel" = ""diff""
+				device i2c 0x1a on end
+			end
+		end
+		# No PCIe WiFi
+		device ref pcie_rp14	off end
+		device ref gspi1	on
+			chip drivers/spi/acpi
+				register "name" = ""CRFP""
+				register "hid" = "ACPI_DT_NAMESPACE_HID"
+				register "uid" = "1"
+				register "compat_string" = ""google,cros-ec-spi""
+				register "irq" = "ACPI_IRQ_WAKE_LEVEL_LOW(GPP_A23_IRQ)"
+				register "wake" = "GPE0_DW0_23"
+				device spi 1 hidden end
+			end # FPMCU
+		end
+		device ref hda		on
+			chip drivers/generic/max98357a
+				register "hid" = ""MX98357A""
+				register "sdmode_gpio" =  "ACPI_GPIO_OUTPUT_ACTIVE_HIGH(GPP_H3)"
+				register "sdmode_delay" = "5"
+				device generic 0 on end
+			end
+			chip drivers/sof
+				register "spkr_tplg" = "max98357a"
+				register "jack_tplg" = "da7219"
+				register "mic_tplg" = "_2ch_pdm0"
+				device generic 0 on end
+			end
+		end
+	end
+end

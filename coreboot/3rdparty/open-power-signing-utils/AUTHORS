@@ -1,0 +1,7 @@
+Principal author of signtool is Dave Heller <hellerda@us.ibm.com>
+
+Based on container creation code by Stewart Smith <sesmith@au1.ibm.com>
+
+Some files based on code and headers from project skiboot:
+https://github.com/open-power/skiboot
+

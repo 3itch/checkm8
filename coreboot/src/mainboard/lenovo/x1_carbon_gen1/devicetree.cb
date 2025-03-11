@@ -1,0 +1,158 @@
+chip northbridge/intel/sandybridge
+	register "gfx" = "GMA_STATIC_DISPLAYS(1)"
+	register "gpu_cpu_backlight" = "0x00001155"
+	register "gpu_dp_b_hotplug" = "4"
+	register "gpu_dp_c_hotplug" = "4"
+	register "gpu_dp_d_hotplug" = "4"
+	register "gpu_panel_port_select" = "PANEL_PORT_LVDS"
+	register "gpu_panel_power_backlight_off_delay" = "2000"
+	register "gpu_panel_power_backlight_on_delay" = "3000"
+	register "gpu_panel_power_cycle_delay" = "6"
+	register "gpu_panel_power_down_delay" = "300"
+	register "gpu_panel_power_up_delay" = "300"
+	register "gpu_pch_backlight" = "0x11551155"
+
+	device domain 0 on
+		subsystemid 0x17aa 0x21f9 inherit
+
+		device ref host_bridge on end # host bridge
+		device ref peg10 off end # PCIe Bridge for discrete graphics
+		device ref igd on end # vga controller
+
+		chip southbridge/intel/bd82x6x # Intel Series 6 Cougar Point PCH
+			# GPI routing
+			#  0 No effect (default)
+			#  1 SMI# (if corresponding ALT_GPI_SMI_EN bit is also set)
+			#  2 SCI (if corresponding GPIO_EN bit is also set)
+			register "alt_gp_smi_en" = "0x0000"
+			register "gpi1_routing" = "2"
+			register "gpi13_routing" = "2"
+
+			# Enable SATA ports 0 (HDD bay) 2 (msata)
+			register "sata_port_map" = "0x5"
+			# Set max SATA speed to 6.0 Gb/s
+			register "sata_interface_speed_support" = "0x3"
+
+			register "gen1_dec" = "0x7c1601"
+			register "gen2_dec" = "0x0c15e1"
+			register "gen3_dec" = "0x000000"
+			register "gen4_dec" = "0x0c06a1"
+
+			register "pcie_hotplug_map" = "{ 0, 0, 0, 0, 0, 0, 0, 0 }"
+
+			register "xhci_switchable_ports" = "0xf"
+			register "superspeed_capable_ports" = "0xf"
+			register "xhci_overcurrent_mapping" = "0x4000201"
+			register "usb_port_config" = "{
+				{0, 3, 0 }, /* P00 disconnected */
+				{1, 1, 1 }, /* P01 left or right */
+				{0, 1, 3 }, /* P02 disconnected */
+				{1, 3, -1}, /* P03 WWAN */
+				{0, 1, 2 }, /* P04 disconnected */
+				{0, 1, -1}, /* P05 disconnected */
+				{0, 1, -1}, /* P06 disconnected */
+				{0, 2, -1}, /* P07 disconnected */
+				{0, 1, -1}, /* P08 disconnected */
+				{1, 2, 5 }, /* P09 left or right */
+				{1, 3, -1}, /* P10 FPR */
+				{1, 3, -1}, /* P11 Bluetooth */
+				{1, 1, -1}, /* P12 WLAN */
+				{1, 1, -1}  /* P13 Camera */
+				}"
+
+			# Enable zero-based linear PCIe root port functions
+			register "pcie_port_coalesce" = "true"
+
+			register "spi_uvscc" = "0x2005"
+			register "spi_lvscc" = "0x2005"
+
+			device ref xhci on end # USB 3.0 Controller
+			device ref mei1 on end # Management Engine Interface 1
+			device ref mei2 off end # Management Engine Interface 2
+			device ref me_ide_r off end # Management Engine IDE-R
+			device ref me_kt off end # Management Engine KT
+			device ref gbe off end # Intel Gigabit Ethernet
+			device ref ehci2 on end # USB2 EHCI #2
+			device ref hda on end # High Definition Audio
+			device ref pcie_rp1 on
+				chip drivers/ricoh/rce822
+					register "sdwppol" = "0"
+					register "disable_mask" = "0x87"
+					device pci 00.0 on end
+				end
+			end # PCIe Port #1
+			device ref pcie_rp2 on end # PCIe Port #2
+			device ref pcie_rp3 off end # PCIe Port #3
+			device ref pcie_rp4 off end # PCIe Port #4
+			device ref pcie_rp5 off end # PCIe Port #5
+			device ref pcie_rp6 off end # PCIe Port #6
+			device ref pcie_rp7 off end # PCIe Port #7
+			device ref pcie_rp8 off end # PCIe Port #8
+			device ref ehci1 on end # USB2 EHCI #1
+			device ref pci_bridge off end # PCI bridge
+			device ref lpc on #LPC bridge
+				chip ec/lenovo/pmh7
+					device pnp ff.1 on end # dummy
+					register "backlight_enable" = "true"
+					register "dock_event_enable" = "true"
+				end
+
+				chip drivers/pc80/tpm
+					device pnp 0c31.0 on end
+				end
+
+				chip ec/lenovo/h8
+					device pnp ff.2 on # dummy
+						io 0x60 = 0x62
+						io 0x62 = 0x66
+						io 0x64 = 0x1600
+						io 0x66 = 0x1604
+					end
+
+					register "has_keyboard_backlight" = "1"
+
+					register "beepmask0" = "0x00"
+					register "beepmask1" = "0x86"
+					register "config0" = "0xa6"
+					register "config1" = "0x05"
+					register "config2" = "0xa0"
+					register "config3" = "0xc0"
+					register "event2_enable" = "0xff"
+					register "event3_enable" = "0xff"
+					register "event4_enable" = "0xc0"
+					register "event5_enable" = "0x3c"
+					register "event7_enable" = "0x01"
+					register "event8_enable" = "0x7b"
+					register "event9_enable" = "0xff"
+					register "eventc_enable" = "0xff"
+					register "eventd_enable" = "0xff"
+					register "evente_enable" = "0x0d"
+
+					register "has_bdc_detection" = "1"
+					register "bdc_gpio_num" = "54"
+					register "bdc_gpio_lvl" = "0"
+
+					register "has_wwan_detection" = "1"
+					register "wwan_gpio_num" = "70"
+					register "wwan_gpio_lvl" = "0"
+				end
+			end # LPC bridge
+			device ref sata1 on end # SATA Controller 1
+			device ref smbus on
+				# eeprom, 8 virtual devices, same chip
+				chip drivers/i2c/at24rf08c
+					device i2c 54 on end
+					device i2c 55 on end
+					device i2c 56 on end
+					device i2c 57 on end
+					device i2c 5c on end
+					device i2c 5d on end
+					device i2c 5e on end
+					device i2c 5f on end
+				end
+			end # SMBus
+			device ref sata2 off end # SATA Controller 2
+			device ref thermal on end # Thermal
+		end
+	end
+end

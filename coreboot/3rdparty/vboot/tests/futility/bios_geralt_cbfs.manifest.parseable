@@ -1,0 +1,6 @@
+default::host::versions::ro::Google_Geralt.15635.0.0
+default::host::versions::rw::Google_Geralt.15635.0.0
+default::host::versions::ecrw::geralt-15857.0.0
+default::host::keys::root::b11d74edd286c144e1135b49e7f0bc20cf041f10
+default::host::keys::recovery::c14bd720b70d97394257e3e826bd8f43de48d4ed
+default::host::image::image.bin

@@ -1,0 +1,282 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+chip soc/amd/mendocino
+
+	register "common_config.acp_config" = "{
+		.acp_pin_cfg = ACP_PINS_HDA_3SDI_PDM6_I2S,
+		.acp_i2s_wake_enable = 0,
+		.acp_pme_enable = 0,
+		.dmic_present = 1,
+	}"
+
+	# eSPI Configuration
+	register "common_config.espi_config" = "{
+		.std_io_decode_bitmap = ESPI_DECODE_IO_0x80_EN | ESPI_DECODE_IO_0X60_0X64_EN,
+		.generic_io_range[0] = {
+			.base = 0x62,
+			/*
+			 * Only 0x62 and 0x66 are required. But, this is not supported by
+			 * standard IO decodes and there are only 4 generic I/O windows
+			 * available. Hence, open a window from 0x62-0x67.
+			 */
+			.size = 5,
+		},
+		.generic_io_range[1] = {
+			.base = 0x800,   /* EC_HOST_CMD_REGION0 */
+			.size = 256,     /* EC_HOST_CMD_REGION_SIZE * 2 */
+		},
+		.generic_io_range[2] = {
+			.base = 0x900,   /* EC_LPC_ADDR_MEMMAP */
+			.size = 255,     /* EC_MEMMAP_SIZE */
+		},
+		.generic_io_range[3] = {
+			.base = 0x200,   /* EC_LPC_ADDR_HOST_DATA */
+			.size = 8,       /* 0x200 - 0x207 */
+		},
+
+		.io_mode = ESPI_IO_MODE_QUAD,
+		.op_freq_mhz = ESPI_OP_FREQ_16_MHZ,
+		.crc_check_enable = 1,
+		.alert_pin = ESPI_ALERT_PIN_OPEN_DRAIN,
+		.periph_ch_en = 1,
+		.vw_ch_en = 1,
+		.oob_ch_en = 0,
+		.flash_ch_en = 0,
+
+		.vw_irq_polarity = ESPI_VW_IRQ_LEVEL_HIGH(1),
+	}"
+
+	register "i2c_scl_reset" = "GPIO_I2C0_SCL | GPIO_I2C1_SCL |
+					GPIO_I2C2_SCL | GPIO_I2C3_SCL"
+
+	# I2C Pad Control RX Select Configuration
+	register "i2c_pad[0].rx_level" = "I2C_PAD_RX_1_8V" # Touchpad
+	register "i2c_pad[1].rx_level" = "I2C_PAD_RX_1_8V" # Touchscreen
+	register "i2c_pad[2].rx_level" = "I2C_PAD_RX_1_8V" # Audio/SAR
+	register "i2c_pad[3].rx_level" = "I2C_PAD_RX_1_8V" # GSC
+
+	# I2C Config
+	#+-------------------+----------------------------+
+	#| Field             |  Value                     |
+	#+-------------------+----------------------------+
+	#| I2C0              | Trackpad                   |
+	#| I2C1              | Touchscreen                |
+	#| I2C2              | Speaker, Codec, P-SAR, USB |
+	#| I2C3              | D2 TPM                     |
+	#+-------------------+----------------------------+
+	register "i2c[0]" = "{
+		.speed = I2C_SPEED_FAST,
+	}"
+
+	register "i2c[1]" = "{
+		.speed = I2C_SPEED_FAST,
+	}"
+
+	register "i2c[2]" = "{
+		.speed = I2C_SPEED_FAST,
+	}"
+
+	register "i2c[3]" = "{
+		.speed = I2C_SPEED_FAST,
+		.early_init = true,
+	}"
+
+	# general purpose PCIe clock output configuration
+	register "gpp_clk_config[0]" = "GPP_CLK_REQ"
+	register "gpp_clk_config[1]" = "GPP_CLK_REQ"
+	register "gpp_clk_config[2]" = "GPP_CLK_REQ"
+	register "gpp_clk_config[3]" = "GPP_CLK_OFF"
+
+	# PSPP doesn't save any power on this platform
+	register "pspp_policy" = "DXIO_PSPP_DISABLED"
+
+	register "s0ix_enable" = "true"
+
+	device domain 0 on
+		device ref lpc_bridge on
+			chip ec/google/chromeec
+				device pnp 0c09.0 alias chrome_ec on end
+			end
+		end
+		device ref gpp_bridge_0 on # WLAN
+			chip drivers/pcie/generic
+				register "wake_gpe" = "GEVENT_8"
+				register "wake_deepest" = "ACPI_S0"
+				register "add_acpi_dma_property" = "true"
+				register "name" = ""WLAN""
+				device pci 00.0 on end
+			end
+		end
+		device ref iommu on end
+		device ref gpp_bridge_1 on end # SD
+		device ref gpp_bridge_2 on
+			# Required so the NVMe gets placed into D3 when entering S0i3.
+			chip drivers/pcie/rtd3/device
+				register "name" = ""NVME""
+				device pci 00.0 on end
+			end
+		end # NVMe
+
+		device ref gpp_bridge_a on  # Internal GPP Bridge 0 to Bus A
+			device ref gfx on end # Internal GPU (GFX)
+			device ref gfx_hda on end # Display HD Audio Controller (GFXAZ)
+			device ref crypto on end # Crypto Coprocessor
+			device ref xhci_0 on # USB 3.1 (USB0)
+				chip drivers/usb/acpi
+					device ref xhci_0_root_hub on
+						chip drivers/usb/acpi
+							register "desc" = ""USB3 Type-C Port C0 (MLB)""
+							register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+							register "use_custom_pld" = "true"
+							register "custom_pld" = "ACPI_PLD_TYPE_C(LEFT, LEFT, ACPI_PLD_GROUP(1, 1))"
+							device ref usb3_port0 on end
+						end
+						chip drivers/usb/acpi
+							register "desc" = ""USB2 Type-C Port C0 (MLB)""
+							register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+                                                        register "use_custom_pld" = "true"
+                                                        register "custom_pld" = "ACPI_PLD_TYPE_C(LEFT, LEFT, ACPI_PLD_GROUP(1, 1))"
+							device ref usb2_port0 on end
+						end
+						chip drivers/usb/acpi
+							register "desc" = ""User-Facing Camera""
+							register "type" = "UPC_TYPE_INTERNAL"
+							device ref usb2_port1 on end
+						end
+					end
+				end
+			end
+			device ref xhci_1 on # USB 3.1 (USB1)
+				chip drivers/usb/acpi
+					device ref xhci_1_root_hub on
+						chip drivers/usb/acpi
+							register "desc" = ""USB3 Type-C Port C1 (DB)""
+							register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+                                                        register "use_custom_pld" = "true"
+                                                        register "custom_pld" = "ACPI_PLD_TYPE_C(RIGHT, RIGHT, ACPI_PLD_GROUP(2, 1))"
+							device ref usb3_port2 on end
+						end
+						chip drivers/usb/acpi
+							register "desc" = ""USB2 Type-C Port C1 (DB)""
+							register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+                                                        register "use_custom_pld" = "true"
+                                                        register "custom_pld" = "ACPI_PLD_TYPE_C(RIGHT, RIGHT, ACPI_PLD_GROUP(2, 1))"
+							device ref usb2_port2 on end
+						end
+						chip drivers/usb/acpi
+							register "desc" = ""World-Facing Camera""
+							register "type" = "UPC_TYPE_INTERNAL"
+							device ref usb2_port4 on end
+						end
+					end
+				end
+			end
+			device ref acp on end # Audio Processor (ACP)
+			device ref mp2 on end # Sensor Fusion Hub (MP2)
+		end
+		device ref gpp_bridge_c on  # Internal GPP Bridge 2 to Bus C
+			device ref xhci_2 on # USB 2.0 (USB2)
+				ops xhci_pci_ops
+				chip drivers/usb/acpi
+					register "type" = "UPC_TYPE_HUB"
+					device usb 0.0 alias xhci_2_root_hub on
+						chip drivers/usb/acpi
+							register "desc" = ""Bluetooth""
+							register "type" = "UPC_TYPE_INTERNAL"
+							register "has_power_resource" = "true"
+							register "enable_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPIO_10)"
+							register "enable_delay_ms" = "500"
+							register "enable_off_delay_ms" = "200"
+							register "use_gpio_for_status" = "true"
+							device usb 2.0 alias usb2_port5 on end
+						end
+					end
+				end
+			end
+		end
+	end # domain
+	device ref uart_0 on end # UART0
+	device ref i2c_0 on end
+	device ref i2c_1 on end
+	device ref i2c_2 on end
+	device ref i2c_3 hidden
+		chip drivers/i2c/tpm
+			register "hid" = ""GOOG0005""
+			register "desc" = ""Ti50 TPM""
+			register "irq_gpio" = "ACPI_GPIO_IRQ_EDGE_LOW(GPIO_18)"
+			device i2c 50 alias ti50 on end
+		end
+	end
+
+	# EC is configured to power off the system at 105C, so add a two degree
+	# buffer so the OS can gracefully shutdown.
+	#
+	# EC is configured to assert PROCHOT at 100C. That drastically lowers
+	# performance. Instead we will tell the OS to start throttling the CPUs
+	# at 95C in hopes that we don't hit the PROCHOT limit.
+	#
+	# We set use_acpi1_thermal_zone_scope because the Chrome ec.asl
+	# performs a `Notify` to the `_\TZ` scope.
+	chip drivers/acpi/thermal_zone
+		register "description" = ""Charger""
+		use chrome_ec as temperature_controller
+		register "sensor_id" = "0"
+		register "polling_period" = "10"
+		register "critical_temperature" = "103"
+		register "passive_config.temperature" = "95"
+		register "use_acpi1_thermal_zone_scope" = "true"
+
+		device generic 0 on end
+	end
+	chip drivers/acpi/thermal_zone
+		register "description" = ""Memory""
+		use chrome_ec as temperature_controller
+		register "sensor_id" = "1"
+		register "polling_period" = "10"
+		register "critical_temperature" = "103"
+		register "passive_config.temperature" = "95"
+		register "use_acpi1_thermal_zone_scope" = "true"
+
+		device generic 1 on end
+	end
+	chip drivers/acpi/thermal_zone
+		register "description" = ""CPU""
+		use chrome_ec as temperature_controller
+		register "sensor_id" = "2"
+		register "polling_period" = "10"
+		register "critical_temperature" = "103"
+		register "passive_config.temperature" = "95"
+		register "use_acpi1_thermal_zone_scope" = "true"
+
+		device generic 2 on end
+	end
+	chip drivers/acpi/thermal_zone
+		register "description" = ""SOC""
+		use chrome_ec as temperature_controller
+		register "sensor_id" = "3"
+		register "polling_period" = "10"
+		register "critical_temperature" = "103"
+		register "passive_config.temperature" = "95"
+		register "use_acpi1_thermal_zone_scope" = "true"
+
+		device generic 3 on end
+	end
+
+	# DPTC: Refer the spec "FT6 Infrastructure Roadmap"#57316
+	# Set system_configuration to 3 for 15W. Spec lists 4 for 15W,
+	# however, setting to 3 will avoid an additional communication
+	# with the SMU and save boot time.
+	register "system_configuration" = "3"
+	# Normal
+	register "slow_ppt_limit_mW"                     = "25000"
+	register "fast_ppt_limit_mW"                     = "30000"
+	register "slow_ppt_time_constant_s"              = "5"
+	register "stapm_time_constant_s"                 = "275"
+	register "thermctl_limit_degreeC"                = "100"
+	register "vrm_current_limit_mA"                  = "28000"
+	register "vrm_maximum_current_limit_mA"          = "50000"
+	register "vrm_soc_current_limit_mA"              = "10000"
+	# Throttle (e.g., Low/No Battery)
+	register "vrm_current_limit_throttle_mA"         = "20000"
+	register "vrm_maximum_current_limit_throttle_mA" = "20000"
+	register "vrm_soc_current_limit_throttle_mA"     = "10000"
+end	# chip soc/amd/mendocino

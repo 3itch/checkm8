@@ -1,0 +1,22 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_INTEL_ADLRVP_P
+	bool "Alderlake-P RVP"
+
+config BOARD_INTEL_ADLRVP_P_EXT_EC
+	bool "Alderlake-P RVP with Chrome EC"
+
+config BOARD_INTEL_ADLRVP_P_MCHP
+	bool "Alderlake-P RVP with Microchip EC"
+
+config BOARD_INTEL_ADLRVP_N
+	bool "Alderlake-N RVP"
+
+config BOARD_INTEL_ADLRVP_N_EXT_EC
+	bool "Alderlake-N RVP with Chrome EC"
+
+config BOARD_INTEL_ADLRVP_RPL
+	bool "Raptorlake silicon with Alderlake-P RVP"
+
+config BOARD_INTEL_ADLRVP_RPL_EXT_EC
+	bool "Raptorlake silicon with Alderlake-P RVP and Chrome EC"

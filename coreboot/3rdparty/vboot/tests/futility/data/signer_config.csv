@@ -1,0 +1,6 @@
+model_name,firmware_image,key_id,ec_image,brand_code
+customtip,images/bios_coral.bin,DEFAULT,,ZZCR
+customtip-cl,images/bios_coral.bin,CL,,ZZCR
+customtip-bad,images/bios_link.bin,CL,,ZZCR
+link,images/bios_link.bin,LINK,images/ec_link.bin,ZZCR
+peppy,images/bios_peppy.bin,PEPPY,images/ec_peppy.bin,ZZCR

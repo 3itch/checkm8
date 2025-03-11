@@ -1,0 +1,107 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#include <cpu/x86/mtrr.h>
+#include <cpu/x86/mp.h>
+#include <amdblocks/cpu.h>
+#include <amdblocks/smm.h>
+#include <console/console.h>
+#include <cpu/amd/amd64_save_state.h>
+#include <cpu/amd/microcode.h>
+#include <cpu/amd/msr.h>
+#include <cpu/amd/mtrr.h>
+#include <cpu/cpu.h>
+#include <cpu/x86/msr.h>
+#include <cpu/x86/smm.h>
+#include <types.h>
+
+/* AP MTRRs will be synced to the BSP in the SIPI vector so set them up before MP init. */
+static void pre_mp_init(void)
+{
+	const msr_t syscfg = rdmsr(SYSCFG_MSR);
+	if (syscfg.lo & SYSCFG_MSR_TOM2WB)
+		x86_setup_mtrrs_with_detect_no_above_4gb();
+	else
+		x86_setup_mtrrs_with_detect();
+	x86_mtrr_check();
+	if (CONFIG(SOC_AMD_COMMON_BLOCK_UCODE))
+		amd_load_microcode_from_cbfs();
+}
+
+static void get_smm_info(uintptr_t *perm_smbase, size_t *perm_smsize,
+			 size_t *smm_save_state_size)
+{
+	printk(BIOS_DEBUG, "Setting up SMI for CPU\n");
+
+	uintptr_t tseg_base;
+	size_t tseg_size;
+
+	smm_region(&tseg_base, &tseg_size);
+
+	if (!IS_ALIGNED(tseg_base, tseg_size)) {
+		printk(BIOS_ERR, "TSEG base not aligned to TSEG size\n");
+		return;
+	}
+	/* Minimum granularity for TSEG MSRs */
+	if (tseg_size < 128 * KiB) {
+		printk(BIOS_ERR, "TSEG size (0x%zx) too small\n", tseg_size);
+		return;
+	}
+
+
+	smm_subregion(SMM_SUBREGION_HANDLER, perm_smbase, perm_smsize);
+	*smm_save_state_size = sizeof(amd64_smm_state_save_area_t);
+}
+
+static void smm_relocation_handler(void)
+{
+	uintptr_t tseg_base;
+	size_t tseg_size;
+
+	/* For the TSEG masks all physical address bits including the ones reserved for memory
+	   encryption need to be taken into account. TODO: Find out why this is the case */
+	const unsigned int total_physical_address_bits =
+		cpu_phys_address_size() + get_reserved_phys_addr_bits();
+
+	smm_region(&tseg_base, &tseg_size);
+
+	msr_t msr;
+	msr.raw = tseg_base;
+	wrmsr(SMM_ADDR_MSR, msr);
+
+	msr.lo = ~(tseg_size - 1);
+	msr.lo |= SMM_TSEG_WB;
+	msr.hi = (1 << (total_physical_address_bits - 32)) - 1;
+	wrmsr(SMM_MASK_MSR, msr);
+
+	uintptr_t smbase = smm_get_cpu_smbase(cpu_index());
+	msr_t smm_base = {
+		.raw = smbase
+	};
+	wrmsr(SMM_BASE_MSR, smm_base);
+
+
+	if (!CONFIG(SOC_AMD_COMMON_LATE_SMM_LOCKING)) {
+		tseg_valid();
+		lock_smm();
+	}
+}
+
+static void post_mp_init(void)
+{
+	if (CONFIG(SOC_AMD_COMMON_BLOCK_UCODE))
+		amd_free_microcode();
+	global_smi_enable();
+}
+
+const struct mp_ops amd_mp_ops_with_smm = {
+	.pre_mp_init = pre_mp_init,
+	.get_cpu_count = get_cpu_count,
+	.get_smm_info = get_smm_info,
+	.per_cpu_smm_trigger = smm_relocation_handler,
+	.post_mp_init = post_mp_init,
+};
+
+const struct mp_ops amd_mp_ops_no_smm = {
+	.pre_mp_init = pre_mp_init,
+	.get_cpu_count = get_cpu_count,
+};

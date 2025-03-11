@@ -1,0 +1,22 @@
+Kernel partition:        tests/futility/data/rec_kernel_part.bin
+Keyblock:
+  Size:                  0xcb8
+  Signature:             valid
+    Size:                0x400
+    Data size:           0x878
+  Flags:                 11  !DEV DEV REC
+  Data key algorithm:    11 RSA8192 SHA512
+  Data key version:      1
+  Data key sha1sum:      e78ce746a037837155388a1096212ded04fb86eb
+Kernel Preamble:
+  Size:                  0xf348
+  Header version:        2.2
+  Kernel version:        1
+  Flags:                 0
+  Body load address:     0x100000
+  Body size:             0x3d5000
+  Bootloader address:    0x4d4000
+  Bootloader size:       0x1000
+Body verification succeeded.
+Config:
+hi there

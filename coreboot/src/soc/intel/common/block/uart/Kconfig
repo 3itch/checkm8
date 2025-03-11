@@ -1,0 +1,19 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_UART
+	bool
+	select SOC_INTEL_COMMON_BLOCK_LPSS
+	help
+	  Intel Processor common UART support
+
+if SOC_INTEL_COMMON_BLOCK_UART
+
+config INTEL_LPSS_UART_FOR_CONSOLE
+	bool
+	select DRIVERS_UART_8250MEM_32
+	select FIXED_UART_FOR_CONSOLE
+	help
+	  Selected by mainboards that use one of the SoC's LPSS UARTS
+	  for the coreboot console.
+
+endif

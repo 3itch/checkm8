@@ -1,0 +1,29 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_INTEL_EMERALDLAKE2
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select NORTHBRIDGE_INTEL_SANDYBRIDGE
+	select SOUTHBRIDGE_INTEL_C216
+	select SUPERIO_SMSC_SIO1007
+	select BOARD_ROMSIZE_KB_8192
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select HAVE_ACPI_RESUME
+	select INTEL_INT15
+	select HAVE_IFD_BIN
+	select HAVE_ME_BIN
+	#select MAINBOARD_HAS_CHROMEOS
+
+config MAINBOARD_DIR
+	default "intel/emeraldlake2"
+
+config MAINBOARD_PART_NUMBER
+	default "EMERALD LAKE 2"
+
+config MAX_CPUS
+	int
+	default 16
+
+endif # BOARD_INTEL_EMERALDLAKE2

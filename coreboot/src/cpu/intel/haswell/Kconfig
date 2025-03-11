@@ -1,0 +1,39 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+
+config CPU_INTEL_HASWELL
+	bool
+	select ARCH_X86
+	select SSE2
+	select UDELAY_TSC
+	select TSC_MONOTONIC_TIMER
+	select SUPPORT_CPU_UCODE_IN_CBFS
+	#select AP_IN_SIPI_WAIT
+	select TSC_SYNC_MFENCE
+	select CPU_INTEL_FIRMWARE_INTERFACE_TABLE
+	select CPU_INTEL_COMMON
+	select CPU_INTEL_COMMON_TIMEBASE
+	select HAVE_ASAN_IN_ROMSTAGE
+	select CPU_INTEL_COMMON_VOLTAGE
+
+if CPU_INTEL_HASWELL
+
+config SMM_TSEG_SIZE
+	hex
+	default 0x800000
+
+config IED_REGION_SIZE
+	hex
+	default 0x400000
+
+config SMM_RESERVED_SIZE
+	hex
+	default 0x100000
+
+config MAX_CPUS
+	int
+	default 8
+
+config CPU_INTEL_NUM_FIT_ENTRIES
+	default 6
+endif

@@ -1,0 +1,202 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_BASEBOARD_KAHLEE
+	bool
+	select ALWAYS_LOAD_OPROM
+	select ALWAYS_RUN_OPROM
+	select AMD_APU_STONEYRIDGE
+	select AMD_APU_PKG_FT4
+	select AMD_FWM_POSITION_F20000_DEFAULT
+	select AMD_SOC_CONSOLE_UART
+	select BOARD_ROMSIZE_KB_16384
+	select DRIVERS_GENERIC_ADAU7002
+	select DRIVERS_GENERIC_BH720
+	select DRIVERS_GENERIC_MAX98357A
+	select DRIVERS_I2C_DA7219
+	select DRIVERS_I2C_GENERIC
+	select DRIVERS_I2C_HID
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_BOARDID
+	select EC_GOOGLE_CHROMEEC_LPC
+	select GFXUMA
+	select GOOGLE_SMBIOS_MAINBOARD_VERSION
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_EM100_SUPPORT
+	select HAVE_SPD_IN_CBFS
+	select I2C_TPM
+	select MAINBOARD_HAS_CHROMEOS
+	select MAINBOARD_HAS_TPM2
+	select PCIEXP_ASPM
+	select PCIEXP_CLK_PM
+	select PCIEXP_COMMON_CLOCK
+	select PCIEXP_L1_SUB_STATE
+	select SERIRQ_CONTINUOUS_MODE
+	select SOC_AMD_COMMON_BLOCK_GRAPHICS_ACP
+	select SOC_AMD_COMMON_BLOCK_GRAPHICS_ATIF
+	select SOC_AMD_SMU_FANLESS
+	select SOC_AMD_STONEYRIDGE
+	select SYSTEM_TYPE_LAPTOP
+	select TPM_GOOGLE_CR50
+
+config BOARD_GOOGLE_ALEENA
+	select BOARD_GOOGLE_BASEBOARD_KAHLEE
+
+config BOARD_GOOGLE_CAREENA
+	select BOARD_GOOGLE_BASEBOARD_KAHLEE
+
+config BOARD_GOOGLE_GRUNT
+	select BOARD_GOOGLE_BASEBOARD_KAHLEE
+
+config BOARD_GOOGLE_LIARA
+	select BOARD_GOOGLE_BASEBOARD_KAHLEE
+
+config BOARD_GOOGLE_NUWANI
+	select BOARD_GOOGLE_BASEBOARD_KAHLEE
+
+config BOARD_GOOGLE_TREEYA
+	select BOARD_GOOGLE_BASEBOARD_KAHLEE
+
+if BOARD_GOOGLE_BASEBOARD_KAHLEE
+
+config MAINBOARD_DIR
+	default "google/kahlee"
+
+config VGA_BIOS_FILE
+	string
+	default "3rdparty/blobs/mainboard/google/kahlee/aleena/VBIOS_015_049_000_018.bin" if BOARD_GOOGLE_ALEENA
+	default "3rdparty/blobs/mainboard/google/kahlee/liara/VBIOS_BRT39865.001.bin" if BOARD_GOOGLE_LIARA
+	default "3rdparty/blobs/mainboard/google/kahlee/VBIOS_015_049_000_017.bin"
+
+config VARIANT_DIR
+	default "aleena" if BOARD_GOOGLE_ALEENA
+	default "careena" if BOARD_GOOGLE_CAREENA
+	default "grunt" if BOARD_GOOGLE_GRUNT
+	default "liara" if BOARD_GOOGLE_LIARA
+	default "nuwani" if BOARD_GOOGLE_NUWANI
+	default "treeya" if BOARD_GOOGLE_TREEYA
+
+config MAINBOARD_PART_NUMBER
+	default "Aleena" if BOARD_GOOGLE_ALEENA
+	default "Careena" if BOARD_GOOGLE_CAREENA
+	default "Grunt" if BOARD_GOOGLE_GRUNT
+	default "Liara" if BOARD_GOOGLE_LIARA
+	default "Nuwani" if BOARD_GOOGLE_NUWANI
+	default "Treeya" if BOARD_GOOGLE_TREEYA
+
+config DEVICETREE
+	default "variants/baseboard/devicetree.cb"
+
+config OVERRIDE_DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/overridetree.cb"
+
+config MAINBOARD_FAMILY
+	string
+	default "Google_Kahlee"
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/variants/baseboard/chromeos.fmd" if CHROMEOS
+	default ""
+	help
+	  The build system creates a default FMAP from ROM_SIZE and CBFS_SIZE,
+	  but in some cases more complex setups are required.
+	  When an fmd is specified, it overrides the default format.
+
+config MAX_CPUS
+	int
+	default 4
+
+config IRQ_SLOT_COUNT
+	int
+	default 11
+
+config ONBOARD_VGA_IS_PRIMARY
+	bool
+	default y
+
+config VBOOT
+	select EC_GOOGLE_CHROMEEC_SWITCHES
+	select VBOOT_LID_SWITCH
+
+config VBOOT_VBNV_OFFSET
+	hex
+	default 0x2A
+
+config CHROMEOS
+	select LP_DEFCONFIG_OVERRIDE if PAYLOAD_DEPTHCHARGE
+
+config DRIVER_TPM_I2C_BUS
+	hex
+	default 0x01
+
+config DRIVER_TPM_I2C_ADDR
+	hex
+	default 0x50
+
+config GSC_IRQ_GPIO
+	int
+	default 9
+
+config USE_OEM_BIN
+	bool "Add an oem.bin file"
+	help
+	  Add an oem.bin file to identify the manufacturer in SMBIOS, overriding the
+	  CONFIG_MAINBOARD_SMBIOS_MANUFACTURER value.
+
+config OEM_BIN_FILE
+	string "OEM ID table"
+	depends on USE_OEM_BIN
+	default ""
+
+if !EM100	# EM100 defaults in soc/amd/common/blocks/spi/Kconfig
+config EFS_SPI_READ_MODE
+	default 4          # Dual IO (1-2-2)
+
+config EFS_SPI_SPEED
+	default 0	# 66MHz
+
+config NORMAL_READ_SPI_SPEED
+	default 1	# 33MHz
+
+config ALT_SPI_SPEED
+	default 0	# 66MHz
+
+config TPM_SPI_SPEED
+	default 0	# 66MHz
+
+endif
+
+# Don't use AMD's Secure OS if ChromeOS build.
+config USE_PSPSECUREOS
+	bool
+	default n if CHROMEOS
+	default y
+
+choice
+	prompt "UMA Memory Allocation"
+	default KAHLEE_UMA_SIZE_32MB
+	help
+	  The amount of system memory allocated for the integrated GPU
+
+config KAHLEE_UMA_SIZE_32MB
+	bool "32MB"
+
+config KAHLEE_UMA_SIZE_64MB
+	bool "64MB"
+
+config KAHLEE_UMA_SIZE_128MB
+	bool "128MB"
+
+config KAHLEE_UMA_SIZE_256MB
+	bool "256MB"
+
+endchoice
+
+config UMA_SIZE_IN_MB
+	int
+	default 32  if KAHLEE_UMA_SIZE_32MB
+	default 64  if KAHLEE_UMA_SIZE_64MB
+	default 128 if KAHLEE_UMA_SIZE_128MB
+	default 256 if KAHLEE_UMA_SIZE_256MB
+
+endif # BOARD_GOOGLE_BASEBOARD_KAHLEE

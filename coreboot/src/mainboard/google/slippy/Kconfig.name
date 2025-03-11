@@ -1,0 +1,15 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Slippy"
+
+config BOARD_GOOGLE_FALCO
+	bool "->  Falco (HP Chromebook 14)"
+
+config BOARD_GOOGLE_LEON
+	bool "->  Leon (Toshiba Chromebook)"
+
+config BOARD_GOOGLE_PEPPY
+	bool "->  Peppy (Acer C720/C720P Chromebook)"
+
+config BOARD_GOOGLE_WOLF
+	bool "->  Wolf (Dell Chromebook 11)"

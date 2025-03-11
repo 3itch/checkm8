@@ -1,0 +1,92 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_PMC
+	depends on SOC_INTEL_COMMON_BLOCK_GPIO
+	depends on ACPI_INTEL_HARDWARE_SLEEP_VALUES
+	bool
+	select ACPI_S1_NOT_SUPPORTED
+	select HAVE_POWER_STATE_AFTER_FAILURE
+	select HAVE_POWER_STATE_PREVIOUS_AFTER_FAILURE
+	help
+	  Intel Processor common code for Power Management controller(PMC)
+	  subsystem
+
+if SOC_INTEL_COMMON_BLOCK_PMC
+
+config SOC_INTEL_MEM_MAPPED_PM_CONFIGURATION
+	bool
+	help
+	  Select this on platforms where the PMC register for PM configuration (i.e.,
+	  GEN_PMCON_A/B etc. are memory mapped).
+
+config POWER_STATE_DEFAULT_ON_AFTER_FAILURE
+	default y
+
+config SOC_INTEL_COMMON_BLOCK_PMC_DISCOVERABLE
+	bool
+	help
+	  Select this on platforms where the PMC device is discoverable
+	  when scanning buses.
+
+config SOC_INTEL_COMMON_BLOCK_PMC_EPOC
+	bool
+	help
+	  Enable this for PMC devices to perform EPOC (CPU Early Power-on
+	  Configuration) related functions.
+
+endif # SOC_INTEL_COMMON_BLOCK_PMC
+
+config PMC_INVALID_READ_AFTER_WRITE
+	bool
+	default n
+	help
+	  Enable this for PMC devices where a read back of ACPI BAR and
+	  IO access bit does not return the previously written value.
+
+config PMC_IPC_ACPI_INTERFACE
+	bool
+	default n
+	depends on HAVE_ACPI_TABLES
+	help
+	  Enable this to have the PMC IPC mailbox ACPI interface added
+	  to the SSDT for use by other drivers.
+
+config PMC_GLOBAL_RESET_ENABLE_LOCK
+	bool
+	help
+	  Enable this for PMC devices where the reset configuration
+	  and lock register is located under PMC BASE at offset ETR.
+	  Note that the reset register is still at 0xCF9 this only
+	  controls the enable and lock feature.
+
+config NO_PM_ACPI_TIMER
+	bool
+	help
+	  Selected by SoCs that do not have a PM ACPI timer.
+
+config USE_PM_ACPI_TIMER
+	bool "Enable ACPI PM timer"
+	default y
+	depends on !NO_PM_ACPI_TIMER
+	help
+	  This should be disabled for devices running on battery since
+	  it can draw much power. Further, it must be disabled, if S0ix
+	  is enabled.
+
+	  Disabling this option also stops the hardware TCO timer and makes
+	  the TCO watchdog unavailable.
+
+	  Note: On platforms without uCode PM Timer emulation, legacy OSes
+	        or payloads with ACPI version < 5.0A might not work without
+	        PM ACPI timer.
+
+	        (Legacy) software requiring `TMR_STS` (for timer overflow
+	        interrupts) will not work with this option disabled.
+
+config SOC_QDF_DYNAMIC_READ_PMC
+	bool
+	default n
+	depends on SOC_INTEL_COMMON_BLOCK_PMC && PMC_IPC_ACPI_INTERFACE
+	help
+	  Enable this option if the platform supports reading SOC QDF
+	  data dynamically at runtime using the PMC IPC interface.

@@ -1,0 +1,65 @@
+commit ab0cc6067d5a00182e89fbec82b942eb3d803204
+Author: Patrick Georgi <pgeorgi@google.com>
+Date:   Fri Nov 22 22:08:15 2019 +0100
+
+    util/kconfig: Allow emitting false booleans into kconfig output
+
+    This is controlled by an environment variable so the same tool is
+    useful in different contexts.
+
+    Change-Id: I9e62b05e45709f1539e455e2eed37308609be15e
+    Signed-off-by: Patrick Georgi <pgeorgi@google.com>
+
+Index: kconfig/confdata.c
+===================================================================
+--- kconfig.orig/confdata.c
++++ kconfig/confdata.c
+@@ -731,7 +731,12 @@ static void print_symbol_for_dotconfig(F
+ 
+ static void print_symbol_for_autoconf(FILE *fp, struct symbol *sym)
+ {
+-	__print_symbol(fp, sym, OUTPUT_N_NONE, false);
++	int print_negatives = getenv("KCONFIG_NEGATIVES") != NULL;
++	enum output_n out = OUTPUT_N_NONE;
++	if (print_negatives) {
++		out = OUTPUT_N;
++	}
++	__print_symbol(fp, sym, out, false);
+ }
+ 
+ void print_symbol_for_listconfig(struct symbol *sym)
+@@ -756,6 +761,10 @@ static void print_symbol_for_c(FILE *fp,
+ 	case S_TRISTATE:
+ 		switch (*val) {
+ 		case 'n':
++			if (getenv("KCONFIG_NEGATIVES") != NULL) {
++				val = "0";
++				break;
++			}
+ 			return;
+ 		case 'm':
+ 			sym_suffix = "_MODULE";
+@@ -767,6 +776,12 @@ static void print_symbol_for_c(FILE *fp,
+ 	case S_HEX:
+ 		if (val[0] != '0' || (val[1] != 'x' && val[1] != 'X'))
+ 			val_prefix = "0x";
++		/* fall through */
++	case S_INT:
++		if (val[0] == '\0') {
++			val = "0";
++			val_prefix = "";
++		}
+ 		break;
+ 	case S_STRING:
+ 		escaped = escape_string_value(val);
+@@ -1183,8 +1198,9 @@ static int __conf_write_autoconf(const c
+ 
+ 	conf_write_heading(file, comment_style);
+ 
++	int print_negatives = getenv("KCONFIG_NEGATIVES") != NULL;
+ 	for_all_symbols(i, sym)
+-		if ((sym->flags & SYMBOL_WRITE) && sym->name)
++		if (((sym->flags & SYMBOL_WRITE) || (print_negatives && sym->type != S_STRING)) && sym->name)
+ 			print_symbol(file, sym);
+ 
+ 	fflush(file);

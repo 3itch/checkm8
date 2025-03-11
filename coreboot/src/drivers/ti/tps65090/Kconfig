@@ -1,0 +1,7 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVER_TI_TPS65090
+	bool
+	default n
+	help
+	  TI TPS65090

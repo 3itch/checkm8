@@ -1,0 +1,1 @@
+vb20_verify_fw.c

@@ -1,0 +1,82 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+chip northbridge/intel/sandybridge
+	register "gpu_cpu_backlight" = "0x0000014a"
+
+	device domain 0 on
+		subsystemid 0x103c 0x1621 inherit
+
+		device ref peg10 off end
+		device ref igd on  end
+
+		chip southbridge/intel/bd82x6x # Intel Series 6 Cougar Point PCH
+			register "gen1_dec" = "0x007c0201"
+			register "gen2_dec" = "0x000c0101"
+			register "gen3_dec" = "0x00fcfe01"
+			register "gen4_dec" = "0x000402e9"
+			register "gpi6_routing" = "2"
+			register "pcie_hotplug_map" = "{ 0, 1, 1, 0, 0, 0, 0, 0 }"
+			# HDD(0), ODD(1), docking(3, 5), eSATA(4)
+			# FIXME: ports 3, 5 are untested
+			register "sata_port_map" = "0x3b"
+
+			register "usb_port_config" = "{
+				{1, 1, 0}, /* left front */
+				{1, 1, 0}, /* left rear, debug */
+				{1, 1, 1}, /* eSATA */
+				{1, 1, 1}, /* webcam */
+				{1, 0, 2},
+				{1, 0, 2}, /* bluetooth */
+				{0, 0, 3},
+				{0, 0, 3},
+				{1, 1, 4}, /* fingerprint reader */
+				{1, 1, 4}, /* WWAN */
+				{1, 0, 5}, /* right */
+				{1, 0, 5},
+				{1, 0, 6},
+				{1, 0, 6}
+			}"
+
+			device ref pcie_rp1 on  end
+			device ref pcie_rp2 on
+				smbios_slot_desc "SlotTypePcmcia" "SlotLengthShort"
+					"ExpressCard Slot" "SlotDataBusWidth1X"
+			end
+			device ref pcie_rp3 on  end # SD/MMC and FireWire
+			device ref pcie_rp4 on      # WLAN
+				smbios_slot_desc "SlotTypePciExpressMini52pinWithoutBSKO"
+					"SlotLengthShort" "Mini PCIe" "SlotDataBusWidth1X"
+			end
+			device ref pcie_rp5 off end
+			device ref pcie_rp6 off end
+			device ref pcie_rp7 on      # WWAN
+				smbios_slot_desc "SlotTypePciExpressMini52pinWithoutBSKO"
+					"SlotLengthLong" "Mini PCIe" "SlotDataBusWidth1X"
+			end
+			device ref pcie_rp8 off end
+			device ref lpc on
+				chip ec/hp/kbc1126
+					register "ec_data_port" = "0x60"
+					register "ec_cmd_port"  = "0x64"
+					register "ec_ctrl_reg"  = "0xca"
+					register "ec_fan_ctrl_value" = "0x6e"
+					device pnp ff.1 off end
+				end
+				chip superio/smsc/lpc47n217
+					device pnp 4e.3 on      # Parallel
+						io  0x60  = 0x378
+						irq 0x70 = 7
+					end
+					device pnp 4e.4 on      # COM1
+						io  0x60  = 0x3f8
+						irq 0x70 = 4
+					end
+					device pnp 4e.5 off end # COM2
+				end
+				chip drivers/pc80/tpm
+					device pnp 0c31.0 on end
+				end
+			end
+		end
+	end
+end

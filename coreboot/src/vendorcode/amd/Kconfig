@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+if CPU_AMD_PI || SOC_AMD_PI
+
+menu "AMD Platform Initialization"
+
+source "src/vendorcode/amd/pi/Kconfig"
+
+config AGESA_EXTRA_TIMESTAMPS
+	bool "Add instrumentation for AGESA calls"
+	default n
+	depends on DRIVERS_AMD_PI
+	help
+	  Insert additional timestamps around each entrypoint into
+	  AGESA vendorcode.
+
+endmenu
+
+endif
+
+config SOC_AMD_OPENSIL
+	bool
+	help
+	  Select this on SoCs that use openSIL.
+
+source "src/vendorcode/amd/opensil/Kconfig"

@@ -1,0 +1,103 @@
+chip northbridge/intel/sandybridge
+	register "spd_addresses" = "{0x50, 0x51, 0x52, 0x53}"
+	chip cpu/intel/model_206ax
+		device cpu_cluster 0 on end
+
+		register "tcc_offset" = "5" # TCC of 95C
+	end
+	device domain 0 on
+
+		device ref host_bridge on end
+		device ref peg10 on	# blue slot1
+			smbios_slot_desc "SlotTypePciExpressGen3X16" "SlotLengthLong" "SLOT1" "SlotDataBusWidth16X"
+		end
+		device ref igd on  end
+		device ref peg60 off end
+
+		chip southbridge/intel/bd82x6x # Intel Series 7 Panther Point PCH
+			register "gpe0_en" = "0x00002a46"
+			register "alt_gp_smi_en" = "0x0004"
+			register "gpi2_routing" = "1"
+			register "gpi12_routing" = "2"
+			register "gen1_dec" = "0x007c0a01"
+			register "gen2_dec" = "0x007c0901"
+			register "gen3_dec" = "0x003c07e1"
+			register "gen4_dec" = "0x001c0901"
+			register "pcie_port_coalesce" = "true"
+			register "sata_interface_speed_support" = "0x3"
+			register "spi_lvscc" = "0x2005"
+			register "spi_uvscc" = "0x2005"
+			register "superspeed_capable_ports" = "0x0000000f"
+			register "xhci_overcurrent_mapping" = "0x08040201"
+			register "xhci_switchable_ports" = "0x0000000f"
+			register "usb_port_config" = "{
+				{ 1, 6, 0 },
+				{ 1, 6, 0 },
+				{ 1, 1, 1 },
+				{ 1, 1, 1 },
+				{ 1, 1, 2 },
+				{ 1, 1, 2 },
+				{ 1, 6, 3 },
+				{ 1, 6, 3 },
+				{ 1, 6, 4 },
+				{ 1, 6, 4 },
+				{ 1, 6, 5 },
+				{ 1, 1, 5 },
+				{ 1, 1, 6 },
+				{ 1, 6, 6 }
+			}"
+			device ref xhci on  end
+			device ref mei1 off end
+			device ref mei2 off end
+			device ref me_ide_r off end
+			device ref me_kt off end
+			device ref gbe on  end
+			device ref ehci2 on  end
+			device ref hda on  end
+			device ref pcie_rp1 off end
+			device ref pcie_rp2 off end
+			device ref pcie_rp3 off end
+			device ref pcie_rp4 off end
+			device ref pcie_rp5 off end
+			device ref pcie_rp6 off end
+			device ref pcie_rp7 off end
+			device ref pcie_rp8 off end
+			device ref ehci1 on  end
+			device ref pci_bridge off end
+			device ref lpc on
+				chip drivers/pc80/tpm
+					device pnp 0c31.0 on end
+				end
+				chip superio/smsc/sch5545
+					device pnp 2e.c on # LPC
+						io 0x60 = 0x2e
+					end
+					device pnp 2e.0 on # EMI
+						io 0x60 = 0xa40
+					end
+					device pnp 2e.1 on # KBC/PS2M
+						io 0x60 = 0x60
+						irq 0x70 = 1
+						irq 0x72 = 12
+					end
+					device pnp 2e.7 on # UART1
+						io 0x60 = 0x3f8
+						irq 0x70 = 4
+						irq 0xf0 = 0x02
+					end
+					device pnp 2e.8 off end # UART2
+					device pnp 2e.a on # Runtime registers
+						io 0x60 = 0xa00
+						irq 0x70 = 9 # PME
+					end
+					device pnp 2e.b  off end # Floppy
+					device pnp 2e.11 off end # PP
+				end
+			end
+			device ref sata1 on  end
+			device ref smbus on  end
+			device ref sata2 off end
+			device ref thermal on  end
+		end
+	end
+end

@@ -1,0 +1,96 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+# For a description of the syntax of this configuration file,
+# see http://lxr.linux.no/source/Documentation/kbuild/kconfig-language.txt.
+#
+
+mainmenu "coreinfo Configuration"
+
+menu "General settings"
+
+# TODO: Needs changes in coreinfo, won't update without keypress currently.
+config SHOW_DATE_TIME
+	bool "Show current date/time in the menu"
+	default y
+	help
+	  Show the current date and time in the lower-right corner of
+	  the coreinfo menu.
+
+	  This option will increase the ELF file size by ca. 250 bytes.
+
+config COREINFO_NAME
+	string "Payload name"
+	default "coreinfo"
+	help
+	  The name of this payload for use in (e.g.) Bayou.
+
+config COREINFO_VERSION
+	string "Payload version"
+	default "0.1"
+	help
+	  The version number of this payload.
+
+config LTO
+	bool "Use link time optimization (LTO)"
+	default n
+	help
+	  Compile with link time optimization. This can often decrease the
+	  final binary size, but may increase compilation time. This option
+	  is most effective when LTO is also enabled in libpayload, which
+	  is done separately.
+
+endmenu
+
+menu "Modules"
+
+config MODULE_COREBOOT
+	bool "Enable the coreboot module"
+	default y
+	help
+	  This option will increase the ELF file size by ca. 2250 bytes.
+
+config MODULE_MULTIBOOT
+	bool "Enable the multiboot module"
+	default y
+	help
+	  This option will increase the ELF file size by ca. 1790 bytes.
+
+config MODULE_CPUINFO
+	bool "Enable the cpuinfo module"
+	default y
+	help
+	  This option will increase the ELF file size by ca. 2650 bytes.
+
+config MODULE_PCI
+	bool "Enable the PCI info module"
+	default y
+	help
+	  This option will increase the ELF file size by ca. 1750 bytes.
+
+config MODULE_NVRAM
+	bool "Enable the NVRAM dump module"
+	default y
+	help
+	  This option will increase the ELF file size by ca. 350 bytes.
+
+config MODULE_BOOTLOG
+	bool "Enable the coreboot bootlog module"
+	default y
+
+config MODULE_RAMDUMP
+	bool "Enable the RAM dump module"
+	default y
+
+config MODULE_CBFS
+	bool "Enable the coreboot CBFS module"
+	default y
+	help
+	  This option will increase the ELF file size by ca. 1440 bytes.
+
+config MODULE_TIMESTAMPS
+	bool "Enable the coreboot timestamps module"
+	default y
+	help
+	  This option will increase the ELF file size by ca. 4200 bytes.
+
+endmenu

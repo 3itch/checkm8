@@ -1,0 +1,74 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVERS_WIFI_GENERIC
+	bool
+	default n
+	help
+	  When enabled, add identifiers in ACPI tables that are common
+	  to WiFi chipsets from multiple vendors.
+
+config DRIVERS_INTEL_WIFI
+	bool "Support Intel PCI-e WiFi adapters"
+	depends on PCI
+	default y if PCIEXP_PLUGIN_SUPPORT
+	select DRIVERS_WIFI_GENERIC
+	help
+	   When enabled, add identifiers in ACPI and SMBIOS tables to
+	   make OS drivers work with certain Intel PCI-e WiFi chipsets.
+
+config DRIVERS_MTK_WIFI
+	bool "Support MediaTek PCI-e WiFi adapters"
+	depends on PCI
+	default y if PCIEXP_PLUGIN_SUPPORT
+	select DRIVERS_WIFI_GENERIC
+	help
+	  When enabled, add identifiers in ACPI tables to make OS
+	  drivers work with certain MediaTek PCI-e WiFi chipsets.
+
+config USE_SAR
+	bool
+	default n
+	depends on DRIVERS_WIFI_GENERIC
+	help
+	  Enable it when wifi driver uses SAR configuration feature.
+
+config SAR_ENABLE
+	bool
+	default n
+	depends on USE_SAR
+
+config DSAR_ENABLE
+	bool
+	default n
+	depends on USE_SAR
+
+config GEO_SAR_ENABLE
+	bool
+	default n
+	depends on USE_SAR
+
+config WIFI_SAR_CBFS_FILEPATH
+	string "The cbfs file which has WIFI SAR defaults"
+	depends on USE_SAR
+	default ""
+
+config DSAR_SET_NUM
+	hex "Number of SAR sets when D-SAR is enabled"
+	default 0x3
+	depends on USE_SAR
+	help
+	  There can be up to 3 optional SAR table sets.
+
+config USE_MTCL
+	bool
+	default n
+	depends on DRIVERS_MTK_WIFI
+	help
+	  When enabled, adds the MTCL function for MediaTek WiFi chipsets.
+	  This function supplies country list information used to enable or
+	  disable operation on 5.9GHz and 6GHz bands.
+
+config WIFI_MTCL_CBFS_FILEPATH
+	string "The cbfs file which has WIFI MTCL defaults"
+	depends on USE_MTCL
+	default ""

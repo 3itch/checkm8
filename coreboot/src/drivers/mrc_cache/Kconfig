@@ -1,0 +1,67 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config CACHE_MRC_SETTINGS
+	bool
+	help
+	  Save cached MRC settings
+
+if CACHE_MRC_SETTINGS
+
+config MRC_SETTINGS_CACHE_SIZE
+	hex
+	default 0x10000
+
+config MRC_SETTINGS_PROTECT
+	bool "Enable protection on MRC settings"
+	default n
+
+config HAS_RECOVERY_MRC_CACHE
+	bool
+	default n
+
+config MRC_SETTINGS_VARIABLE_DATA
+	bool
+	default n
+
+config MRC_WRITE_NV_LATE
+	bool
+	default n
+	help
+	  MRC settings are normally written to NVRAM at BS_DEV_ENUMERATE-EXIT.
+	  If a platform requires MRC settings written to NVRAM later than
+	  normal, select this item. This will cause the write to occur at
+	  BS_OS_RESUME_CHECK-ENTRY.
+
+config MRC_STASH_TO_CBMEM
+	bool
+	default y if MRC_WRITE_NV_LATE || BOOT_DEVICE_SPI_FLASH_NO_EARLY_WRITES
+	default n
+	help
+	  Instead of writing back MRC_CACHE training data back to the
+	  MRC_CACHE right away, stash the data into cbmem.  This data
+	  will be written back later to MRC_CACHE.  This is selected
+	  for platforms which either do not support writes to SPI
+	  flash in early stages
+	  (BOOT_DEVICE_SPI_FLASH_NO_EARLY_WRITES) or the platforms
+	  that need to write back the MRC data in late ramstage boot
+	  states (MRC_WRITE_NV_LATE).
+
+config MRC_SAVE_HASH_IN_TPM
+	bool "Save a hash of the MRC_CACHE data in TPM NVRAM"
+	depends on VBOOT_STARTS_IN_BOOTBLOCK && TPM2 && !TPM1 && !VBOOT_MOCK_SECDATA
+	default y
+	help
+	  Store a hash of the MRC_CACHE training data in a TPM NVRAM
+	  space to ensure that it cannot be tampered with.
+
+config MRC_CACHE_USING_MRC_VERSION
+	bool
+	default n
+	help
+	  Use the MRC version info from FSP extended header to store the MRC cache data.
+	  This method relies on the FSP_PRODUCER_DATA_TABLES belongs to the
+	  `FspProducerDataHeader.h`file to get the MRC version.
+
+	  Supported platform can retrieve the MRC version by directly parsing the binary.
+
+endif # CACHE_MRC_SETTINGS

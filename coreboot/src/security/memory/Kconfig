@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+menu "Memory initialization"
+
+config PLATFORM_HAS_DRAM_CLEAR
+	bool
+	default y
+	depends on ARCH_X86
+	help
+	  Selected by platforms that support clearing all DRAM
+	  after DRAM initialization.
+
+config SECURITY_CLEAR_DRAM_ON_REGULAR_BOOT
+	depends on PLATFORM_HAS_DRAM_CLEAR
+	bool "Always clear all DRAM on regular boot"
+	help
+	  Always clear the DRAM after DRAM initialization regardless
+	  of additional security implementations in use.
+	  This increases boot time depending on the amount of DRAM
+	  installed.
+
+endmenu #Memory initialization

@@ -1,0 +1,127 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config MAINBOARD_HAS_CHROMEOS
+	def_bool n
+
+menu "ChromeOS"
+	depends on MAINBOARD_HAS_CHROMEOS
+
+config CHROMEOS
+	bool "Build for ChromeOS"
+	default n
+	select ELOG if BOOT_DEVICE_SUPPORTS_WRITES
+	select COLLECT_TIMESTAMPS
+	select VBOOT
+	select CHROMEOS_NVS if ACPI_SOC_NVS
+	select VPD
+	select VBOOT_SLOTS_RW_AB
+	help
+	  Enable ChromeOS specific features like the GPIO sub table in
+	  the coreboot table. NOTE: Enabling this option on an unsupported
+	  board will most likely break your build.
+
+if CHROMEOS
+
+config CHROMEOS_RAMOOPS
+	bool "Reserve space for ChromeOS ramoops"
+	default y
+
+config CHROMEOS_RAMOOPS_RAM_SIZE
+	hex "Size of preserved RAM"
+	default 0x00100000
+	depends on CHROMEOS_RAMOOPS
+
+config HAVE_REGULATORY_DOMAIN
+	bool "Add regulatory domain methods"
+	default n
+	help
+	 This option is needed to add ACPI regulatory domain methods
+
+config CHROMEOS_DISABLE_PLATFORM_HIERARCHY_ON_RESUME
+	bool
+	default y
+	depends on TPM2 && RESUME_PATH_SAME_AS_BOOT
+	help
+	  Disable the platform hierarchy on resume path if the firmware
+	  is involved in resume. The hierarchy is disabled prior to jumping
+	  to the OS.  Note that this option is sepcific to TPM2 boards.
+	  This option is auto selected if CHROMEOS because it matches with
+	  vboot_reference model which disables the platform hierarchy in
+	  the boot loader. However, those operations need to be symmetric
+	  on normal boot as well as resume and coreboot is only involved
+	  in the resume piece w.r.t. the platform hierarchy.
+
+config CHROMEOS_USE_EC_WATCHDOG_FLAG
+	bool
+	default n
+	help
+	  Use the AP watchdog flag stored in EC.
+
+config CHROMEOS_CSE_BOARD_RESET_OVERRIDE
+	bool
+	default n
+	depends on SOC_INTEL_CSE_LITE_SKU
+	help
+	  On some boards that run old firmware version in cr50, Embedded Controller (EC) needs
+	  to trigger the cold reset of Application Processor (AP) when CSE jumps from RO to RW
+	  so that cr50 resets the TPM state. This is required on boards where the cr50 firmware
+	  does not understand the new cr50 strap config (applicable only to boards using strap
+	  config 0xe). Enabling this config will help to override the default global reset.
+
+config CHROMEOS_DRAM_PART_NUMBER_IN_CBI
+	def_bool n
+	depends on EC_GOOGLE_CHROMEEC
+	help
+	  Some boards declare the DRAM part number in the CBI instead of the SPD.  This option
+	  allows those boards to declare that their DRAM part number is stored in the CBI.
+
+config CHROMEOS_NVS
+	bool
+	depends on ACPI_SOC_NVS
+
+config CHROMEOS_FW_SPLASH_SCREEN
+	bool "Display Splash Screen in firmware"
+	default n
+	select BMP_LOGO
+	select HAVE_CUSTOM_BMP_LOGO
+	help
+	  Select this option to display the manufacturer's logo or
+	  custom image (OEM splash screen) early in the boot process.
+	  This can enhance the user experience by providing visual
+	  feedback while the system starts up. For example, ChromeOS
+	  devices use this option to show their logo before the operating
+	  system loads.
+
+config CHROMEOS_LOGO_PATH
+	string "Path to ChromeOS logo file"
+	depends on CHROMEOS_FW_SPLASH_SCREEN
+	default "3rdparty/blobs/mainboard/\$(MAINBOARDDIR)/logo.bmp"
+
+config CHROMEBOOK_PLUS_LOGO_PATH
+	string "Path to Chromebook Plus logo file"
+	depends on CHROMEOS_FW_SPLASH_SCREEN
+	default "3rdparty/blobs/mainboard/\$(MAINBOARDDIR)/logo.bmp"
+
+config CHROMEOS_ENABLE_ESOL
+	def_bool FSP_UGOP_EARLY_SIGN_OF_LIFE || MAINBOARD_HAS_EARLY_LIBGFXINIT
+	help
+	  Early sign-of-life (eSOL) provides an early boot notification during
+	  critical firmware updates on Chrome OS devices, particularly for
+	  updates requiring a restart (e.g., CSE and FSP).
+
+	  eSOL Implementation Options:
+
+	  - FSP uGOP: Closed-source solution from Intel's Firmware Support
+	  Package.
+	  - libgfxinit: Open-source graphics initialization library.
+
+	  Platforms before Intel Meteor Lake are expected to use the libgfxinit.
+
+	  Devices from Intel Meteor Lake onwards will utilize the Intel FSP
+	  uGOP driver for eSOL.
+
+	  If your platform supports eSOL, enable it by selecting the
+	  appropriate option.
+
+endif # CHROMEOS
+endmenu

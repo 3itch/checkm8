@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config SUPERIO_NSC_PC87392
+	bool
+	select SUPERIO_NSC_COMMON_PRE_RAM

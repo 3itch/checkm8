@@ -1,0 +1,34 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_SIEMENS_BASEBOARD_FA_EHL
+	def_bool n
+	select SOC_INTEL_ELKHARTLAKE
+	select BOARD_ROMSIZE_KB_16384
+	select DRIVERS_I2C_GENERIC
+	select HAVE_ACPI_TABLES
+	select USE_SIEMENS_HWILIB
+	select SOC_INTEL_DISABLE_POWER_LIMITS
+
+config BOARD_SIEMENS_FA_EHL
+	select BOARD_SIEMENS_BASEBOARD_FA_EHL
+
+source "src/mainboard/siemens/fa_ehl/variants/*/Kconfig"
+
+if BOARD_SIEMENS_BASEBOARD_FA_EHL
+
+config MAINBOARD_DIR
+	default "siemens/fa_ehl"
+
+config VARIANT_DIR
+	default "fa_ehl" if BOARD_SIEMENS_FA_EHL
+
+config MAINBOARD_PART_NUMBER
+	default "FA EHL" if BOARD_SIEMENS_FA_EHL
+
+config DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/devicetree.cb"
+
+config SOC_INTEL_ELKHARTLAKE_TCO_NO_REBOOT_EN
+	default y
+
+endif # BOARD_SIEMENS_BASEBOARD_FA_EHL

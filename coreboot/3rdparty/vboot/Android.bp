@@ -1,0 +1,406 @@
+// Copyright 2024 The ChromiumOS Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+cc_defaults {
+    name: "vboot_defaults",
+    visibility: ["//visibility:public"],
+    init_rc: ["vboot.rc"],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wstrict-prototypes",
+        "-Wtype-limits",
+        "-Wundef",
+        "-Wmissing-prototypes",
+        "-Wno-trigraphs",
+        "-Wredundant-decls",
+        "-Wshadow",
+        "-Wwrite-strings",
+        "-Wstrict-aliasing",
+        "-Wdate-time",
+        "-Wno-format-security",
+        "-Wimplicit-fallthrough",
+        "-Wno-address-of-packed-member",
+        "-Wincompatible-function-pointer-types",
+        "-Wno-error=deprecated-declarations",
+        "-D_GNU_SOURCE",
+        "-DCHROMEOS_ENVIRONMENT", // FIRMWARE_ARCH=""
+        "-DUSE_FLASHROM",
+        "-DEXTERNAL_TPM_CLEAR_REQUEST=0",
+        "-Wno-gnu-pointer-arith",
+        "-Wno-ignored-qualifiers",
+        "-Wno-missing-field-initializers",
+        "-Wno-unused-parameter",
+        "-Wno-macro-redefined",
+        "-DTPM2_MODE",
+        "-DEC_EFS=0",
+    ],
+
+    local_include_dirs: [
+        "firmware/include",
+        "firmware/lib/include",
+        "firmware/lib/cgptlib/include",
+        "firmware/lib/tpm_lite/include",
+        "firmware/2lib/include",
+
+        // FIRMWARE_STUB
+        "host/include",
+        "host/lib/include",
+        "host/lib21/include",
+    ],
+
+    export_include_dirs: [
+        "host/include",
+        "firmware/include",
+        "firmware/2lib/include",
+    ],
+
+    shared_libs: [
+        "libcrypto",
+        "libflashrom",
+        "libssl",
+    ],
+
+    target: {
+        android: {
+            cflags: [
+                "-DCROSSYSTEM_LOCK_DIR=\"/data/vendor/vboot/tmp\"",
+                "-DVBOOT_TMP_DIR=\"/data/vendor/vboot/tmp\"",
+            ],
+        },
+        darwin: {
+            cflags: [
+                "-DHAVE_MACOS",
+                "-DCROSSYSTEM_LOCK_DIR=\"/tmp\"",
+                "-DVBOOT_TMP_DIR=\"/tmp\"",
+            ],
+        },
+        linux: {
+            cflags: [
+                "-DCROSSYSTEM_LOCK_DIR=\"/run/lock\"",
+                "-DVBOOT_TMP_DIR=\"/tmp\"",
+            ],
+        },
+        windows: {
+            cflags: [
+                "-DCROSSYSTEM_LOCK_DIR=\"c:\\windows\\temp\"",
+                "-DVBOOT_TMP_DIR=\"c:\\windows\\temp\"",
+            ],
+        },
+    },
+}
+
+filegroup {
+    name: "tlcl_srcs",
+    srcs: [
+        "firmware/lib/tpm2_lite/tlcl.c",
+        "firmware/lib/tpm2_lite/marshaling.c",
+    ],
+}
+
+filegroup {
+    name: "vboot_fw_srcs",
+    srcs: [
+        "firmware/2lib/2api.c",
+        "firmware/2lib/2auxfw_sync.c",
+        "firmware/2lib/2common.c",
+        "firmware/2lib/2context.c",
+        "firmware/2lib/2crc8.c",
+        "firmware/2lib/2crypto.c",
+        "firmware/2lib/2ec_sync.c",
+        "firmware/2lib/2firmware.c",
+        "firmware/2lib/2gbb.c",
+        "firmware/2lib/2hmac.c",
+        "firmware/2lib/2kernel.c",
+        "firmware/2lib/2load_kernel.c",
+        "firmware/2lib/2misc.c",
+        "firmware/2lib/2nvstorage.c",
+        "firmware/2lib/2packed_key.c",
+        "firmware/2lib/2recovery_reasons.c",
+        "firmware/2lib/2rsa.c",
+        "firmware/2lib/2secdata_firmware.c",
+        "firmware/2lib/2secdata_fwmp.c",
+        "firmware/2lib/2secdata_kernel.c",
+        "firmware/2lib/2sha1.c",
+        "firmware/2lib/2sha256.c",
+        "firmware/2lib/2sha512.c",
+        "firmware/2lib/2sha_utility.c",
+        "firmware/2lib/2struct.c",
+        "firmware/2lib/2stub_hwcrypto.c",
+        "firmware/2lib/2tpm_bootmode.c",
+        "firmware/lib/cgptlib/cgptlib.c",
+        "firmware/lib/cgptlib/cgptlib_internal.c",
+        "firmware/lib/cgptlib/crc32.c",
+        "firmware/lib/gpt_misc.c",
+        "firmware/lib20/api_kernel.c",
+        "firmware/lib20/kernel.c",
+
+        // FIRMWARE_STUB
+        "firmware/stub/tpm_lite_stub.c",
+        "firmware/stub/vboot_api_stub_disk.c",
+        "firmware/stub/vboot_api_stub_stream.c",
+        "firmware/2lib/2stub.c",
+    ],
+}
+
+cc_defaults {
+    name: "libvboot_defaults",
+    defaults: ["vboot_defaults"],
+    srcs: [
+        // USE_FLASHROM
+        "host/lib/flashrom.c",
+        "host/lib/flashrom_drv.c",
+
+        "host/lib/subprocess.c",
+        "host/lib/cbfstool.c",
+    ],
+}
+
+filegroup {
+    name: "cgpt_common",
+    srcs: [
+        "cgpt/cgpt_add.c",
+        "cgpt/cgpt_boot.c",
+        "cgpt/cgpt_common.c",
+        "cgpt/cgpt_create.c",
+        "cgpt/cgpt_edit.c",
+        "cgpt/cgpt_prioritize.c",
+        "cgpt/cgpt_repair.c",
+        "cgpt/cgpt_show.c",
+    ],
+}
+
+cc_library_static {
+    name: "libvboot_util",
+    defaults: ["libvboot_defaults"],
+    host_supported: true,
+    vendor_available: true,
+
+    srcs: [
+        ":cgpt_common",
+        "futility/dump_kernel_config_lib.c",
+        "host/lib/chromeos_config.c",
+        "host/lib/crossystem.c",
+        "host/lib/crypto.c",
+        "host/lib/file_keys.c",
+        "host/lib/fmap.c",
+        "host/lib/host_common.c",
+        "host/lib/host_key2.c",
+        "host/lib/host_keyblock.c",
+        "host/lib/host_misc.c",
+        "host/lib/host_p11_stub.c",
+        "host/lib/host_signature.c",
+        "host/lib/host_signature2.c",
+        "host/lib/signature_digest.c",
+        "host/lib/util_misc.c",
+        "host/lib21/host_common.c",
+        "host/lib21/host_key.c",
+        "host/lib21/host_misc.c",
+        "host/lib21/host_signature.c",
+        ":vboot_fw_srcs",
+        ":tlcl_srcs",
+    ],
+
+    arch: {
+        arm: {
+            srcs: [
+                "host/arch/arm/lib/crossystem_arch.c",
+            ],
+        },
+        arm64: {
+            srcs: [
+                "host/arch/arm/lib/crossystem_arch.c",
+            ],
+        },
+        x86: {
+            srcs: [
+                "host/arch/x86/lib/crossystem_arch.c",
+            ],
+        },
+        x86_64: {
+            srcs: [
+                "host/arch/x86/lib/crossystem_arch.c",
+            ],
+        },
+    },
+}
+
+cc_library_static {
+    name: "libvboot_host",
+    defaults: ["libvboot_defaults"],
+    host_supported: true,
+    vendor_available: true,
+
+    srcs: [
+        ":cgpt_common",
+        "firmware/2lib/2common.c",
+        "firmware/2lib/2context.c",
+        "firmware/2lib/2crc8.c",
+        "firmware/2lib/2crypto.c",
+        "firmware/2lib/2hmac.c",
+        "firmware/2lib/2nvstorage.c",
+        "firmware/2lib/2recovery_reasons.c",
+        "firmware/2lib/2rsa.c",
+        "firmware/2lib/2sha1.c",
+        "firmware/2lib/2sha256.c",
+        "firmware/2lib/2sha512.c",
+        "firmware/2lib/2sha_utility.c",
+        "firmware/2lib/2struct.c",
+        "firmware/2lib/2stub.c",
+        "firmware/2lib/2stub_hwcrypto.c",
+        "firmware/lib/cgptlib/cgptlib_internal.c",
+        "firmware/lib/cgptlib/crc32.c",
+        "firmware/lib/gpt_misc.c",
+        "firmware/stub/tpm_lite_stub.c",
+        "firmware/stub/vboot_api_stub_disk.c",
+        "futility/dump_kernel_config_lib.c",
+        "host/lib/chromeos_config.c",
+        "host/lib/crossystem.c",
+        "host/lib/crypto.c",
+        "host/lib/extract_vmlinuz.c",
+        "host/lib/fmap.c",
+        "host/lib/host_misc.c",
+        "host/lib21/host_misc.c",
+        ":tlcl_srcs",
+    ],
+
+    arch: {
+        arm: {
+            srcs: [
+                "host/arch/arm/lib/crossystem_arch.c",
+            ],
+        },
+        arm64: {
+            srcs: [
+                "host/arch/arm/lib/crossystem_arch.c",
+            ],
+        },
+        x86: {
+            srcs: [
+                "host/arch/x86/lib/crossystem_arch.c",
+            ],
+        },
+        x86_64: {
+            srcs: [
+                "host/arch/x86/lib/crossystem_arch.c",
+            ],
+        },
+    },
+}
+
+cc_binary {
+    name: "cgpt",
+    defaults: ["vboot_defaults"],
+    host_supported: true,
+    vendor: true,
+
+    srcs: [
+        "cgpt/cgpt.c",
+        ":cgpt_common",
+        "cgpt/cgpt_find.c",
+        "cgpt/cgpt_legacy.c",
+        "cgpt/cmd_add.c",
+        "cgpt/cmd_boot.c",
+        "cgpt/cmd_create.c",
+        "cgpt/cmd_edit.c",
+        "cgpt/cmd_find.c",
+        "cgpt/cmd_legacy.c",
+        "cgpt/cmd_prioritize.c",
+        "cgpt/cmd_repair.c",
+        "cgpt/cmd_show.c",
+    ],
+
+    include_dirs: [
+        "external/e2fsprogs/lib/",
+    ],
+
+    static_libs: [
+        "libext2_uuid",
+        "libvboot_util",
+    ],
+}
+
+filegroup {
+    name: "futility_srcs",
+    srcs: [
+        "futility/futility.c",
+        "futility/cmd_create.c",
+        "futility/cmd_dump_fmap.c",
+        "futility/cmd_dump_kernel_config.c",
+        "futility/cmd_flash_util.c",
+        "futility/cmd_gbb_utility.c",
+        "futility/cmd_gscvd.c",
+        "futility/cmd_load_fmap.c",
+        "futility/cmd_pcr.c",
+        "futility/cmd_read.c",
+        "futility/cmd_show.c",
+        "futility/cmd_sign.c",
+        "futility/cmd_update.c",
+        "futility/cmd_vbutil_firmware.c",
+        "futility/cmd_vbutil_kernel.c",
+        "futility/cmd_vbutil_key.c",
+        "futility/cmd_vbutil_keyblock.c",
+        "futility/file_type_bios.c",
+        "futility/file_type.c",
+        "futility/file_type_rwsig.c",
+        "futility/file_type_usbpd1.c",
+        "futility/flash_helpers.c",
+        "futility/platform_csme.c",
+        "futility/misc.c",
+        "futility/vb1_helper.c",
+        "futility/vb2_helper.c",
+
+        // USE_FLASHROM
+        "host/lib/flashrom_drv.c",
+        "futility/updater_archive.c",
+        "futility/updater_dut.c",
+        "futility/updater_manifest.c",
+        "futility/updater_quirks.c",
+        "futility/updater_utils.c",
+        "futility/updater.c",
+    ],
+}
+
+genrule {
+    name: "futility_cmds",
+    cmd: "grep -hoRE '^DECLARE_FUTIL_COMMAND\\([^,]+' $(locations :futility_srcs) | sed 's/DECLARE_FUTIL_COMMAND(\\(.*\\)/_CMD(\\1)/' | sort >>$(genDir)/commands" +
+        "&& $(location scripts/getversion.sh) >> $(out)" +
+        "&& echo '#define _CMD(NAME) extern const struct futil_cmd_t __cmd_##NAME;' >> $(out)" +
+        "&& cat $(genDir)/commands >> $(out)" +
+        "&& echo '#undef _CMD' >> $(out)" +
+        "&& echo '#define _CMD(NAME) &__cmd_##NAME,' >> $(out)" +
+        "&& echo 'const struct futil_cmd_t *const futil_cmds[] = {' >> $(out)" +
+        "&& cat $(genDir)/commands >> $(out)" +
+        "&& echo '0};  /* null-terminated */' >> $(out)" +
+        "&& echo '#undef _CMD' >> $(out)",
+    srcs: [
+        ":futility_srcs",
+        "scripts/getversion.sh",
+    ],
+    out: ["futility_cmds.c"],
+}
+
+cc_binary {
+    name: "futility",
+    defaults: ["vboot_defaults"],
+    host_supported: true,
+    vendor: true,
+
+    srcs: [":futility_srcs"],
+    generated_sources: ["futility_cmds"],
+
+    local_include_dirs: ["futility"],
+
+    static_libs: ["libvboot_util"],
+}
+
+cc_binary {
+    name: "crossystem",
+    defaults: ["vboot_defaults"],
+    vendor_available: true,
+
+    srcs: ["utility/crossystem.c"],
+    static_libs: ["libvboot_util"],
+}

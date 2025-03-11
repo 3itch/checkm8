@@ -20,7 +20,6 @@
 #include <stddef.h>
 
 #define TBOOT_BASE_ADDR 0x100000
-
 #define VERIFY_INTEGRITY_OFFSET 0x80af10
 
 void serial_putc(char c) {
@@ -55,6 +54,7 @@ void patch(void) {
   /**************
   mov eax, 1; ret
   **************/
+
   uint8_t patch[] = {0xB8, 0x01, 0x00, 0x00, 0x00, 0xC3};
 
   size_t i;

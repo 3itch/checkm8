@@ -1,0 +1,91 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_FACEBOOK_MONOLITH
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOARD_ROMSIZE_KB_16384
+	select DISABLE_ACPI_HIBERNATE
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select SOC_INTEL_KABYLAKE
+	select MEMORY_MAPPED_TPM
+	select MAINBOARD_HAS_TPM2
+	select MAINBOARD_USES_IFD_GBE_REGION
+	select INTEL_GMA_HAVE_VBT
+	select VPD
+
+config DISABLE_HECI1_AT_PRE_BOOT
+	default y
+
+config CBFS_SIZE
+	default 0x00900000
+
+config MAINBOARD_DIR
+	default "facebook/monolith"
+
+config MAINBOARD_PART_NUMBER
+	default "Monolith"
+
+config MAINBOARD_FAMILY
+	string
+	default "Facebook Monolith"
+
+config MAX_CPUS
+	int
+	default 4
+
+config IFD_BIN_PATH
+	string
+	depends on HAVE_IFD_BIN
+	default "3rdparty/blobs/mainboard/\$(MAINBOARDDIR)/descriptor.bin"
+
+config ME_BIN_PATH
+	string
+	depends on HAVE_ME_BIN
+	default "3rdparty/blobs/mainboard/\$(MAINBOARDDIR)/me.bin"
+
+config GBE_BIN_PATH
+	string
+	depends on HAVE_GBE_BIN
+	default "3rdparty/blobs/mainboard/\$(MAINBOARDDIR)/gbe.bin"
+
+config PRERAM_CBMEM_CONSOLE_SIZE
+	hex
+	default 0xd00
+
+config DIMM_SPD_SIZE
+	default 512  #DDR4
+
+config UART_FOR_CONSOLE
+	int
+	default 0
+
+config DIMM_MAX
+	default 2
+
+config MAINBOARD_SUPPORTS_SKYLAKE_CPU
+	bool
+	default n
+
+config MAINBOARD_SUPPORTS_KABYLAKE_QUAD
+	bool
+	default n
+
+config VBOOT
+	select VBOOT_NO_BOARD_SUPPORT
+	select VBOOT_SLOTS_RW_A
+	select VBOOT_ALWAYS_ENABLE_DISPLAY
+	select VBOOT_ENABLE_CBFS_FALLBACK
+
+config RW_REGION_ONLY
+	string "Files in RW only"
+
+config VBOOT_ALWAYS_ALLOW_UDC
+	def_bool y
+	depends on VBOOT && !CHROMEOS
+
+config USE_PM_ACPI_TIMER
+	default n
+
+endif

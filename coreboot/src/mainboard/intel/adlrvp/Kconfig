@@ -1,0 +1,193 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_INTEL_ADLRVP_COMMON
+	def_bool n
+	select BOARD_ROMSIZE_KB_32768
+	select CPU_INTEL_SOCKET_LGA1700
+	select DRIVERS_I2C_GENERIC
+	select DRIVERS_I2C_HID
+	select DRIVERS_I2C_MAX98373
+	select DRIVERS_INTEL_DPTF
+	select DRIVERS_INTEL_MIPI_CAMERA
+	select DRIVERS_INTEL_SOUNDWIRE
+	select DRIVERS_SOUNDWIRE_ALC_BASE_7XX
+	select DRIVERS_SPI_ACPI
+	select DRIVERS_USB_ACPI
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_SPD_IN_CBFS
+	select MAINBOARD_HAS_CHROMEOS
+	select SOC_INTEL_COMMON_BLOCK_IPU
+	select SOC_INTEL_ENABLE_USB4_PCIE_RESOURCES
+
+config BOARD_INTEL_ADLRVP_P
+	select BOARD_INTEL_ADLRVP_COMMON
+	select DRIVERS_UART_8250IO
+	select MAINBOARD_USES_IFD_EC_REGION
+	select SOC_INTEL_ALDERLAKE_PCH_P
+	select GEN3_EXTERNAL_CLOCK_BUFFER
+	select MAINBOARD_USES_IFD_GBE_REGION
+
+config BOARD_INTEL_ADLRVP_P_EXT_EC
+	select BOARD_INTEL_ADLRVP_COMMON
+	select DRIVERS_INTEL_PMC
+	select INTEL_LPSS_UART_FOR_CONSOLE
+	select SOC_INTEL_ALDERLAKE_PCH_P
+	select GEN3_EXTERNAL_CLOCK_BUFFER
+	select DRIVERS_WWAN_FM350GL
+
+config BOARD_INTEL_ADLRVP_RPL
+	select BOARD_INTEL_ADLRVP_COMMON
+	select DRIVERS_UART_8250IO
+	select GEN3_EXTERNAL_CLOCK_BUFFER
+	select MAINBOARD_USES_IFD_EC_REGION
+	select SOC_INTEL_ALDERLAKE_PCH_P
+	select SOC_INTEL_RAPTORLAKE
+
+config BOARD_INTEL_ADLRVP_RPL_EXT_EC
+	select SOC_INTEL_RAPTORLAKE
+	select BOARD_INTEL_ADLRVP_COMMON
+	select DRIVERS_INTEL_PMC
+	select INTEL_LPSS_UART_FOR_CONSOLE
+	select SOC_INTEL_ALDERLAKE_PCH_P
+	select GEN3_EXTERNAL_CLOCK_BUFFER
+	select DRIVERS_WWAN_FM350GL
+	select MAINBOARD_HAS_TPM2
+	select SPI_TPM
+	select TPM_GOOGLE_CR50
+
+config BOARD_INTEL_ADLRVP_P_MCHP
+	select BOARD_INTEL_ADLRVP_COMMON
+	select DRIVERS_INTEL_MIPI_CAMERA
+	select DRIVERS_INTEL_PMC
+	select EC_GOOGLE_CHROMEEC_MEC
+	select INTEL_LPSS_UART_FOR_CONSOLE
+	select SOC_INTEL_ALDERLAKE_PCH_P
+
+config BOARD_INTEL_ADLRVP_N
+	select BOARD_INTEL_ADLRVP_COMMON
+	select DRIVERS_UART_8250IO
+	select MAINBOARD_USES_IFD_EC_REGION
+	select SOC_INTEL_ALDERLAKE_PCH_N
+
+config BOARD_INTEL_ADLRVP_N_EXT_EC
+	select BOARD_INTEL_ADLRVP_COMMON
+	select DRIVERS_INTEL_PMC
+	select INTEL_LPSS_UART_FOR_CONSOLE
+	select SOC_INTEL_ALDERLAKE_PCH_N
+	select FW_CONFIG
+	select FW_CONFIG_SOURCE_CHROMEEC_CBI
+
+if BOARD_INTEL_ADLRVP_COMMON
+
+config SOC_INTEL_CSE_LITE_SKU
+	bool "Use CSE Lite firmware"
+	default y if ADL_CHROME_EC
+	help
+	  Enable if CSE Lite firmware is used in your build. It is commonly
+	  used in Chrome boards (chromebooks, chromeboxes, ...).
+	  But since ADL RVP build can be used with or without CSE Lite firmware
+	  it is a configurable option. Alderlake RVP boards usually don't use
+	  an CSE Lite firmware, but are still very likely to use it in case
+	  ChromeEC is used.
+
+config CHROMEOS
+	select GBB_FLAG_FORCE_DEV_SWITCH_ON
+	select GBB_FLAG_FORCE_DEV_BOOT_USB
+	select GBB_FLAG_FORCE_DEV_BOOT_ALTFW
+	select GBB_FLAG_FORCE_MANUAL_RECOVERY
+	select GBB_FLAG_DISABLE_PD_SOFTWARE_SYNC
+	select HAS_RECOVERY_MRC_CACHE
+
+config MAINBOARD_DIR
+	default "intel/adlrvp"
+
+config VARIANT_DIR
+	default "adlrvp_p" if BOARD_INTEL_ADLRVP_P
+	default "adlrvp_p_ext_ec" if BOARD_INTEL_ADLRVP_P_EXT_EC
+	default "adlrvp_rpl" if BOARD_INTEL_ADLRVP_RPL
+	default "adlrvp_rpl_ext_ec" if BOARD_INTEL_ADLRVP_RPL_EXT_EC
+	default "adlrvp_p_mchp" if BOARD_INTEL_ADLRVP_P_MCHP
+	default "adlrvp_n" if BOARD_INTEL_ADLRVP_N
+	default "adlrvp_n_ext_ec" if BOARD_INTEL_ADLRVP_N_EXT_EC
+
+config GBB_HWID
+	string
+	depends on CHROMEOS
+	default "ADLRVPN TEST 7673" if BOARD_INTEL_ADLRVP_N || BOARD_INTEL_ADLRVP_N_EXT_EC
+	default "ADLRVPP TEST 2418"
+
+config MAINBOARD_PART_NUMBER
+	default "Alder Lake Client"
+
+config MAINBOARD_VENDOR
+	string
+	default "Intel Corporation"
+
+config MAINBOARD_FAMILY
+	string
+	default "Intel_adlrvp"
+
+config DEVICETREE
+	default "devicetree_n.cb" if BOARD_INTEL_ADLRVP_N || BOARD_INTEL_ADLRVP_N_EXT_EC
+	default "devicetree.cb"
+
+config OVERRIDE_DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/overridetree.cb"
+
+choice
+	prompt "ON BOARD EC"
+	default ADL_CHROME_EC if BOARD_INTEL_ADLRVP_P_EXT_EC || BOARD_INTEL_ADLRVP_P_MCHP || BOARD_INTEL_ADLRVP_N_EXT_EC || BOARD_INTEL_ADLRVP_RPL_EXT_EC
+	help
+	  This option allows you to select the on board EC to use.
+	  Select whether the board has Intel EC or Chrome EC
+
+config ADL_CHROME_EC
+	bool "Chrome EC"
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_ESPI
+	select EC_GOOGLE_CHROMEEC_BOARDID
+	select EC_ACPI
+	select EC_GOOGLE_CHROMEEC_LPC
+
+config ADL_INTEL_EC
+	bool "Intel EC"
+	select EC_ACPI
+endchoice
+
+config VBOOT
+	select VBOOT_LID_SWITCH
+	select VBOOT_MOCK_SECDATA if BOARD_INTEL_ADLRVP_P_EXT_EC || BOARD_INTEL_ADLRVP_N_EXT_EC
+	select EC_GOOGLE_CHROMEEC_SWITCHES if ADL_CHROME_EC
+	select VBOOT_EARLY_EC_SYNC if BOARD_INTEL_ADLRVP_N_EXT_EC
+
+config UART_FOR_CONSOLE
+	int
+	default 0
+
+config DRIVER_TPM_SPI_BUS
+	default 0x2 if BOARD_INTEL_ADLRVP_RPL_EXT_EC
+
+config USE_PM_ACPI_TIMER
+	default n if BOARD_INTEL_ADLRVP_N_EXT_EC || BOARD_INTEL_ADLRVP_N
+
+config TPM_TIS_ACPI_INTERRUPT
+	int
+	default 67 if BOARD_INTEL_ADLRVP_RPL_EXT_EC # GPE0_DW2_3 (GPP_E3)
+
+config GEN3_EXTERNAL_CLOCK_BUFFER
+	bool
+	depends on SOC_INTEL_ALDERLAKE_PCH_P
+	default n
+	help
+	  Support external Gen-3 clock chip for ADL-P.
+	  `CONFIG_CLKSRC_FOR_EXTERNAL_BUFFER` provides feed clock to discrete buffer
+	  for further distribution to platform. SRCCLKREQB[7:9] maps to internal
+	  SRCCLKREQB[6]. If any of them asserted, SRC buffer
+	  `CONFIG_CLKSRC_FOR_EXTERNAL_BUFFER` gets enabled.
+
+config CLKSRC_FOR_EXTERNAL_BUFFER
+	depends on GEN3_EXTERNAL_CLOCK_BUFFER
+	int
+	default 6  # CLKSRC 6
+endif

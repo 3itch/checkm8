@@ -1,0 +1,216 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Brya"
+
+config BOARD_GOOGLE_AGAH
+	bool "->  Agah"
+
+config BOARD_GOOGLE_ANAHERA
+	bool "->  Anahera"
+
+config BOARD_GOOGLE_ANAHERA4ES
+	bool "->  Anahera4ES"
+
+config BOARD_GOOGLE_ANRAGGAR
+	bool "->  Anraggar"
+
+config BOARD_GOOGLE_AURASH
+	bool "->  Aurash"
+
+config BOARD_GOOGLE_BANSHEE
+	bool "->  Banshee"
+
+config BOARD_GOOGLE_BRASK
+	bool "->  Brask"
+
+config BOARD_GOOGLE_BRYA0
+	bool "->  Brya 0"
+
+config BOARD_GOOGLE_CRAASK
+	bool "->  Craask"
+
+config BOARD_GOOGLE_CRAASKOV
+	bool "->  Craaskov"
+
+config BOARD_GOOGLE_CONSTITUTION
+	bool "->  Constitution"
+
+config BOARD_GOOGLE_CROTA
+	bool "->  Crota"
+
+config BOARD_GOOGLE_DIRKS
+	bool "->  Dirks"
+
+config BOARD_GOOGLE_DOCHI
+	bool "->  Dochi"
+
+config BOARD_GOOGLE_DOMIKA
+	bool "->  Domika"
+
+config BOARD_GOOGLE_FELWINTER
+	bool "->  Felwinter"
+
+config BOARD_GOOGLE_GAELIN
+	bool "->  Gaelin"
+
+config BOARD_GOOGLE_GIMBLE
+	bool "->  Gimble"
+
+config BOARD_GOOGLE_GIMBLE4ES
+	bool "->  Gimble4ES"
+
+config BOARD_GOOGLE_GLADIOS
+	bool "->  Gladios"
+
+config BOARD_GOOGLE_GLASSWAY
+	bool "->  Glassway"
+
+config BOARD_GOOGLE_GOTHRAX
+	bool "->  Gothrax"
+
+config BOARD_GOOGLE_HADES
+	bool "->  Hades"
+
+config BOARD_GOOGLE_KANO
+	bool "->  Kano"
+
+config BOARD_GOOGLE_KINOX
+	bool "->  Kinox"
+
+config BOARD_GOOGLE_KULDAX
+	bool "->  Kuldax"
+
+config BOARD_GOOGLE_JOXER
+	bool "->  Joxer"
+
+config BOARD_GOOGLE_LISBON
+	bool "->  Lisbon"
+
+config BOARD_GOOGLE_MARASOV
+	bool "->  Marasov"
+
+config BOARD_GOOGLE_MITHRAX
+	bool "->  Mithrax"
+
+config BOARD_GOOGLE_MOLI
+	bool "->  Moli"
+
+config BOARD_GOOGLE_NIVVIKS
+	bool "->  Nivviks"
+
+config BOARD_GOOGLE_NEREID
+	bool "->  Nereid"
+
+config BOARD_GOOGLE_NOKRIS
+	bool "->  Nokris"
+
+config BOARD_GOOGLE_OMNIGUL
+	bool "->  Omnigul"
+
+config BOARD_GOOGLE_OSIRIS
+	bool "->  Osiris"
+
+config BOARD_GOOGLE_PIRRHA
+	bool "->  Pirrha"
+
+config BOARD_GOOGLE_PRIMUS
+	bool "->  Primus"
+
+config BOARD_GOOGLE_PUJJO
+	bool "->  Pujjo"
+
+config BOARD_GOOGLE_QUANDISO
+	bool "->  Quandiso"
+
+config BOARD_GOOGLE_QUANDISO2
+	bool "->  Quandiso2"
+
+config BOARD_GOOGLE_REDRIX
+	bool "->  Redrix"
+
+config BOARD_GOOGLE_REDRIX4ES
+	bool "->  Redrix4ES"
+
+config BOARD_GOOGLE_RIVEN
+	bool "->  Riven"
+
+config BOARD_GOOGLE_RULL
+	bool "->  Rull"
+
+config BOARD_GOOGLE_SKOLAS
+	bool "->  Skolas"
+
+config BOARD_GOOGLE_SKOLAS4ES
+	bool "->  Skolas4ES"
+
+config BOARD_GOOGLE_TAEKO
+	bool "->  Taeko"
+
+config BOARD_GOOGLE_TAEKO4ES
+	bool "->  Taeko4ES"
+
+config BOARD_GOOGLE_TANIKS
+	bool "->  Taniks"
+
+config BOARD_GOOGLE_TELIKS
+	bool "->  Teliks"
+
+config BOARD_GOOGLE_TEREID
+	bool "->  Tereid"
+
+config BOARD_GOOGLE_TIVVIKS
+	bool "-> Tivviks"
+
+config BOARD_GOOGLE_TRULO
+	bool "->  Trulo"
+
+config BOARD_GOOGLE_ULDREN
+	bool "->  Uldren"
+
+config BOARD_GOOGLE_ULDRENITE
+	bool "->  Uldrenite"
+
+config BOARD_GOOGLE_VELL
+	bool "->  Vell"
+
+config BOARD_GOOGLE_VOLMAR
+	bool "->  Volmar"
+
+config BOARD_GOOGLE_XIVU
+	bool "->  Xivu"
+
+config BOARD_GOOGLE_YAVIKS
+	bool "->  Yaviks"
+
+config BOARD_GOOGLE_YAVILLA
+	bool "->  Yavilla"
+
+config BOARD_GOOGLE_ZYDRON
+	bool "->  Zydron"
+
+config BOARD_GOOGLE_XOL
+	bool "->  Xol"
+
+config BOARD_GOOGLE_NOVA
+	bool "->  Nova"
+
+config BOARD_GOOGLE_BUJIA
+	bool "->  Bujia"
+
+config BOARD_GOOGLE_YAVISTA
+	bool "->  Yavista"
+
+config BOARD_GOOGLE_SUNDANCE
+	bool "->  Sundance"
+
+config BOARD_GOOGLE_PUJJOGA
+	bool "->  Pujjoga"
+
+config BOARD_GOOGLE_PUJJOGATWIN
+	bool "->  Pujjogatwin"
+
+config BOARD_GOOGLE_ORISA
+	bool "->  Orisa"
+
+config BOARD_GOOGLE_TELITH
+	bool "->  Telith"

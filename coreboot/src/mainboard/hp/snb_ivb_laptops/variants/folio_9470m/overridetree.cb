@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+chip northbridge/intel/sandybridge
+	register "gpu_cpu_backlight" = "0x00000d9c"
+	register "gpu_panel_power_backlight_off_delay" = "2000"
+	register "gpu_pch_backlight" = "0x0d9c0d9c"
+	device domain 0 on
+		subsystemid 0x103c 0x18df inherit
+
+		device ref peg10 off end
+		device ref igd on  end
+
+		chip southbridge/intel/bd82x6x # Intel Series 6 Cougar Point PCH
+			# mailbox at 0x200/0x201 and PM1 at 0x220
+			register "gen1_dec" = "0x007c0201"
+			register "gen2_dec" = "0x000c0101"
+			register "gen3_dec" = "0x00fcfe01"
+			register "gen4_dec" = "0x000402e9"
+			register "gpi6_routing" = "2"
+			register "pcie_hotplug_map" = "{ 0, 0, 1, 0, 0, 0, 0, 0 }"
+			register "sata_port_map" = "0x3"
+			register "superspeed_capable_ports" = "0x0000000f"
+			register "xhci_overcurrent_mapping" = "0x00000c03"
+			register "xhci_switchable_ports"    = "0x0000000f"
+			register "usb_port_config" = "{
+				{1, 1, 0}, /* SSP1: dock */
+				{1, 1, 0}, /* SSP2: left, EHCI Debug */
+				{1, 1, 1}, /* SSP3: right back side */
+				{1, 1, 1}, /* SSP4: right front side */
+				{1, 0, 2}, /* B0P5 */
+				{1, 0, 2}, /* B0P6: wlan USB */
+				{0, 0, 3}, /* B0P7 */
+				{1, 1, 3}, /* B0P8: smart card reader */
+				{1, 1, 4}, /* B1P1: fingerprint reader */
+				{0, 0, 4}, /* B1P2: (EHCI Debug, not connected) */
+				{1, 1, 5}, /* B1P3: Camera */
+				{0, 0, 5}, /* B1P4 */
+				{1, 1, 6}, /* B1P5: wwan USB */
+				{0, 0, 6}
+			}"
+
+			device ref xhci on  end
+			device ref pcie_rp1 on  end
+			device ref pcie_rp2 off end
+			device ref pcie_rp3 on  end	# SDHCI
+			device ref pcie_rp4 on     	# WLAN
+				smbios_slot_desc "SlotTypePciExpressMini52pinWithoutBSKO"
+					"SlotLengthShort" "Mini PCIe" "SlotDataBusWidth1X"
+			end
+			device ref pcie_rp5 off end
+			device ref pcie_rp6 off end
+			device ref pcie_rp7 off end
+			device ref pcie_rp8 off end
+			device ref lpc on
+				chip ec/hp/kbc1126
+					register "ec_data_port" = "0x62"
+					register "ec_cmd_port"  = "0x66"
+					register "ec_ctrl_reg"  = "0x81"
+					register "ec_fan_ctrl_value" = "0x44"
+					device pnp ff.1 off end
+				end
+			end
+		end
+	end
+end

@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_ASUS_P5QPL_AM || BOARD_ASUS_P5G41T_M_LX
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select CPU_INTEL_SOCKET_LGA775
+	select NORTHBRIDGE_INTEL_X4X
+	select SOUTHBRIDGE_INTEL_I82801GX
+	select SUPERIO_WINBOND_W83627DHG
+	select HAVE_ACPI_TABLES
+	select BOARD_ROMSIZE_KB_1024
+	select HAVE_OPTION_TABLE
+	select HAVE_CMOS_DEFAULT
+	select HAVE_ACPI_RESUME
+	select INTEL_GMA_HAVE_VBT
+	select MAINBOARD_HAS_LIBGFXINIT
+
+	# P5G41T-M LX has ATL1C which works fine
+	select ATHEROS_ATL1E_SETMAC if BOARD_ASUS_P5QPL_AM
+
+config MAINBOARD_DIR
+	default "asus/p5qpl-am"
+
+config VARIANT_DIR
+	default "p5qpl-am" if BOARD_ASUS_P5QPL_AM
+	default "p5g41t-m_lx" if BOARD_ASUS_P5G41T_M_LX
+
+config MAINBOARD_PART_NUMBER
+	default "P5QPL-AM" if BOARD_ASUS_P5QPL_AM
+	default "P5G41T-M LX" if BOARD_ASUS_P5G41T_M_LX
+
+config OVERRIDE_DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/overridetree.cb"
+
+# Override the default variant behavior, since the data.vbt is the same
+config INTEL_GMA_VBT_FILE
+	default "src/mainboard/\$(MAINBOARDDIR)/data.vbt"
+
+endif # BOARD_ASUS_P5QPL_AM || BOARD_ASUS_P5G41T_M_LX

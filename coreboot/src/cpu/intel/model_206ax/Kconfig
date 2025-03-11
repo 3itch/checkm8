@@ -1,0 +1,35 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config CPU_INTEL_MODEL_206AX
+	bool
+	select ARCH_X86
+	select HAVE_X86_64_SUPPORT
+	select SSE2
+	select UDELAY_TSC
+	select TSC_MONOTONIC_TIMER
+	select SUPPORT_CPU_UCODE_IN_CBFS
+	#select AP_IN_SIPI_WAIT
+	select TSC_SYNC_MFENCE
+	select CPU_INTEL_COMMON
+	select CPU_INTEL_COMMON_TIMEBASE
+
+if CPU_INTEL_MODEL_206AX
+
+config SMM_TSEG_SIZE
+	hex
+	default 0x800000
+
+config SMM_RESERVED_SIZE
+	hex
+	default 0x100000
+
+# Intel Enhanced Debug region must be 4MB
+config IED_REGION_SIZE
+	hex
+	default 0x400000
+
+config MAX_CPUS
+	int
+	default 8
+
+endif

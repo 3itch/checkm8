@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_FOXCONN
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/foxconn/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/foxconn/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "Foxconn"
+
+endif # VENDOR_FOXCONN

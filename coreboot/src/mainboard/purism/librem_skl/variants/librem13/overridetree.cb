@@ -1,0 +1,23 @@
+chip soc/intel/skylake
+
+	device domain 0 on
+		device ref south_xhci on
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_TYPE_C(OC_SKIP),	// Type-C Port
+				[1] = USB2_PORT_MID(OC0),		// Type-A Port (right)
+				[2] = USB2_PORT_MID(OC_SKIP),		// Bluetooth
+				[3] = USB2_PORT_FLEX(OC_SKIP),		// Camera
+				[5] = USB2_PORT_FLEX(OC2),		// Type-A Port (left)
+				[6] = USB2_PORT_MID(OC_SKIP),		// SD
+			}"
+
+			# OC1 should be for Type-C but it seems to not have been wired, according to
+			# the available schematics, even though it is labeled as USB_OC_TYPEC.
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC_SKIP),	// Type-C Port
+				[1] = USB3_PORT_DEFAULT(OC0),		// Type-A Port (right)
+				[2] = USB3_PORT_DEFAULT(OC_SKIP),	// Type-C Port
+			}"
+		end
+	end
+end

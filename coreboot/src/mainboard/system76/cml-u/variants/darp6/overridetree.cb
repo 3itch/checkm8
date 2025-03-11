@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+chip soc/intel/cannonlake
+	device domain 0 on
+		subsystemid 0x1558 0x1404 inherit
+
+		device ref xhci		on
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_MID(OC_SKIP),		/* Type-A port 1 */
+				[1] = USB2_PORT_MID(OC_SKIP),		/* 3G / LTE */
+				[2] = USB2_PORT_TYPE_C(OC_SKIP),	/* Type-C port 3 */
+				[3] = USB2_PORT_MID(OC_SKIP),		/* USB Board port 4 */
+				[6] = USB2_PORT_MAX(OC_SKIP),		/* Camera */
+				[9] = USB2_PORT_MID(OC_SKIP),		/* Bluetooth */
+			}"
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC_SKIP),	/* Type-A port 1 */
+				[1] = USB3_PORT_DEFAULT(OC_SKIP),	/* 4G */
+				[2] = USB3_PORT_DEFAULT(OC_SKIP),	/* Type-C port 3 */
+				[3] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB Board port 4 */
+				[4] = USB3_PORT_EMPTY,			/* Used by TBT */
+				[5] = USB3_PORT_EMPTY,			/* Used by TBT */
+			}"
+		end
+		device ref i2c0		on
+			chip drivers/i2c/hid
+				register "generic.hid" = ""SYNA1202""
+				register "generic.desc" = ""Synaptics Touchpad""
+				register "generic.irq" = "ACPI_IRQ_LEVEL_LOW(GPP_C23_IRQ)"
+				register "generic.detect" = "1"
+				register "hid_desc_reg_offset" = "0x20"
+				device i2c 2c on end
+			end
+		end
+		device ref sata		on
+			register "SataPortsEnable" = "{
+				[0] = 1,
+				[2] = 1,
+			}"
+		end
+		device ref pcie_rp5	on
+			# PCI Express Root port #5 x4, Clock 4 (TBT)
+			register "PcieRpEnable[4]" = "1"
+			register "PcieRpLtrEnable[4]" = "1"
+			register "PcieRpHotPlug[4]" = "1"
+			register "PcieClkSrcUsage[4]" = "4"
+			register "PcieClkSrcClkReq[4]" = "4"
+		end
+		device ref pcie_rp9	on
+			# PCI Express Root port #9 x1, Clock 3 (LAN)
+			register "PcieRpEnable[8]" = "1"
+			register "PcieRpLtrEnable[8]" = "1"
+			register "PcieClkSrcUsage[3]" = "8"
+			register "PcieClkSrcClkReq[3]" = "3"
+		end
+		device ref pcie_rp10	on
+			# PCI Express Root port #10 x1, Clock 2 (WLAN)
+			register "PcieRpEnable[9]" = "1"
+			register "PcieRpLtrEnable[9]" = "0"
+			register "PcieClkSrcUsage[2]" = "9"
+			register "PcieClkSrcClkReq[2]" = "2"
+		end
+		device ref pcie_rp13	on
+			# PCI Express Root port #13 x4, Clock 5 (NVMe)
+			register "PcieRpEnable[12]" = "1"
+			register "PcieRpLtrEnable[12]" = "1"
+			register "PcieClkSrcUsage[5]" = "12"
+			register "PcieClkSrcClkReq[5]" = "5"
+		end
+		device ref hda		on
+			register "PchHdaAudioLinkDmic0" = "1"
+			register "PchHdaAudioLinkDmic1" = "1"
+		end
+	end
+end

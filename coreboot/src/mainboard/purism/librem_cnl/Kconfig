@@ -1,0 +1,119 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_PURISM_BASEBOARD_LIBREM_CNL
+	def_bool n
+	select BOARD_ROMSIZE_KB_16384
+	select DRIVERS_GENERIC_CBFS_SERIAL
+	select DRIVERS_USB_ACPI
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select INTEL_GMA_HAVE_VBT
+	select MAINBOARD_HAS_LIBGFXINIT
+	select NO_UART_ON_SUPERIO
+	select SOC_INTEL_COMMON_BLOCK_HDA_VERB
+	select SPD_CACHE_IN_FMAP
+	select SPD_READ_BY_WORD
+
+config BOARD_PURISM_LIBREM_MINI
+	select BOARD_PURISM_BASEBOARD_LIBREM_CNL
+	select HAVE_CMOS_DEFAULT
+	select HAVE_OPTION_TABLE
+	select SOC_INTEL_WHISKEYLAKE
+	select SUPERIO_ITE_IT8528E
+
+config BOARD_PURISM_LIBREM_MINI_V2
+	select BOARD_PURISM_BASEBOARD_LIBREM_CNL
+	select HAVE_CMOS_DEFAULT
+	select HAVE_OPTION_TABLE
+	select SOC_INTEL_COMETLAKE_1
+	select SUPERIO_ITE_IT8528E
+
+config BOARD_PURISM_LIBREM_14
+	select BOARD_PURISM_BASEBOARD_LIBREM_CNL
+	select DRIVERS_I2C_HID
+	select EC_LIBREM_EC
+	select MEMORY_MAPPED_TPM
+	select MAINBOARD_HAS_TPM1
+	select SOC_INTEL_COMETLAKE_1_2
+	select SYSTEM_TYPE_LAPTOP
+
+if BOARD_PURISM_BASEBOARD_LIBREM_CNL
+
+config MAINBOARD_DIR
+	default "purism/librem_cnl"
+
+config MAINBOARD_FAMILY
+	string
+	default "Librem Mini" if BOARD_PURISM_LIBREM_MINI || BOARD_PURISM_LIBREM_MINI_V2
+	default "Librem 14" if BOARD_PURISM_LIBREM_14
+
+config MAINBOARD_PART_NUMBER
+	default "Librem Mini" if BOARD_PURISM_LIBREM_MINI
+	default "Librem Mini v2" if BOARD_PURISM_LIBREM_MINI_V2
+	default "Librem 14" if BOARD_PURISM_LIBREM_14
+
+config VARIANT_DIR
+	default "librem_mini" if BOARD_PURISM_LIBREM_MINI || BOARD_PURISM_LIBREM_MINI_V2
+	default "librem_14" if BOARD_PURISM_LIBREM_14
+
+config OVERRIDE_DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/overridetree.cb"
+
+config CBFS_SIZE
+	default 0x800000 if BOARD_PURISM_LIBREM_MINI
+	default 0xA00000 if BOARD_PURISM_LIBREM_MINI_V2
+	default 0x900000 if BOARD_PURISM_LIBREM_14
+
+config DIMM_MAX
+	default 2
+
+config DIMM_SPD_SIZE
+	default 512
+
+config VGA_BIOS_ID
+	string
+	default "8086,3ea0" if BOARD_PURISM_LIBREM_MINI
+	default "8086,9b41" if BOARD_PURISM_LIBREM_MINI_V2 || BOARD_PURISM_LIBREM_14
+
+config PXE_ROM_ID
+	string
+	default "10ec,8168"
+
+# This platform has limited means to display POST codes
+config NO_POST
+	default y
+
+endif
+
+if BOARD_PURISM_LIBREM_MINI || BOARD_PURISM_LIBREM_MINI_V2
+
+config PC_CMOS_BASE_PORT_BANK1
+	default 0x360
+
+config CMOS_LAYOUT_FILE
+	default "src/mainboard/\$(MAINBOARDDIR)/variants/librem_mini/cmos.layout"
+
+config CMOS_DEFAULT_FILE
+	default "src/mainboard/\$(MAINBOARDDIR)/variants/librem_mini/cmos.default"
+
+endif
+
+config ENABLE_EC_UART1
+	bool "Enable EC UART1"
+	depends on BOARD_PURISM_LIBREM_MINI || BOARD_PURISM_LIBREM_MINI_V2
+	default n
+	select DRIVERS_UART_8250IO
+	help
+	  Enable UART1 on the EC.
+
+	  This UART can be used for boot logging by coreboot, SeaBIOS, or
+	  Linux.  It also works as a general-purpose UART.
+
+	  Soldering is required to access these signals.  Locate the pads for
+	  U81 on the bottom of the board near the front edge; the IC is not
+	  populated.  TX is pin 14, RX is pin 19.  The signals are 3.3V (do NOT
+	  connect directly to an RS-232 serial port).
+
+config EDK2_BOOT_TIMEOUT
+	int
+	default 4 if BOARD_PURISM_LIBREM_MINI || BOARD_PURISM_LIBREM_MINI_V2

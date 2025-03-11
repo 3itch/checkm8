@@ -1,0 +1,201 @@
+chip soc/intel/skylake
+	register "deep_s3_enable_ac" = "false"
+	register "deep_s3_enable_dc" = "false"
+	register "deep_s5_enable_ac" = "false"
+	register "deep_s5_enable_dc" = "false"
+	register "deep_sx_config" = "DSX_EN_LAN_WAKE_PIN"
+
+	register "eist_enable" = "true"
+
+	# GPE configuration
+	# Note that GPE events called out in ASL code rely on this
+	# route. i.e. If this route changes then the affected GPE
+	# offset bits also need to be changed.
+	register "gpe0_dw0" = "GPP_C"
+	register "gpe0_dw1" = "GPP_D"
+	register "gpe0_dw2" = "GPP_E"
+
+	# Disable DPTF
+	register "dptf_enable" = "0"
+
+	# FSP Configuration
+	register "DspEnable" = "0"
+	register "IoBufferOwnership" = "0"
+	register "SkipExtGfxScan" = "1"
+	register "SaGv" = "SaGv_Enabled"
+	register "PmConfigSlpS3MinAssert" = "2"		# 50ms
+	register "PmConfigSlpS4MinAssert" = "1"		# 1s
+	register "PmConfigSlpSusMinAssert" = "3"	# 500ms
+	register "PmConfigSlpAMinAssert" = "3"		# 2s
+
+	# VR Settings Configuration for 4 Domains
+	#+----------------+-----------+-----------+-------------+----------+
+	#| Domain/Setting |     SA    |    IA     | GT Unsliced |    GT    |
+	#+----------------+-----------+-----------+-------------+----------+
+	#| Psi1Threshold  | 20A       | 20A       | 20A         | 20A      |
+	#| Psi2Threshold  | 4A        | 5A        | 5A          | 5A       |
+	#| Psi3Threshold  | 1A        | 1A        | 1A          | 1A       |
+	#| Psi3Enable     | 1         | 1         | 1           | 1        |
+	#| Psi4Enable     | 1         | 1         | 1           | 1        |
+	#| ImonSlope      | 0         | 0         | 0           | 0        |
+	#| ImonOffset     | 0         | 0         | 0           | 0        |
+	#| IccMax         | 6A        | 64A       | 31A         | 31A      |
+	#| VrVoltageLimit | 1.52V     | 1.52V     | 1.52V       | 1.52V    |
+	#+----------------+-----------+-----------+-------------+----------+
+	register "domain_vr_config[VR_SYSTEM_AGENT]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(4),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 0,
+		.psi4enable = 0,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(6),
+		.voltage_limit = 1520,
+		.ac_loadline = 1030,
+		.dc_loadline = 1030,
+	}"
+
+	register "domain_vr_config[VR_IA_CORE]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 0,
+		.psi4enable = 0,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(64),
+		.voltage_limit = 1520,
+		.ac_loadline = 240,
+		.dc_loadline = 240,
+	}"
+
+	register "domain_vr_config[VR_GT_UNSLICED]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 0,
+		.psi4enable = 0,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(31),
+		.voltage_limit = 1520,
+		.ac_loadline = 310,
+		.dc_loadline = 310,
+	}"
+
+	register "domain_vr_config[VR_GT_SLICED]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 0,
+		.psi4enable = 0,
+		.imon_slope = 0x0,
+		.imon_offset = 0x0,
+		.icc_max = VR_CFG_AMP(31),
+		.voltage_limit = 1520,
+		.ac_loadline = 310,
+		.dc_loadline = 310,
+	}"
+
+	# PL1 override 25W
+	# PL2 override 44W
+	register "power_limits_config" = "{
+		.tdp_pl1_override = 25,
+		.tdp_pl2_override = 44,
+	}"
+
+	# Send an extra VR mailbox command for the PS4 exit issue
+	register "SendVrMbxCmd" = "2"
+
+	register "SerialIoDevMode" = "{
+		[PchSerialIoIndexI2C0]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C1]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C2]  = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C3]  = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C4]  = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C5]  = PchSerialIoDisabled,
+		[PchSerialIoIndexSpi0]  = PchSerialIoDisabled,
+		[PchSerialIoIndexSpi1]  = PchSerialIoDisabled,
+		[PchSerialIoIndexUart0] = PchSerialIoDisabled,
+		[PchSerialIoIndexUart1] = PchSerialIoDisabled,
+		[PchSerialIoIndexUart2] = PchSerialIoDisabled,
+	}"
+
+	device domain 0 on
+		device ref igpu		on
+			register "gfx" = "GMA_STATIC_DISPLAYS(0)"
+
+			register "panel_cfg" = "{
+				.up_delay_ms		= 200,
+				.down_delay_ms		= 50,
+				.cycle_delay_ms		= 500,
+				.backlight_on_delay_ms	= 1,
+				.backlight_off_delay_ms	= 200,
+				.backlight_pwm_hz	= 200,
+			}"
+		end
+		device ref sa_thermal	on  end
+		device ref south_xhci	on  end
+		device ref thermal	on  end
+		device ref i2c0		on  end
+		device ref i2c1		on
+			chip drivers/i2c/hid
+				register "generic.hid" = ""PNP0C50""
+				register "generic.desc" = ""Synaptics Touchpad""
+				register "generic.irq" = "ACPI_IRQ_WAKE_LEVEL_LOW(GPP_E7_IRQ)"
+				register "generic.detect" = "1"
+				register "hid_desc_reg_offset" = "0x20"
+				device i2c 0x2c on end
+			end
+		end
+		device ref heci1	on  end
+		device ref uart2	on  end
+		device ref pcie_rp1	on  end
+		device ref pcie_rp3	on
+			register "PcieRpEnable[2]" = "1"
+			register "PcieRpLtrEnable[2]" = "1"
+		end
+		device ref pcie_rp5	on
+			register "PcieRpEnable[4]" = "1"
+			register "PcieRpLtrEnable[4]" = "1"
+			register "PcieRpHotPlug[4]" = "1"
+		end
+		device ref pcie_rp9	on
+			register "PcieRpEnable[8]" = "1"
+			register "PcieRpLtrEnable[8]" = "1"
+		end
+		device ref lpc_espi	on
+			register "serirq_mode" = "SERIRQ_CONTINUOUS"
+
+			register "gen1_dec" = "0x000c0681"
+			register "gen2_dec" = "0x000c1641"
+
+			chip superio/ite/it8528e
+				device pnp 6e.1 off end
+				device pnp 6e.2 off end
+				device pnp 6e.3 off end
+				device pnp 6e.4 off end
+				device pnp 6e.5 off end
+				device pnp 6e.6 off end
+				device pnp 6e.a off end
+				device pnp 6e.f off end
+				device pnp 6e.10 off end
+				device pnp 6e.11 off end
+				device pnp 6e.12 off end
+				device pnp 6e.13 off end
+				device pnp 6e.14 off end
+				device pnp 6e.17 off end
+				device pnp 6e.18 off end
+				device pnp 6e.19 off end
+			end	#superio/ite/it8528e
+		end
+		device ref hda		on  end
+		device ref smbus	on  end
+		device ref fast_spi	on  end
+	end
+end

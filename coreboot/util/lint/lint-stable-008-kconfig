@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# DESCR: Check Kconfig files for errors
+
+LINTDIR="$(
+  cd -- "$(dirname "$0")" > /dev/null 2>&1 || return
+  pwd -P
+)"
+
+# shellcheck source=helper_functions.sh
+. "${LINTDIR}/helper_functions.sh"
+
+# Verify that the test can run, tell users the issue
+if [ -z "$(command -v perl)" ]; then
+	echo "The kconfig lint tool uses perl.  Please install it to run this test."
+fi
+
+# Check whether coreboot is in a repo
+if [ "${IN_GIT_TREE}" -eq 1 ]; then
+	env perl util/lint/kconfig_lint --warnings_off 2>&1
+else
+	env perl util/lint/kconfig_lint --no_git_grep --warnings_off 2>&1
+fi

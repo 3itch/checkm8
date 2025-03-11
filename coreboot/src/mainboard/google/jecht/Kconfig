@@ -1,0 +1,66 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_BASEBOARD_JECHT
+	def_bool n
+	select BOARD_ROMSIZE_KB_8192
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select INTEL_GMA_HAVE_VBT
+	select MAINBOARD_HAS_CHROMEOS
+	select MAINBOARD_HAS_LIBGFXINIT
+	select MEMORY_MAPPED_TPM
+	select MAINBOARD_HAS_TPM1
+	select SOC_INTEL_BROADWELL
+	select SUPERIO_ITE_IT8772F
+
+config BOARD_GOOGLE_GUADO
+	select BOARD_GOOGLE_BASEBOARD_JECHT
+
+config BOARD_GOOGLE_JECHT
+	select BOARD_GOOGLE_BASEBOARD_JECHT
+
+config BOARD_GOOGLE_RIKKU
+	select BOARD_GOOGLE_BASEBOARD_JECHT
+
+config BOARD_GOOGLE_TIDUS
+	select BOARD_GOOGLE_BASEBOARD_JECHT
+
+if BOARD_GOOGLE_BASEBOARD_JECHT
+
+config VBOOT
+	select VBOOT_VBNV_CMOS
+
+config MAINBOARD_DIR
+	default "google/jecht"
+
+
+config VARIANT_DIR
+	default "guado" if BOARD_GOOGLE_GUADO
+	default "jecht" if BOARD_GOOGLE_JECHT
+	default "rikku" if BOARD_GOOGLE_RIKKU
+	default "tidus" if BOARD_GOOGLE_TIDUS
+
+config MAINBOARD_PART_NUMBER
+	default "Guado" if BOARD_GOOGLE_GUADO
+	default "Jecht" if BOARD_GOOGLE_JECHT
+	default "Rikku" if BOARD_GOOGLE_RIKKU
+	default "Tidus" if BOARD_GOOGLE_TIDUS
+
+# Override the default variant behavior, since the data.vbt is the same
+# for all variants except tidus
+config INTEL_GMA_VBT_FILE
+	default "src/mainboard/\$(MAINBOARDDIR)/data.vbt" if !BOARD_GOOGLE_TIDUS
+
+config MAINBOARD_SMBIOS_MANUFACTURER
+	string
+	default "GOOGLE"
+
+config PCIEXP_AER
+	def_bool n
+
+config EDK2_BOOT_TIMEOUT
+	int
+	default 5
+
+endif

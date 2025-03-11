@@ -1,0 +1,64 @@
+# SPDX-License-Identifier: BSD-3-Clause
+
+config VBOOT_LIB
+	bool "Compile verified boot (vboot) library"
+	default y if CHROMEOS
+	default n
+	help
+	  This option enables compiling and building vboot libraries vboot_fw and tlcl.
+
+if VBOOT_LIB
+
+config VBOOT_CBFS_INTEGRATION
+	bool "Enable vboot and CBFS integration"
+	default n
+	depends on CBFS_VERIFICATION
+	help
+	  Say yes to request reboot on CBFS file hash mismatch in non-recovery mode.
+
+config VBOOT_TPM2_MODE
+	bool "TPM2 Mode"
+	default y
+	help
+	  This option enables TPM 2.0 support in vboot. Disabling it allows using TPM 1.2.
+
+config VBOOT_X86_SHA_EXT
+	bool "x86 SHA Extension"
+	default y if CHROMEOS
+	default n
+	depends on ARCH_X86
+	help
+	  This option enables SHA256 implementation using x86 SHA processor extension
+	  instructions: sha256msg1, sha256msg2, sha256rnds2.
+
+config VBOOT_X86_RSA_ACCELERATION
+	bool "Use SSE2 instructions for RSA signature verification"
+	default y if CHROMEOS
+	default n
+	depends on ARCH_X86
+	help
+	  Use paddq, pmuludq, psrlq, punpckldq and punpcklqdq SSE2
+	  instructions to accelerate the modulus exponentiation which
+	  is part of the RSA signature verification process.
+
+config VBOOT_SHA_ARMV8_CE
+	bool "SHA256 implementation using ARMv8 Crypto Extension"
+	default y if CHROMEOS
+	default n
+	depends on ARCH_ARM64
+	help
+	  This option enables SHA256 implementation using ARMv8 Crypto Extension.
+
+config VBOOT_ARM64_RSA_ACCELERATION
+	bool "Use arm64 SIMD instructions to accelerate RSA signature verification"
+	default y
+	depends on ARCH_ARM64
+	help
+	  Use arm64 SIMD instructions (NEON) to parallelize two multiplications
+	  in the modulus exponentiation algorithm, which speeds up RSA signature
+	  verification in vboot. This is supported on all arm64 CPUs so you'd
+	  generally always want this enabled, unless your SoC is overriding
+	  vboot's hwcrypto API with its own crypto accelerator IP instead (or
+	  you're trying really hard to save on code size).
+
+endif

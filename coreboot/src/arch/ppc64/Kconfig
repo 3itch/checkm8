@@ -1,0 +1,21 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config ARCH_PPC64
+	bool
+
+config ARCH_BOOTBLOCK_PPC64
+	bool
+	select ARCH_PPC64
+	select BOOTBLOCK_CUSTOM
+
+config ARCH_VERSTAGE_PPC64
+	bool
+	select ARCH_PPC64
+
+config ARCH_ROMSTAGE_PPC64
+	bool
+	select ARCH_PPC64
+
+config ARCH_RAMSTAGE_PPC64
+	bool
+	select ARCH_PPC64

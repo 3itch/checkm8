@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_GPMR
+	bool
+	select SOC_INTEL_COMMON_BLOCK_PCR
+	help
+	  Intel Processor common GPMR support
+
+if SOC_INTEL_COMMON_BLOCK_GPMR
+
+config USE_SOC_GPMR_DEFS
+	bool
+	default n
+	help
+	  Specify if the SoC has specific GPMR register definitions.
+
+endif

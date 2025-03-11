@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_AMD_COMMON_BLOCK_GPP_CLK
+	bool
+	help
+	  Select this option to use AMD common PCIe clk generator configuration.

@@ -1,0 +1,8 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVERS_SOUNDWIRE_MAX98363
+	bool
+	depends on HAVE_ACPI_TABLES
+	default n
+	help
+	  SoundWire MAX98363 audio amp SSDT generator.

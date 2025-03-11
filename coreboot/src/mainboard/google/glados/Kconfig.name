@@ -1,0 +1,24 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Glados"
+
+config BOARD_GOOGLE_ASUKA
+	bool "->  Asuka (Dell Chromebook 13 3380)"
+
+config BOARD_GOOGLE_CAROLINE
+	bool "->  Caroline (Samsung Chromebook Pro)"
+
+config BOARD_GOOGLE_CAVE
+	bool "->  Cave (Asus Chromebook Flip C302SA)"
+
+config BOARD_GOOGLE_CHELL
+	bool "->  Chell (HP Chromebook 13 G1)"
+
+config BOARD_GOOGLE_GLADOS
+	bool "->  Glados Skylake Reference Board"
+
+config BOARD_GOOGLE_LARS
+	bool "->  Lars (Acer Chromebook 14 for Work (CP5-471))"
+
+config BOARD_GOOGLE_SENTRY
+	bool "->  Sentry (Lenovo Thinkpad 13 Chromebook)"

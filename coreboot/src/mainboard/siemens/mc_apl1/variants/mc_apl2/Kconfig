@@ -1,0 +1,47 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_SIEMENS_MC_APL2
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select DRIVER_INTEL_I210
+	select DRIVERS_I2C_RX6110SA
+	select RX6110SA_DISABLE_ACPI
+	select DRIVER_SIEMENS_NC_FPGA
+	select NC_FPGA_POST_CODE
+	select MAINBOARD_HAS_TPM2
+	select MEMORY_MAPPED_TPM
+	select TPM_ON_FAST_SPI
+	select TPM_MEASURED_BOOT
+	select HAS_RECOVERY_MRC_CACHE
+
+config CBFS_SIZE
+	default 0xb4e000
+
+config VBOOT
+	select VBOOT_VBNV_FLASH
+	select VBOOT_NO_BOARD_SUPPORT
+	select GBB_FLAG_DISABLE_LID_SHUTDOWN
+	select GBB_FLAG_DISABLE_PD_SOFTWARE_SYNC
+	select GBB_FLAG_DISABLE_EC_SOFTWARE_SYNC
+	select GBB_FLAG_DISABLE_FWMP
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/mc_apl_vboot.fmd"
+
+config EARLY_PCI_BRIDGE_DEVICE
+	hex
+	depends on NC_FPGA_POST_CODE
+	default 0x13
+
+config EARLY_PCI_BRIDGE_FUNCTION
+	hex
+	depends on NC_FPGA_POST_CODE
+	default 0x1
+
+config EARLY_PCI_MMIO_BASE
+	hex
+	depends on NC_FPGA_POST_CODE
+	default 0xfe800000
+
+endif # BOARD_SIEMENS_MC_APL2

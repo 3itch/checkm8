@@ -1,0 +1,281 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#ifndef _SOC_ALDERLAKE_PCI_DEVS_H_
+#define _SOC_ALDERLAKE_PCI_DEVS_H_
+
+#include <device/pci_def.h>
+
+#define _SA_DEVFN(slot)		PCI_DEVFN(SA_DEV_SLOT_ ## slot, 0)
+#define _PCH_DEVFN(slot, func)	PCI_DEVFN(PCH_DEV_SLOT_ ## slot, func)
+
+#if !defined(__SIMPLE_DEVICE__)
+#include <device/device.h>
+#define _SA_DEV(slot)		pcidev_path_on_root(_SA_DEVFN(slot))
+#define _PCH_DEV(slot, func)	pcidev_path_on_root_debug(_PCH_DEVFN(slot, func), __func__)
+#else
+#define _SA_DEV(slot)		PCI_DEV(0, SA_DEV_SLOT_ ## slot, 0)
+#define _PCH_DEV(slot, func)	PCI_DEV(0, PCH_DEV_SLOT_ ## slot, func)
+#endif
+
+/* System Agent Devices */
+
+#define SA_DEV_SLOT_ROOT	0x00
+#define  SA_DEVFN_ROOT		PCI_DEVFN(SA_DEV_SLOT_ROOT, 0)
+#if defined(__SIMPLE_DEVICE__)
+#define  SA_DEV_ROOT		PCI_DEV(0, SA_DEV_SLOT_ROOT, 0)
+#endif
+
+#define SA_DEV_SLOT_CPU_1	0x01
+#define  SA_DEVFN_CPU_PCIE1_0	PCI_DEVFN(SA_DEV_SLOT_CPU_1, 0)
+#define  SA_DEVFN_CPU_PCIE1_1	PCI_DEVFN(SA_DEV_SLOT_CPU_1, 1)
+
+#define SA_DEV_SLOT_IGD		0x02
+#define  SA_DEVFN_IGD		PCI_DEVFN(SA_DEV_SLOT_IGD, 0)
+#define  SA_DEV_IGD		PCI_DEV(0, SA_DEV_SLOT_IGD, 0)
+
+#define SA_DEV_SLOT_DPTF	0x04
+#define  SA_DEVFN_DPTF		PCI_DEVFN(SA_DEV_SLOT_DPTF, 0)
+#define  SA_DEV_DPTF		PCI_DEV(0, SA_DEV_SLOT_DPTF, 0)
+
+#define SA_DEV_SLOT_IPU		0x05
+#define  SA_DEVFN_IPU		PCI_DEVFN(SA_DEV_SLOT_IPU, 0)
+#define  SA_DEV_IPU		PCI_DEV(0, SA_DEV_SLOT_IPU, 0)
+
+#define SA_DEV_SLOT_CPU_6	0x06
+#define  SA_DEVFN_CPU_PCIE6_0	PCI_DEVFN(SA_DEV_SLOT_CPU_6, 0)
+#define  SA_DEVFN_CPU_PCIE6_2	PCI_DEVFN(SA_DEV_SLOT_CPU_6, 2)
+
+#define SA_DEV_SLOT_TBT		0x07
+#define SA_DEVFN_TBT(x)		PCI_DEVFN(SA_DEV_SLOT_TBT, (x))
+#define NUM_TBT_FUNCTIONS	4
+#define  SA_DEVFN_TBT0		PCI_DEVFN(SA_DEV_SLOT_TBT, 0)
+#define  SA_DEVFN_TBT1		PCI_DEVFN(SA_DEV_SLOT_TBT, 1)
+#define  SA_DEVFN_TBT2		PCI_DEVFN(SA_DEV_SLOT_TBT, 2)
+#define  SA_DEVFN_TBT3		PCI_DEVFN(SA_DEV_SLOT_TBT, 3)
+#define  SA_DEV_TBT0		PCI_DEV(0, SA_DEV_SLOT_TBT, 0)
+#define  SA_DEV_TBT1		PCI_DEV(0, SA_DEV_SLOT_TBT, 1)
+#define  SA_DEV_TBT2		PCI_DEV(0, SA_DEV_SLOT_TBT, 2)
+#define  SA_DEV_TBT3		PCI_DEV(0, SA_DEV_SLOT_TBT, 3)
+
+#define SA_DEV_SLOT_GNA		0x08
+#define  SA_DEVFN_GNA		PCI_DEVFN(SA_DEV_SLOT_GNA, 0)
+#define  SA_DEV_GNA		PCI_DEV(0, SA_DEV_SLOT_GNA, 0)
+
+#define SA_DEV_SLOT_TMT		0x0A
+#define SA_DEVFN_TMT		_SA_DEVFN(TMT)
+#define SA_DEV_TMT		_SA_DEV(TMT)
+
+#define SA_DEV_SLOT_TCSS	0x0d
+#define NUM_TCSS_DMA_FUNCTIONS	2
+#define SA_DEVFN_TCSS_DMA(x)	PCI_DEVFN(SA_DEV_SLOT_TCSS, ((x) + 2))
+#define  SA_DEVFN_TCSS_XHCI	PCI_DEVFN(SA_DEV_SLOT_TCSS, 0)
+#define  SA_DEVFN_TCSS_XDCI	PCI_DEVFN(SA_DEV_SLOT_TCSS, 1)
+#define  SA_DEVFN_TCSS_DMA0	PCI_DEVFN(SA_DEV_SLOT_TCSS, 2)
+#define  SA_DEVFN_TCSS_DMA1	PCI_DEVFN(SA_DEV_SLOT_TCSS, 3)
+#define  SA_DEV_TCSS_XHCI	PCI_DEV(0, SA_DEV_SLOT_TCSS, 0)
+#define  SA_DEV_TCSS_XDCI	PCI_DEV(0, SA_DEV_SLOT_TCSS, 1)
+#define  SA_DEV_TCSS_DMA0	PCI_DEV(0, SA_DEV_SLOT_TCSS, 2)
+#define  SA_DEV_TCSS_DMA1	PCI_DEV(0, SA_DEV_SLOT_TCSS, 3)
+
+#define SA_DEV_SLOT_VMD		0x0e
+#define  SA_DEVFN_VMD		PCI_DEVFN(SA_DEV_SLOT_VMD, 0)
+#define  SA_DEV_VMD		PCI_DEV(0, SA_DEV_SLOT_VMD, 0)
+
+/* PCH Devices */
+#define MIN_PCH_SLOT		PCH_DEV_SLOT_SIO0
+#define PCH_DEV_SLOT_SIO0	0x10
+#define  PCH_DEVFN_I2C6		_PCH_DEVFN(SIO0, 0)
+#define  PCH_DEVFN_I2C7		_PCH_DEVFN(SIO0, 1)
+#define  PCH_DEVFN_THC0		_PCH_DEVFN(SIO0, 6)
+#define  PCH_DEVFN_THC1		_PCH_DEVFN(SIO0, 7)
+#define  PCH_DEV_I2C6		_PCH_DEV(SIO0, 0)
+#define  PCH_DEV_I2C7		_PCH_DEV(SIO0, 1)
+#define  PCH_DEV_THC0		_PCH_DEV(SIO0, 6)
+#define  PCH_DEV_THC1		_PCH_DEV(SIO0, 7)
+
+#define PCH_DEV_SLOT_SIO6	0x11
+#define  PCH_DEVFN_UART3	_PCH_DEVFN(SIO6, 0)
+#define  PCH_DEVFN_UART4	_PCH_DEVFN(SIO6, 1)
+#define  PCH_DEVFN_UART5	_PCH_DEVFN(SIO6, 2)
+#define  PCH_DEVFN_UART6	_PCH_DEVFN(SIO6, 3)
+#define  PCH_DEV_UART3		_PCH_DEV(SIO6, 0)
+#define  PCH_DEV_UART4		_PCH_DEV(SIO6, 1)
+#define  PCH_DEV_UART5		_PCH_DEV(SIO6, 2)
+#define  PCH_DEV_UART6		_PCH_DEV(SIO6, 3)
+
+#define PCH_DEV_SLOT_ISH	0x12
+#define  PCH_DEVFN_ISH		_PCH_DEVFN(ISH, 0)
+#define  PCH_DEVFN_GSPI2	_PCH_DEVFN(ISH, 6)
+#define  PCH_DEVFN_UFS		_PCH_DEVFN(ISH, 7)
+#define  PCH_DEV_ISH		_PCH_DEV(ISH, 0)
+#define  PCH_DEV_GSPI2		_PCH_DEV(ISH, 6)
+#define  PCH_DEV_UFS		_PCH_DEV(ISH, 7)
+
+#define PCH_DEV_SLOT_SIO2	0x13
+#define  PCH_DEVFN_GSPI3	_PCH_DEVFN(SIO2, 0)
+#define  PCH_DEVFN_GSPI4	_PCH_DEVFN(SIO2, 1)
+#define  PCH_DEVFN_GSPI5	_PCH_DEVFN(SIO2, 2)
+#define  PCH_DEVFN_GSPI6	_PCH_DEVFN(SIO2, 3)
+#define  PCH_DEV_GSPI3		_PCH_DEV(SIO2, 0)
+#define  PCH_DEV_GSPI4		_PCH_DEV(SIO2, 1)
+#define  PCH_DEV_GSPI5		_PCH_DEV(SIO2, 2)
+#define  PCH_DEV_GSPI6		_PCH_DEV(SIO2, 3)
+
+#define PCH_DEV_SLOT_XHCI	0x14
+#define  PCH_DEVFN_XHCI		_PCH_DEVFN(XHCI, 0)
+#define  PCH_DEVFN_USBOTG	_PCH_DEVFN(XHCI, 1)
+#define  PCH_DEVFN_SRAM		_PCH_DEVFN(XHCI, 2)
+#define  PCH_DEVFN_CNVI_WIFI	_PCH_DEVFN(XHCI, 3)
+#define  PCH_DEV_XHCI		_PCH_DEV(XHCI, 0)
+#define  PCH_DEV_USBOTG		_PCH_DEV(XHCI, 1)
+#define  PCH_DEV_SRAM		_PCH_DEV(XHCI, 2)
+#define  PCH_DEV_CNVI_WIFI	_PCH_DEV(XHCI, 3)
+
+#define PCH_DEV_SLOT_SIO3	0x15
+#define  PCH_DEVFN_I2C0		_PCH_DEVFN(SIO3, 0)
+#define  PCH_DEVFN_I2C1		_PCH_DEVFN(SIO3, 1)
+#define  PCH_DEVFN_I2C2		_PCH_DEVFN(SIO3, 2)
+#define  PCH_DEVFN_I2C3		_PCH_DEVFN(SIO3, 3)
+#define  PCH_DEV_I2C0		_PCH_DEV(SIO3, 0)
+#define  PCH_DEV_I2C1		_PCH_DEV(SIO3, 1)
+#define  PCH_DEV_I2C2		_PCH_DEV(SIO3, 2)
+#define  PCH_DEV_I2C3		_PCH_DEV(SIO3, 3)
+
+#define PCH_DEV_SLOT_CSE	0x16
+#define  PCH_DEVFN_CSE		_PCH_DEVFN(CSE, 0)
+#define  PCH_DEVFN_CSE_2	_PCH_DEVFN(CSE, 1)
+#define  PCH_DEVFN_CSE_IDER	_PCH_DEVFN(CSE, 2)
+#define  PCH_DEVFN_CSE_KT	_PCH_DEVFN(CSE, 3)
+#define  PCH_DEVFN_CSE_3	_PCH_DEVFN(CSE, 4)
+#define  PCH_DEVFN_CSE_4	_PCH_DEVFN(CSE, 5)
+#define  PCH_DEV_CSE		_PCH_DEV(CSE, 0)
+#define  PCH_DEV_CSE_2		_PCH_DEV(CSE, 1)
+#define  PCH_DEV_CSE_IDER	_PCH_DEV(CSE, 2)
+#define  PCH_DEV_CSE_KT		_PCH_DEV(CSE, 3)
+#define  PCH_DEV_CSE_3		_PCH_DEV(CSE, 4)
+#define  PCH_DEV_CSE_4		_PCH_DEV(CSE, 5)
+
+#define PCH_DEV_SLOT_SATA	0x17
+#define  PCH_DEVFN_SATA		_PCH_DEVFN(SATA, 0)
+#define  PCH_DEV_SATA		_PCH_DEV(SATA, 0)
+
+#define PCH_DEV_SLOT_SIO4	0x19
+#define  PCH_DEVFN_I2C4		_PCH_DEVFN(SIO4, 0)
+#define  PCH_DEVFN_I2C5		_PCH_DEVFN(SIO4, 1)
+#define  PCH_DEVFN_UART2	_PCH_DEVFN(SIO4, 2)
+#define  PCH_DEV_I2C4		_PCH_DEV(SIO4, 0)
+#define  PCH_DEV_I2C5		_PCH_DEV(SIO4, 1)
+#define  PCH_DEV_UART2		_PCH_DEV(SIO4, 2)
+
+#if CONFIG(SOC_INTEL_ALDERLAKE_PCH_N)
+#define PCH_DEV_SLOT_EMMC	0x1a
+#define  PCH_DEVFN_EMMC		_PCH_DEVFN(EMMC, 0)
+#define  PCH_DEV_EMMC		_PCH_DEV(EMMC, 0)
+#endif
+
+#define PCH_DEV_SLOT_PCIE	0x1c
+#define  PCH_DEVFN_PCIE1	_PCH_DEVFN(PCIE, 0)
+#define  PCH_DEVFN_PCIE2	_PCH_DEVFN(PCIE, 1)
+#define  PCH_DEVFN_PCIE3	_PCH_DEVFN(PCIE, 2)
+#define  PCH_DEVFN_PCIE4	_PCH_DEVFN(PCIE, 3)
+#define  PCH_DEVFN_PCIE5	_PCH_DEVFN(PCIE, 4)
+#define  PCH_DEVFN_PCIE6	_PCH_DEVFN(PCIE, 5)
+#define  PCH_DEVFN_PCIE7	_PCH_DEVFN(PCIE, 6)
+#define  PCH_DEVFN_PCIE8	_PCH_DEVFN(PCIE, 7)
+#define  PCH_DEV_PCIE1		_PCH_DEV(PCIE, 0)
+#define  PCH_DEV_PCIE2		_PCH_DEV(PCIE, 1)
+#define  PCH_DEV_PCIE3		_PCH_DEV(PCIE, 2)
+#define  PCH_DEV_PCIE4		_PCH_DEV(PCIE, 3)
+#define  PCH_DEV_PCIE5		_PCH_DEV(PCIE, 4)
+#define  PCH_DEV_PCIE6		_PCH_DEV(PCIE, 5)
+#define  PCH_DEV_PCIE7		_PCH_DEV(PCIE, 6)
+#define  PCH_DEV_PCIE8		_PCH_DEV(PCIE, 7)
+
+#define PCH_DEV_SLOT_PCIE_1	0x1d
+#define  PCH_DEVFN_PCIE9	_PCH_DEVFN(PCIE_1, 0)
+#define  PCH_DEVFN_PCIE10	_PCH_DEVFN(PCIE_1, 1)
+#define  PCH_DEVFN_PCIE11	_PCH_DEVFN(PCIE_1, 2)
+#define  PCH_DEVFN_PCIE12	_PCH_DEVFN(PCIE_1, 3)
+#define  PCH_DEVFN_PCIE13	_PCH_DEVFN(PCIE_1, 4)
+#define  PCH_DEVFN_PCIE14	_PCH_DEVFN(PCIE_1, 5)
+#define  PCH_DEVFN_PCIE15	_PCH_DEVFN(PCIE_1, 6)
+#define  PCH_DEVFN_PCIE16	_PCH_DEVFN(PCIE_1, 7)
+#define  PCH_DEV_PCIE9		_PCH_DEV(PCIE_1, 0)
+#define  PCH_DEV_PCIE10		_PCH_DEV(PCIE_1, 1)
+#define  PCH_DEV_PCIE11		_PCH_DEV(PCIE_1, 2)
+#define  PCH_DEV_PCIE12		_PCH_DEV(PCIE_1, 3)
+#define  PCH_DEV_PCIE13		_PCH_DEV(PCIE_1, 4)
+#define  PCH_DEV_PCIE14		_PCH_DEV(PCIE_1, 5)
+#define  PCH_DEV_PCIE15		_PCH_DEV(PCIE_1, 6)
+#define  PCH_DEV_PCIE16		_PCH_DEV(PCIE_1, 7)
+
+#define PCH_DEV_SLOT_PCIE_2	0x1b
+#define  PCH_DEVFN_PCIE17	_PCH_DEVFN(PCIE_2, 0)
+#define  PCH_DEVFN_PCIE18	_PCH_DEVFN(PCIE_2, 1)
+#define  PCH_DEVFN_PCIE19	_PCH_DEVFN(PCIE_2, 2)
+#define  PCH_DEVFN_PCIE20	_PCH_DEVFN(PCIE_2, 3)
+#define  PCH_DEVFN_PCIE21	_PCH_DEVFN(PCIE_2, 4)
+#define  PCH_DEVFN_PCIE22	_PCH_DEVFN(PCIE_2, 5)
+#define  PCH_DEVFN_PCIE23	_PCH_DEVFN(PCIE_2, 6)
+#define  PCH_DEVFN_PCIE24	_PCH_DEVFN(PCIE_2, 7)
+#define  PCH_DEV_PCIE17		_PCH_DEV(PCIE_2, 0)
+#define  PCH_DEV_PCIE18		_PCH_DEV(PCIE_2, 1)
+#define  PCH_DEV_PCIE19		_PCH_DEV(PCIE_2, 2)
+#define  PCH_DEV_PCIE20		_PCH_DEV(PCIE_2, 3)
+#define  PCH_DEV_PCIE21		_PCH_DEV(PCIE_2, 4)
+#define  PCH_DEV_PCIE22		_PCH_DEV(PCIE_2, 5)
+#define  PCH_DEV_PCIE23		_PCH_DEV(PCIE_2, 6)
+#define  PCH_DEV_PCIE24		_PCH_DEV(PCIE_2, 7)
+
+#define PCH_DEV_SLOT_PCIE_3	0x1a
+#define  PCH_DEVFN_PCIE25	_PCH_DEVFN(PCIE_3, 0)
+#define  PCH_DEVFN_PCIE26	_PCH_DEVFN(PCIE_3, 1)
+#define  PCH_DEVFN_PCIE27	_PCH_DEVFN(PCIE_3, 2)
+#define  PCH_DEVFN_PCIE28	_PCH_DEVFN(PCIE_3, 3)
+#define  PCH_DEV_PCIE25		_PCH_DEV(PCIE_3, 0)
+#define  PCH_DEV_PCIE26		_PCH_DEV(PCIE_3, 1)
+#define  PCH_DEV_PCIE27		_PCH_DEV(PCIE_3, 2)
+#define  PCH_DEV_PCIE28		_PCH_DEV(PCIE_3, 3)
+
+#define PCH_DEV_SLOT_SIO5	0x1e
+#define  PCH_DEVFN_UART0	_PCH_DEVFN(SIO5, 0)
+#define  PCH_DEVFN_UART1	_PCH_DEVFN(SIO5, 1)
+#define  PCH_DEVFN_GSPI0	_PCH_DEVFN(SIO5, 2)
+#define  PCH_DEVFN_GSPI1	_PCH_DEVFN(SIO5, 3)
+#define  PCH_DEV_UART0		_PCH_DEV(SIO5, 0)
+#define  PCH_DEV_UART1		_PCH_DEV(SIO5, 1)
+#define  PCH_DEV_GSPI0		_PCH_DEV(SIO5, 2)
+#define  PCH_DEV_GSPI1		_PCH_DEV(SIO5, 3)
+
+#define PCH_DEV_SLOT_ESPI	0x1f
+#define  PCH_DEVFN_ESPI		_PCH_DEVFN(ESPI, 0)
+#define  PCH_DEVFN_P2SB		_PCH_DEVFN(ESPI, 1)
+#define  PCH_DEVFN_PMC		_PCH_DEVFN(ESPI, 2)
+#define  PCH_DEVFN_HDA		_PCH_DEVFN(ESPI, 3)
+#define  PCH_DEVFN_SMBUS	_PCH_DEVFN(ESPI, 4)
+#define  PCH_DEVFN_SPI		_PCH_DEVFN(ESPI, 5)
+#define  PCH_DEVFN_GBE		_PCH_DEVFN(ESPI, 6)
+#define  PCH_DEVFN_TRACEHUB	_PCH_DEVFN(ESPI, 7)
+#define  PCH_DEV_ESPI		_PCH_DEV(ESPI, 0)
+#define  PCH_DEV_LPC		PCH_DEV_ESPI
+#define  PCH_DEV_P2SB		_PCH_DEV(ESPI, 1)
+
+#if !ENV_RAMSTAGE
+/*
+ * PCH_DEV_PMC is intentionally not defined in RAMSTAGE since PMC device gets
+ * hidden from PCI bus after call to FSP-S. This leads to resource allocator
+ * dropping it from the root bus as unused device. All references to PCH_DEV_PMC
+ * would then return NULL and can go unnoticed if not handled properly. Since,
+ * this device does not have any special chip config associated with it, it is
+ * okay to not provide the definition for it in ramstage.
+ */
+#define  PCH_DEV_PMC		_PCH_DEV(ESPI, 2)
+#endif
+
+#define  PCH_DEV_HDA		_PCH_DEV(ESPI, 3)
+#define  PCH_DEV_SMBUS		_PCH_DEV(ESPI, 4)
+#define  PCH_DEV_SPI		_PCH_DEV(ESPI, 5)
+#define  PCH_DEV_GBE		_PCH_DEV(ESPI, 6)
+#define  PCH_DEV_TRACEHUB	_PCH_DEV(ESPI, 7)
+
+#endif

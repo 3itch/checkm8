@@ -1,0 +1,60 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_MEDIATEK_MT8188
+	bool
+	default n
+	select ARCH_BOOTBLOCK_ARMV8_64
+	select ARCH_VERSTAGE_ARMV8_64
+	select ARCH_ROMSTAGE_ARMV8_64
+	select ARCH_RAMSTAGE_ARMV8_64
+	select ARM64_USE_ARM_TRUSTED_FIRMWARE
+	select HAVE_UART_SPECIAL
+	select SOC_MEDIATEK_COMMON
+	select FLASH_DUAL_IO_READ
+	select CACHE_MRC_SETTINGS
+	select MEDIATEK_DRAM_BLOB_FAST_INIT
+	select USE_CBMEM_DRAM_INFO
+	select DPM_FOUR_CHANNEL
+	select ARM64_USE_ARCH_TIMER
+	select EARLY_MMU_INIT
+
+if SOC_MEDIATEK_MT8188
+
+config VBOOT
+	select VBOOT_MUST_REQUEST_DISPLAY
+	select VBOOT_STARTS_IN_BOOTBLOCK
+	select VBOOT_SEPARATE_VERSTAGE
+	select VBOOT_RETURN_FROM_VERSTAGE
+	select VBOOT_DEFINE_WIDEVINE_COUNTERS
+
+config DPM_DM_FIRMWARE
+	string
+	default "dpm.dm"
+	help
+	  The file name of the MediaTek DPM DM firmware.
+
+config DPM_PM_FIRMWARE
+	string
+	default "dpm.pm"
+	help
+	  The file name of the MediaTek DPM PM firmware.
+
+config MCUPM_FIRMWARE
+	string
+	default "mcupm.bin"
+	help
+	  The file name of the MediaTek MCUPM firmware.
+
+config SPM_FIRMWARE
+	string
+	default "spm_firmware.bin"
+	help
+	  The file name of the MediaTek SPM firmware.
+
+config SSPM_FIRMWARE
+	string
+	default "sspm.bin"
+	help
+	  The file name of the MediaTek SSPM firmware.
+
+endif

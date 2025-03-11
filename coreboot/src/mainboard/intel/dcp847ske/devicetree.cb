@@ -1,0 +1,112 @@
+chip northbridge/intel/sandybridge
+	# IGD Displays
+	register "gfx" = "GMA_STATIC_DISPLAYS(0)"
+
+	# Enable DisplayPort 1 Hotplug with 6ms pulse
+	register "gpu_dp_d_hotplug" = "0x06"
+
+	# Enable DisplayPort 0 Hotplug with 6ms pulse
+	register "gpu_dp_c_hotplug" = "0x06"
+
+	# Enable DVI Hotplug with 6ms pulse
+	register "gpu_dp_b_hotplug" = "0x06"
+
+	# 1333MHz RAM frequency
+	register "max_mem_clock_mhz" = "666"
+	register "spd_addresses" = "{0x50, 0, 0x51, 0}"
+
+	device domain 0 on
+		device ref host_bridge on  end	# Host bridge
+		device ref peg10 off end	# PCIe Bridge for discrete graphics
+		device ref igd on  end	# Internal graphics VGA controller
+
+		chip southbridge/intel/bd82x6x # Intel Series 6 Cougar Point PCH
+			register "sata_port_map" = "0x1"
+			register "spi_lvscc" = "0x2005"
+			register "spi_uvscc" = "0x2005"
+
+			register "gen1_dec" = "0x00fc0a01"	# SuperIO @0xa00-0xaff
+
+			register "usb_port_config" = "{
+				{1, 1, 0}, /* back, towards HDMI plugs */
+				{1, 1, 0}, /* back, towards power plug */
+				{1, 1, 1}, /* half-width miniPCIe */
+				{1, 1, 1}, /* full-width miniPCIe */
+				{1, 1, 2}, /* front-panel header */
+				{1, 1, 2}, /* front-panel header */
+				{1, 1, 3}, /* front connector */
+				{0, 1, 3}, /* not available x7 */
+				{0, 1, 4},
+				{0, 1, 4},
+				{0, 1, 5},
+				{0, 1, 5},
+				{0, 1, 6},
+				{0, 1, 6}
+			}"
+
+			device ref xhci off end	# USB xHCI
+			device ref mei1 on  end	# Management Engine Interface 1
+			device ref mei2 off end	# Management Engine Interface 2
+			device ref me_ide_r off end	# Management Engine IDE-R
+			device ref me_kt off end	# Management Engine KT
+			device ref gbe on  end	# Intel Gigabit Ethernet
+			device ref ehci2 off end	# USB2 EHCI #2
+			device ref hda on  end	# HD Audio controller
+			device ref pcie_rp1 on  end	# PCIe Port #1 (unused)
+			device ref pcie_rp2 on  end	# PCIe Port #2 (full-length mPCIe/mSATA)
+			device ref pcie_rp3 on  end	# PCIe Port #3 (half-length mPCIe)
+			device ref pcie_rp4 off end	# PCIe Port #4
+			device ref pcie_rp5 off end	# PCIe Port #5
+			device ref pcie_rp6 off end	# PCIe Port #6
+			device ref pcie_rp7 off end	# PCIe Port #7
+			device ref pcie_rp8 off end	# PCIe Port #8
+			device ref ehci1 on  end	# USB2 EHCI #1
+			device ref pci_bridge off end	# PCI bridge
+			device ref lpc on	# LPC bridge
+				chip superio/nuvoton/nct6776
+					device pnp 4e.0 off end		# Floppy
+					device pnp 4e.1 off end		# Parallel port
+					device pnp 4e.2 on		# COM1
+						io 0x60 = 0x3f8
+						irq 0x70 = 4
+					end
+					device pnp 4e.3 off end		# COM2, IR
+					device pnp 4e.5 off end		# Keyboard
+					device pnp 4e.6 off end		# CIR
+					device pnp 4e.7 on end		# GPIO6
+					device pnp 4e.107 on end	# GPIO7
+					device pnp 4e.207 off end	# GPIO8
+					device pnp 4e.307 off end	# GPIO9
+					device pnp 4e.8 off end		# WDT
+					device pnp 4e.108 on end	# GPIO0
+					device pnp 4e.208 off end	# GPIOA
+					device pnp 4e.308 on		# GPIOBASE
+						io 0x60 = 0xa80
+					end
+					device pnp 4e.109 off end	# GPIO1
+					device pnp 4e.209 on end	# GPIO2
+					device pnp 4e.309 off end	# GPIO3
+					device pnp 4e.409 off end	# GPIO4
+					device pnp 4e.509 off end	# GPIO5
+					device pnp 4e.609 off end	# GPIO6
+					device pnp 4e.709 off end	# GPIO7
+					device pnp 4e.a on end		# ACPI
+					device pnp 4e.b on		# HWM, front panel LED
+						io 0x60 = 0xa30
+						io 0x62 = 0 # unused
+					end
+					device pnp 4e.d off end		# VID
+					device pnp 4e.e off end		# CIR WAKE-UP
+					device pnp 4e.f off end		# GPIO
+					device pnp 4e.14 off end	# SVID
+					device pnp 4e.16 off end	# Deep sleep
+					device pnp 4e.17 off end	# GPIOA
+				end
+			end
+			device ref sata1 on  end	# SATA Controller 1
+			device ref smbus on  end	# SMBus
+			device ref sata2 off end	# SATA Controller 2
+			device ref thermal off end	# Thermal
+		end
+	end
+end

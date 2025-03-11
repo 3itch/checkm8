@@ -1,0 +1,19 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_ASUS_P8C_WS
+	bool "P8C_WS"
+
+config BOARD_ASUS_P8H77_V
+	bool "P8H77-V"
+
+config BOARD_ASUS_P8Z77_M_PRO
+	bool "P8Z77-M PRO"
+
+config BOARD_ASUS_P8Z77_V_LX2
+	bool "P8Z77-V LX2"
+
+config BOARD_ASUS_P8Z77_V
+	bool "P8Z77-V"
+
+config BOARD_ASUS_P8Z77_M
+	bool "P8Z77-M"

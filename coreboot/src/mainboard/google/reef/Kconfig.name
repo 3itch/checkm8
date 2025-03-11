@@ -1,0 +1,18 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Reef"
+
+config BOARD_GOOGLE_REEF
+	bool "->  Reef/Electro (Acer Chromebook Spin 11 R751T)"
+
+config BOARD_GOOGLE_PYRO
+	bool "->  Pyro (Lenovo Thinkpad (Yoga) 11e Chromebook)"
+
+config BOARD_GOOGLE_SAND
+	bool "->  Sand (Acer Chromebook 15 CB515-1HT/1H)"
+
+config BOARD_GOOGLE_SNAPPY
+	bool "->  Snappy (HP Chromebook x360 11 G1 EE)"
+
+config BOARD_GOOGLE_CORAL
+	bool "->  Coral"

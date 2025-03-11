@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+if VENDOR_51NB
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/51nb/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/51nb/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "51NB"
+
+endif # VENDOR_51NB

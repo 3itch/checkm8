@@ -1,0 +1,77 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_GOOGLE_NYAN_BIG
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select SOC_NVIDIA_TEGRA124
+	select MAINBOARD_HAS_CHROMEOS
+	select COMMON_CBFS_SPI_WRAPPER
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_SPI
+	select TEGRA124_MODEL_CD570M
+	select BOARD_ROMSIZE_KB_4096
+	select SPI_FLASH
+	select SPI_FLASH_GIGADEVICE
+	select SPI_FLASH_WINBOND
+	select I2C_TPM
+	select MAINBOARD_HAS_TPM1
+	select DRIVERS_AS3722_RTC
+
+config VBOOT
+	select EC_GOOGLE_CHROMEEC_SWITCHES
+	select VBOOT_VBNV_FLASH
+
+config MAINBOARD_DIR
+	default "google/nyan_big"
+
+config MAINBOARD_PART_NUMBER
+	default "Nyan Big"
+
+choice
+	prompt "BCT boot media"
+	default NYAN_BIG_BCT_CFG_SPI
+	help
+	  Which boot media to configure the BCT for.
+
+config NYAN_BIG_BCT_CFG_SPI
+	bool "SPI"
+	help
+	  Configure the BCT for booting from SPI.
+
+config NYAN_BIG_BCT_CFG_EMMC
+	bool "eMMC"
+	help
+	  Configure the BCT for booting from eMMC.
+
+endchoice
+
+config BOOT_DEVICE_SPI_FLASH_BUS
+	int "SPI bus with boot media ROM"
+	range 1 6
+	depends on NYAN_BIG_BCT_CFG_SPI
+	default 4
+	help
+	  Which SPI bus the boot media is connected to.
+
+config EC_GOOGLE_CHROMEEC_SPI_BUS
+	hex
+	default 0x1
+
+config DRIVER_TPM_I2C_BUS
+	hex
+	default 0x2
+
+config DRIVER_TPM_I2C_ADDR
+	hex
+	default 0x20
+
+config DRIVERS_AS3722_RTC_BUS
+	int
+	default 4
+
+config DRIVERS_AS3722_RTC_ADDR
+	hex
+	default 0x40
+
+endif # BOARD_GOOGLE_NYAN_BIG

@@ -1,0 +1,26 @@
+gbb::version::1.1
+gbb::flags::57
+gbb::hwid::offset::128
+gbb::hwid::size::256
+gbb::bmpvf::offset::4480
+gbb::bmpvf::size::970368
+gbb::root_key::offset::384
+gbb::root_key::size::4096
+gbb::recovery_key::offset::974848
+gbb::recovery_key::size::4096
+gbb::size::978944
+gbb::header::valid
+gbb::hwid::value::X86 PEPPY TEST 4211
+gbb::hwid::digest::algorithm::2::SHA256
+gbb::hwid::digest::hex::<none>
+gbb::hwid::digest::ignored
+gbb::root_key::valid
+gbb::root_key::api::1.0
+gbb::root_key::algorithm::11::RSA8192 SHA512
+gbb::root_key::version::1
+gbb::root_key::sha1_sum::fc68bcb88bf9af1907289a9f377d658b3b9fe5b0
+gbb::recovery_key::valid
+gbb::recovery_key::api::1.0
+gbb::recovery_key::algorithm::11::RSA8192 SHA512
+gbb::recovery_key::version::1
+gbb::recovery_key::sha1_sum::bf39d0d3e30cbf6a121416d04df4603ad5310779

@@ -1,0 +1,161 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#include <baseboard/gpio.h>
+#include <baseboard/variants.h>
+#include <commonlib/helpers.h>
+
+static const struct pad_config gpio_table[] = {
+	/* A16 : SD_OC_ODL */
+	PAD_CFG_GPI(GPP_A16, NONE, DEEP),
+	/* A18 : LAN_PE_ISOLATE_ODL */
+	PAD_CFG_GPO(GPP_A18, 1, DEEP),
+	/* A19 : PCH_PCON0_PDB_ODL */
+	PAD_CFG_GPO(GPP_A19, 1, DEEP),
+	/* A20 : LAN_I350_WAKE# */
+	PAD_CFG_GPI_IRQ_WAKE(GPP_A20, NONE, DEEP, LEVEL, INVERT),
+	/* A23 : M2_WLAN_INT_ODL */
+	PAD_CFG_GPI_APIC(GPP_A23, NONE, PLTRST, LEVEL, INVERT),
+
+	/* B5 : LAN_CLKREQ_ODL */
+	PAD_CFG_NF(GPP_B5, NONE, DEEP, NF1),
+	/* B6 : M2_SSD_CLKREQ_ODL */
+	PAD_CFG_NF(GPP_B6, NONE, DEEP, NF1),
+	/* B7 : M2_TPU0_CLKREQ_ODL */
+	PAD_CFG_NF(GPP_B7, NONE, DEEP, NF1),
+	/* B8 : CLK_PCIE_REQ3 (not connected) */
+	PAD_NC(GPP_B8, NONE),
+	/* B9 : M2_TPU1_CLKREQ_ODL */
+	PAD_CFG_NF(GPP_B9, NONE, DEEP, NF1),
+	/* B10 : M2_WLAN_CLKREQ_ODL */
+	PAD_CFG_NF(GPP_B10, NONE, DEEP, NF1),
+
+	/* C0 : SMBCLK */
+	PAD_CFG_NF(GPP_C0, NONE, DEEP, NF1),
+	/* C1 : SMBDATA */
+	PAD_CFG_NF(GPP_C1, NONE, DEEP, NF1),
+	/* C3 : PCH_MBCLK1_R (i350) */
+	PAD_CFG_NF(GPP_C3, NONE, DEEP, NF1),
+	/* C4 : PCH_MBDAT1_R (i350) */
+	PAD_CFG_NF(GPP_C4, NONE, DEEP, NF1),
+	/* C6 : M2_WLAN_WAKE_ODL */
+	PAD_CFG_GPI_SCI_LOW(GPP_C6, NONE, DEEP, EDGE_SINGLE),
+	/* C7 : LAN_WAKE_ODL */
+	PAD_CFG_GPI_SCI_LOW(GPP_C7, NONE, DEEP, EDGE_SINGLE),
+	/* C10 : PCH_PCON_RST_ODL */
+	PAD_CFG_GPO(GPP_C10, 1, DEEP),
+	/* C11 : PCH_PCON1_PDB_ODL */
+	PAD_CFG_GPO(GPP_C11, 1, DEEP),
+	/* C12 : PCH_UART1_RX_ADB_TX */
+	PAD_CFG_NF(GPP_C12, NONE, DEEP, NF1),
+	/* C13 : PCH_UART1_TX_ADB_RX */
+	PAD_CFG_NF(GPP_C13, NONE, DEEP, NF1),
+	/* C15 : WLAN_OFF_L */
+	PAD_CFG_GPO(GPP_C15, 1, DEEP),
+	/* C16 : PCH_I2C_RFU_SDA (NC) */
+	PAD_NC(GPP_C16, NONE),
+	/* C17 : PCH_I2C_RFU_SCL (NC) */
+	PAD_NC(GPP_C17, NONE),
+	/* C18 : EC_I2C_HDMI_RE_SCL */
+	PAD_CFG_NF(GPP_C18, NONE, DEEP, NF1),
+	/* C19 : EC_12C_HDMI_RE_SDA */
+	PAD_CFG_NF(GPP_C19, NONE, DEEP, NF1),
+
+	/* D1 : REC_MODE */
+	PAD_CFG_GPO(GPP_D1, 1, DEEP),
+	/* D2 : DEV_MODE_CTRL */
+	PAD_CFG_GPO(GPP_D2, 1, DEEP),
+	/* D3 : BOOT_IND */
+	PAD_CFG_GPI(GPP_D3, NONE, DEEP),
+	/* D14 : EC_PCH_INT_L */
+	PAD_CFG_GPI_APIC(GPP_D14, NONE, PLTRST, LEVEL, INVERT),
+	/* D21 : BOOT_SEL_N */
+	PAD_CFG_GPO(GPP_D21, 1, DEEP),
+	/* D22 : QSPI_MR_N */
+	PAD_CFG_GPO(GPP_D22, 1, DEEP),
+	/* D23 : Not connected */
+	PAD_NC(GPP_D23, NONE),
+
+	/* E2 : Not connected */
+	PAD_NC(GPP_E2, NONE),
+	/* E3 : TPU_BOOT_DELAY_PIN40 */
+	PAD_CFG_GPO(GPP_E3, 1, DEEP),
+	/* E7 : TPU_BOOT_DELAY_PIN42 */
+	PAD_CFG_GPO(GPP_E7, 1, DEEP),
+	/* E9 : PU 10K to PP3300_SOC_A */
+	PAD_NC(GPP_E9, NONE),
+	/* E10 : USB_A1_OC_ODL */
+	PAD_CFG_NF(GPP_E10, NONE, DEEP, NF1),
+	/* E11 : PU 10K to PP3300_SOC_A */
+	PAD_NC(GPP_E11, NONE),
+	/* E12 : PU 10K to PP3300_SOC_A */
+	PAD_NC(GPP_E12, NONE),
+	/* E15 : PCH_TYPEC_UPFB */
+	PAD_CFG_GPI(GPP_E15, NONE, DEEP),
+
+	/* H0 : Not connected */
+	PAD_NC(GPP_H0, NONE),
+	/* H4 : PCH_I2C_PCON_SDA */
+	PAD_CFG_NF(GPP_H4, NONE, DEEP, NF1),
+	/* H5 : PCH_I2C_PCON_SCL */
+	PAD_CFG_NF(GPP_H5, NONE, DEEP, NF1),
+	/* H6 : PCH_I2C_TPU_SDA */
+	PAD_CFG_NF(GPP_H6, NONE, DEEP, NF1),
+	/* H7 : PCH_I2C_TPU_SCL */
+	PAD_CFG_NF(GPP_H7, NONE, DEEP, NF1),
+	/* H8 : Not connected */
+	PAD_NC(GPP_H8, NONE),
+	/* H9 : Not connected */
+	PAD_NC(GPP_H9, NONE),
+	/* H22 : PWM_PP3300_BIOZZER */
+	PAD_CFG_GPO(GPP_H22, 0, DEEP),
+};
+
+const struct pad_config *override_gpio_table(size_t *num)
+{
+	*num = ARRAY_SIZE(gpio_table);
+	return gpio_table;
+}
+
+/* Early pad configuration in bootblock */
+static const struct pad_config early_gpio_table[] = {
+	/* B14 : GPP_B14_STRAP */
+	PAD_NC(GPP_B14, NONE),
+	/* B22 : GPP_B22_STRAP */
+	PAD_NC(GPP_B22, NONE),
+	/* E19 : GPP_E19_STRAP */
+	PAD_NC(GPP_E19, NONE),
+	/* E21 : GPP_E21_STRAP */
+	PAD_NC(GPP_E21, NONE),
+	/* B15 : H1_SLAVE_SPI_CS_L */
+	PAD_CFG_NF(GPP_B15, NONE, DEEP, NF1),
+	/* B16 : H1_SLAVE_SPI_CLK */
+	PAD_CFG_NF(GPP_B16, NONE, DEEP, NF1),
+	/* B17 : H1_SLAVE_SPI_MISO_R */
+	PAD_CFG_NF(GPP_B17, NONE, DEEP, NF1),
+	/* B18 : H1_SLAVE_SPI_MOSI_R */
+	PAD_CFG_NF(GPP_B18, NONE, DEEP, NF1),
+	/* C8  : UART_PCH_RX_DEBUG_TX */
+	PAD_CFG_NF(GPP_C8, NONE, DEEP, NF1),
+	/* C9  : UART_PCH_TX_DEBUG_RX */
+	PAD_CFG_NF(GPP_C9, NONE, DEEP, NF1),
+	/* C14 : BT_DISABLE_L */
+	PAD_CFG_GPO(GPP_C14, 0, DEEP),
+	/* C20 : PCH_WP_OD */
+	PAD_CFG_GPI(GPP_C20, NONE, DEEP),
+	/* C21 : H1_PCH_INT_ODL */
+	PAD_CFG_GPI_APIC(GPP_C21, NONE, PLTRST, LEVEL, INVERT),
+	/* C22 : EC_IN_RW_OD */
+	PAD_CFG_GPI(GPP_C22, NONE, DEEP),
+	/* C23 : WLAN_PE_RST# */
+	PAD_CFG_GPO(GPP_C23, 1, DEEP),
+	/* E1 : M2_SSD_PEDET */
+	PAD_CFG_NF(GPP_E1, NONE, DEEP, NF1),
+	/* E5 : SATA_DEVSLP1 */
+	PAD_CFG_NF(GPP_E5, NONE, PLTRST, NF1),
+};
+
+const struct pad_config *variant_early_gpio_table(size_t *num)
+{
+	*num = ARRAY_SIZE(early_gpio_table);
+	return early_gpio_table;
+}

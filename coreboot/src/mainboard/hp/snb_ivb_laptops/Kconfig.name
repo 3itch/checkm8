@@ -1,0 +1,34 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_HP_2170P
+	bool "EliteBook 2170p"
+
+config BOARD_HP_2560P
+	bool "EliteBook 2560p"
+
+config BOARD_HP_2570P
+	bool "EliteBook 2570p"
+
+config BOARD_HP_2760P
+	bool "EliteBook 2760p"
+
+config BOARD_HP_8460P
+	bool "EliteBook 8460p"
+
+config BOARD_HP_8470P
+	bool "EliteBook 8470p"
+
+config BOARD_HP_8560W
+	bool "EliteBook 8560w"
+
+config BOARD_HP_8770W
+	bool "EliteBook 8770w"
+
+config BOARD_HP_FOLIO_9470M
+	bool "EliteBook Folio 9470m"
+
+config BOARD_HP_PROBOOK_6360B
+	bool "ProBook 6360b"
+
+config BOARD_HP_REVOLVE_810_G1
+	bool "EliteBook Revolve 810 G1"

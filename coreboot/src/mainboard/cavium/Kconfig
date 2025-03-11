@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_CAVIUM
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/cavium/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/cavium/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "Cavium"
+
+endif # VENDOR_CAVIUM

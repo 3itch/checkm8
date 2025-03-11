@@ -1,0 +1,30 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_SAPPHIRE_PUREPLATINUMH61
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select NORTHBRIDGE_INTEL_SANDYBRIDGE
+	select USE_NATIVE_RAMINIT
+	select SOUTHBRIDGE_INTEL_BD82X6X
+	select SUPERIO_FINTEK_F71808A
+	select BOARD_ROMSIZE_KB_4096
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select HAVE_CMOS_DEFAULT
+	select HAVE_ACPI_RESUME
+	select MAINBOARD_HAS_LIBGFXINIT
+	select INTEL_INT15
+	select NO_UART_ON_SUPERIO
+
+config MAINBOARD_DIR
+	default "sapphire/pureplatinumh61"
+
+config MAINBOARD_PART_NUMBER
+	default "Pure Platinum H61"
+
+config DRAM_RESET_GATE_GPIO
+	int
+	default 60
+
+endif

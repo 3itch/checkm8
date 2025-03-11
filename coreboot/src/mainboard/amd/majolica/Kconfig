@@ -1,0 +1,72 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_AMD_MAJOLICA
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOARD_ROMSIZE_KB_16384
+	select SOC_AMD_CEZANNE
+	select SOC_AMD_COMMON_BLOCK_USE_ESPI
+	select AMD_SOC_CONSOLE_UART
+	select PSP_INIT_ESPI
+	select MAINBOARD_HAS_CHROMEOS
+	select AMD_FWM_POSITION_C20000_DEFAULT if CHROMEOS
+	select AMD_FWM_POSITION_820000_DEFAULT if !CHROMEOS
+
+config FMDFILE
+	default "src/mainboard/amd/majolica/chromeos.fmd" if CHROMEOS
+	default "src/mainboard/amd/majolica/board.fmd"
+
+config MAINBOARD_DIR
+	default "amd/majolica"
+
+config MAINBOARD_PART_NUMBER
+	default "MAJOLICA"
+
+config MAJOLICA_HAVE_MCHP_FW
+	bool "Have Microchip EC firmware?"
+	default n
+
+config MAJOLICA_MCHP_FW_FILE
+	string
+	depends on MAJOLICA_HAVE_MCHP_FW
+	default "3rdparty/blobs/mainboard/amd/majolica/EC_majolica.bin"
+	help
+	  The EC firmware blob is usually the first 128kByte of the stock
+	  firmware image.
+
+config VBOOT
+	select VBOOT_NO_BOARD_SUPPORT
+	select VBOOT_SEPARATE_VERSTAGE
+	select VBOOT_STARTS_IN_BOOTBLOCK
+
+config VBOOT_VBNV_OFFSET
+	hex
+	default 0x2A
+
+config CHROMEOS
+	# Use default libpayload config
+	select LP_DEFCONFIG_OVERRIDE if PAYLOAD_DEPTHCHARGE
+
+if !EM100	# EM100 defaults in soc/amd/common/blocks/spi/Kconfig
+config EFS_SPI_READ_MODE
+	default 3	# Quad IO (1-1-4)
+
+config EFS_SPI_SPEED
+	default 0	# 66MHz
+
+config EFS_SPI_MICRON_FLAG
+	default 0
+
+config NORMAL_READ_SPI_SPEED
+	default 1	# 33MHz
+
+config ALT_SPI_SPEED
+	default 1	# 33MHz
+
+config TPM_SPI_SPEED
+	default 1	# 33MHz
+
+endif # !EM100
+
+endif # BOARD_AMD_MAJOLICA

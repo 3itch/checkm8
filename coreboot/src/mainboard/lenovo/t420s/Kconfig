@@ -1,0 +1,70 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_LENOVO_T420S
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOARD_ROMSIZE_KB_8192
+	select DRIVERS_LENOVO_HYBRID_GRAPHICS
+	select DRIVER_LENOVO_SERIALS
+	select EC_LENOVO_H8
+	select EC_LENOVO_PMH7
+	select GFX_GMA_PANEL_1_ON_LVDS
+	select H8_HAS_BAT_THRESHOLDS_IMPL
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_CMOS_DEFAULT
+	select HAVE_OPTION_TABLE
+	select INTEL_GMA_HAVE_VBT
+	select INTEL_INT15
+	select MAINBOARD_HAS_LIBGFXINIT
+	select MAINBOARD_HAS_TPM1
+	select MAINBOARD_USES_IFD_GBE_REGION
+	select MEMORY_MAPPED_TPM
+	select NO_UART_ON_SUPERIO
+	select NORTHBRIDGE_INTEL_SANDYBRIDGE
+	# Workaround for EC/KBC IRQ1.
+	select SERIRQ_CONTINUOUS_MODE
+	select SOUTHBRIDGE_INTEL_BD82X6X
+	select SYSTEM_TYPE_LAPTOP
+	select USE_NATIVE_RAMINIT
+
+config VBOOT
+	select GBB_FLAG_DISABLE_EC_SOFTWARE_SYNC
+	select GBB_FLAG_DISABLE_FWMP
+	select GBB_FLAG_DISABLE_LID_SHUTDOWN
+	select GBB_FLAG_DISABLE_PD_SOFTWARE_SYNC
+	select HAS_RECOVERY_MRC_CACHE
+	select VBOOT_VBNV_FLASH
+
+config VBOOT_SLOTS_RW_A
+	default y
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/vboot-rwa.fmd" if VBOOT
+
+config MAINBOARD_DIR
+	default "lenovo/t420s"
+
+config MAINBOARD_PART_NUMBER
+	default "ThinkPad T420s"
+
+config USBDEBUG_HCD_INDEX
+	int
+	default 2
+
+config DRAM_RESET_GATE_GPIO
+	int
+	default 10
+
+config VGA_BIOS_ID
+	string
+	default "8086,0126"
+
+config PS2K_EISAID
+	default "PNP0303"
+
+config PS2M_EISAID
+	default "LEN0015"
+
+endif # BOARD_LENOVO_T420S

@@ -1,0 +1,13 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_LENOVO_X230
+	bool "ThinkPad X230"
+
+config BOARD_LENOVO_X230T
+	bool "ThinkPad X230t"
+
+config BOARD_LENOVO_X230S
+	bool "ThinkPad X230s"
+
+config BOARD_LENOVO_X230_EDP
+	bool "ThinkPad X230 eDP Mod (2K/FHD)"

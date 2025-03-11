@@ -1,0 +1,21 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config IPMI_OCP
+	bool
+	default n
+	help
+	  This implements OCP specific IPMI command
+
+config IPMI_BMC_SEL
+	bool
+	depends on IPMI_OCP
+	default n
+	help
+	  This implements OCP specific command to generate/send SEL record
+
+config RAS_SEL_VENDOR_ID
+	hex
+	depends on IPMI_BMC_SEL
+	default 0xff
+	help
+	  This option specifies a vendor ID for BMC SEL messages

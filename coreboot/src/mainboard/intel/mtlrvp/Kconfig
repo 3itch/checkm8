@@ -1,0 +1,143 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_INTEL_MTLRVP_COMMON
+	def_bool n
+	select BOARD_ROMSIZE_KB_32768
+	select CPU_INTEL_SOCKET_OTHER
+	select DRIVERS_GENERIC_MAX98357A
+	select DRIVERS_I2C_GENERIC
+	select DRIVERS_I2C_HID
+	select DRIVERS_I2C_MAX98373
+	select DRIVERS_INTEL_DPTF
+	select DRIVERS_INTEL_DPTF_SUPPORTS_TPCH
+	select DRIVERS_INTEL_MIPI_CAMERA
+	select DRIVERS_INTEL_SOUNDWIRE
+	select DRIVERS_SOUNDWIRE_ALC5682
+	select DRIVERS_SOUNDWIRE_ALC_BASE_7XX
+	select DRIVERS_SOUNDWIRE_MAX98373
+	select DRIVERS_USB_ACPI
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_SPD_IN_CBFS
+	select MAINBOARD_HAS_CHROMEOS
+	select SOC_INTEL_COMMON_BLOCK_VARIANT_POWER_LIMIT
+	select SOC_INTEL_CSE_LITE_SKU
+	select SOC_INTEL_METEORLAKE_U_H
+
+config BOARD_INTEL_MTLRVP_P
+	select BOARD_INTEL_MTLRVP_COMMON
+
+config BOARD_INTEL_MTLRVP_P_EXT_EC
+	select BOARD_EXT_EC_SPECIFIC_OPTIONS
+
+config BOARD_INTEL_MTLRVP4ES_P_EXT_EC
+	select BOARD_EXT_EC_SPECIFIC_OPTIONS
+	select SOC_INTEL_METEORLAKE_PRE_PRODUCTION_SILICON
+
+config BOARD_INTEL_MTLRVP_P_MCHP
+	select BOARD_EXT_EC_SPECIFIC_OPTIONS
+	select EC_GOOGLE_CHROMEEC_MEC
+	select SOC_INTEL_METEORLAKE_PRE_PRODUCTION_SILICON
+
+config BOARD_EXT_EC_SPECIFIC_OPTIONS
+	def_bool n
+	select BOARD_INTEL_MTLRVP_COMMON
+	select DRIVERS_INTEL_PMC
+	select EC_ACPI
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_ESPI
+	select EC_GOOGLE_CHROMEEC_BOARDID
+	select FW_CONFIG
+	select FW_CONFIG_SOURCE_CHROMEEC_CBI
+
+if BOARD_INTEL_MTLRVP_COMMON
+
+config CHROMEOS
+	select GBB_FLAG_FORCE_DEV_BOOT_ALTFW
+	select GBB_FLAG_FORCE_DEV_SWITCH_ON
+	select GBB_FLAG_FORCE_DEV_BOOT_USB
+	select GBB_FLAG_FORCE_MANUAL_RECOVERY
+	select GBB_FLAG_DISABLE_PD_SOFTWARE_SYNC
+	select HAS_RECOVERY_MRC_CACHE
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select INTEL_LPSS_UART_FOR_CONSOLE
+	select DRIVERS_INTEL_USB4_RETIMER
+	select DRIVERS_WWAN_FM350GL
+
+config MAINBOARD_DIR
+	default "intel/mtlrvp"
+
+config BASEBOARD_DIR
+	string
+	default "mtlrvp_p" if BOARD_INTEL_MTLRVP_P || BOARD_INTEL_MTLRVP_P_EXT_EC || BOARD_INTEL_MTLRVP_P_MCHP || BOARD_INTEL_MTLRVP4ES_P_EXT_EC
+
+config GBB_HWID
+	string
+	depends on CHROMEOS
+	default "MTLRVP"
+
+config MAINBOARD_PART_NUMBER
+	string
+	default "Mtlrvp_P_Ext_Ec" if BOARD_INTEL_MTLRVP_P_EXT_EC || BOARD_INTEL_MTLRVP4ES_P_EXT_EC
+	default "Mtlrvp_P_Mchp" if BOARD_INTEL_MTLRVP_P_MCHP
+	default "Mtlrvp" if BOARD_INTEL_MTLRVP_P
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/chromeos-debug-fsp.fmd" if CHROMEOS && BUILDING_WITH_DEBUG_FSP
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/chromeos.fmd"
+
+config MAINBOARD_FAMILY
+	string
+	default "Intel_mtlrvp"
+
+config VARIANT_DIR
+	string
+	default "mtlrvp_p" if BOARD_INTEL_MTLRVP_P
+	default "mtlrvp_p_ext_ec" if BOARD_INTEL_MTLRVP_P_EXT_EC || BOARD_INTEL_MTLRVP_P_MCHP || BOARD_INTEL_MTLRVP4ES_P_EXT_EC
+
+config DEVICETREE
+	string
+	default "variants/baseboard/\$(CONFIG_BASEBOARD_DIR)/devicetree.cb"
+
+config OVERRIDE_DEVICETREE
+	string
+	default "variants/\$(CONFIG_VARIANT_DIR)/overridetree.cb"
+
+config DIMM_SPD_SIZE
+	default 512
+
+choice
+	prompt "ON BOARD EC"
+	default MTL_INTEL_EC if BOARD_INTEL_MTLRVP_P
+	default MTL_CHROME_EC if BOARD_INTEL_MTLRVP_P_EXT_EC || BOARD_INTEL_MTLRVP4ES_P_EXT_EC
+	default MTL_CHROME_EC_SHARED_SPI if BOARD_INTEL_MTLRVP_P_MCHP
+	help
+	  This option allows you to select the on board EC to use.
+	  Select whether the board has Intel EC or/and Chrome EC
+
+config MTL_CHROME_EC
+	bool "Chrome EC with Internal SPI flash"
+
+config MTL_CHROME_EC_SHARED_SPI
+	bool "Chrome EC with External Shared SPI flash"
+	select MAINBOARD_USES_IFD_EC_REGION
+
+config MTL_INTEL_EC
+	bool "Intel EC"
+	select EC_ACPI
+endchoice
+
+config VBOOT
+	select VBOOT_LID_SWITCH
+	select EC_GOOGLE_CHROMEEC_SWITCHES if MTL_CHROME_EC || MTL_CHROME_EC_SHARED_SPI
+
+config UART_FOR_CONSOLE
+	int
+	default 0
+
+config USE_PM_ACPI_TIMER
+	default n
+
+endif # BOARD_INTEL_MTLRVP_COMMON

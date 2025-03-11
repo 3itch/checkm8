@@ -1,0 +1,74 @@
+bios::GBB::version::1.2
+bios::GBB::flags::57
+bios::GBB::hwid::offset::128
+bios::GBB::hwid::size::256
+bios::GBB::bmpvf::offset::4480
+bios::GBB::bmpvf::size::0
+bios::GBB::root_key::offset::384
+bios::GBB::root_key::size::4096
+bios::GBB::recovery_key::offset::4480
+bios::GBB::recovery_key::size::4096
+bios::GBB::size::8576
+bios::GBB::header::valid
+bios::GBB::hwid::value::GERALT TEST 0843
+bios::GBB::hwid::digest::algorithm::2::SHA256
+bios::GBB::hwid::digest::hex::14cfa3d880e40e5f706a87a46a19a6ab68877ac39ef30ad14a0bcd7209b31106
+bios::GBB::hwid::digest::valid
+bios::GBB::root_key::valid
+bios::GBB::root_key::api::1.0
+bios::GBB::root_key::algorithm::11::RSA8192 SHA512
+bios::GBB::root_key::version::1
+bios::GBB::root_key::sha1_sum::b11d74edd286c144e1135b49e7f0bc20cf041f10
+bios::GBB::recovery_key::valid
+bios::GBB::recovery_key::api::1.0
+bios::GBB::recovery_key::algorithm::11::RSA8192 SHA512
+bios::GBB::recovery_key::version::1
+bios::GBB::recovery_key::sha1_sum::c14bd720b70d97394257e3e826bd8f43de48d4ed
+bios::VBLOCK_A::keyblock::valid
+bios::VBLOCK_A::keyblock::size::2232
+bios::VBLOCK_A::keyblock::signature::valid
+bios::VBLOCK_A::keyblock::signature::size::1024
+bios::VBLOCK_A::keyblock::signature::data_size::1144
+bios::VBLOCK_A::keyblock::flags::23::!DEV:DEV:!REC:!MINIOS
+bios::VBLOCK_A::keyblock::data_key::algorithm::7::RSA4096 SHA256
+bios::VBLOCK_A::keyblock::data_key::version::1
+bios::VBLOCK_A::keyblock::data_key::sha1_sum::e2c1c92d7d7aa7dfed5e8375edd30b7ae52b7450
+bios::VBLOCK_A::preamble::valid
+bios::VBLOCK_A::preamble::signature::valid
+bios::VBLOCK_A::preamble::size::1688
+bios::VBLOCK_A::preamble::header_version::2.1
+bios::VBLOCK_A::preamble::firmware_version::1
+bios::VBLOCK_A::preamble::kernel_subkey::algorithm::7::RSA4096 SHA256
+bios::VBLOCK_A::preamble::kernel_subkey::version::1
+bios::VBLOCK_A::preamble::kernel_subkey::sha1_sum::5d2b220899c4403d564092ada3f12d3cc4483223
+bios::VBLOCK_A::preamble::flags::0
+bios::VBLOCK_A::body::size::0
+bios::VBLOCK_A::body::metadata_hash::algorithm::2::SHA256
+bios::VBLOCK_A::body::metadata_hash::hex::81c301db828912ad0eab0866293ece02d58d402d67062af8abc74e64342821ee
+bios::VBLOCK_A::body::metadata_hash::valid
+bios::VBLOCK_A::body::signature::valid
+bios::VBLOCK_A::verified
+bios::VBLOCK_B::keyblock::valid
+bios::VBLOCK_B::keyblock::size::2232
+bios::VBLOCK_B::keyblock::signature::valid
+bios::VBLOCK_B::keyblock::signature::size::1024
+bios::VBLOCK_B::keyblock::signature::data_size::1144
+bios::VBLOCK_B::keyblock::flags::23::!DEV:DEV:!REC:!MINIOS
+bios::VBLOCK_B::keyblock::data_key::algorithm::7::RSA4096 SHA256
+bios::VBLOCK_B::keyblock::data_key::version::1
+bios::VBLOCK_B::keyblock::data_key::sha1_sum::e2c1c92d7d7aa7dfed5e8375edd30b7ae52b7450
+bios::VBLOCK_B::preamble::valid
+bios::VBLOCK_B::preamble::signature::valid
+bios::VBLOCK_B::preamble::size::1688
+bios::VBLOCK_B::preamble::header_version::2.1
+bios::VBLOCK_B::preamble::firmware_version::1
+bios::VBLOCK_B::preamble::kernel_subkey::algorithm::7::RSA4096 SHA256
+bios::VBLOCK_B::preamble::kernel_subkey::version::1
+bios::VBLOCK_B::preamble::kernel_subkey::sha1_sum::5d2b220899c4403d564092ada3f12d3cc4483223
+bios::VBLOCK_B::preamble::flags::0
+bios::VBLOCK_B::body::size::0
+bios::VBLOCK_B::body::metadata_hash::algorithm::2::SHA256
+bios::VBLOCK_B::body::metadata_hash::hex::2a7c59681a4a8ec9ac952163f346ea65082d3086d1e74e731ce60822e777b755
+bios::VBLOCK_B::body::metadata_hash::valid
+bios::VBLOCK_B::body::signature::valid
+bios::VBLOCK_B::verified

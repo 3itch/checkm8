@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Peach Pit"
+
+config BOARD_GOOGLE_PEACH_PIT
+	bool "->  Peach Pit (Samsung Chromebook 2 11\")"

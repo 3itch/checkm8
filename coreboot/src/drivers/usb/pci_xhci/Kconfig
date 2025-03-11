@@ -1,0 +1,8 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVERS_USB_PCI_XHCI
+	def_bool n
+	depends on HAVE_ACPI_TABLES
+	select XHCI_UTILS
+	help
+	  PCI driver that generates ACPI nodes for an xHCI compatible controller.

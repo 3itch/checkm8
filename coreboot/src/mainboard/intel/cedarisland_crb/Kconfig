@@ -1,0 +1,22 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_INTEL_CEDARISLAND_CRB
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOARD_ROMSIZE_KB_65536
+	select CPU_INTEL_SOCKET_LGA4189
+	select SOC_INTEL_COOPERLAKE_SP
+	select SUPERIO_ASPEED_AST2400
+	select HAVE_ACPI_TABLES
+
+config MAINBOARD_DIR
+	default "intel/cedarisland_crb"
+
+config MAINBOARD_PART_NUMBER
+	default "Cedar Island CRB"
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/board.fmd"
+
+endif

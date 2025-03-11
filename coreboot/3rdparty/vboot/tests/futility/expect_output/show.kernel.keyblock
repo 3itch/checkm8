@@ -1,0 +1,9 @@
+Keyblock:                tests/devkeys/kernel.keyblock
+  Size:                  0x4b8
+  Signature:             ignored
+    Size:                0x200
+    Data size:           0x278
+  Flags:                 23  !DEV DEV !REC !MINIOS
+  Data key algorithm:    4 RSA2048 SHA256
+  Data key version:      1
+  Data key sha1sum:      d6170aa480136f1f29cf339a5ab1b960585fa444

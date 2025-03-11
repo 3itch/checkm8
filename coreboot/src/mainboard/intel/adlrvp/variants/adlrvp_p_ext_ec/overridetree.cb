@@ -1,0 +1,108 @@
+chip soc/intel/alderlake
+
+	device domain 0 on
+		device ref pch_espi on
+			chip ec/google/chromeec
+				use conn0 as mux_conn[0]
+				use conn1 as mux_conn[1]
+				use conn2 as mux_conn[2]
+				device pnp 0c09.0 on end
+			end
+		end
+		device ref tcss_xhci on
+			chip drivers/usb/acpi
+				register "type" = "UPC_TYPE_HUB"
+				device ref tcss_root_hub on
+					chip drivers/usb/acpi
+						register "desc" = ""TypeC Port 1""
+						device ref tcss_usb3_port1 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""TypeC Port 2""
+						device ref tcss_usb3_port2 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""TypeC Port 3""
+						device ref tcss_usb3_port3 on end
+					end
+				end
+			end
+		end
+		device ref pmc hidden
+			# The pmc_mux chip driver is a placeholder for the
+			# PMC.MUX device in the ACPI hierarchy.
+			chip drivers/intel/pmc_mux
+				device generic 0 on
+					chip drivers/intel/pmc_mux/conn
+						use usb2_port1 as usb2_port
+						use tcss_usb3_port1 as usb3_port
+						# SBU is fixed, HSL follows CC
+						register "sbu_orientation" = "TYPEC_ORIENTATION_NORMAL"
+						device generic 0 alias conn0 on end
+					end
+					chip drivers/intel/pmc_mux/conn
+						use usb2_port2 as usb2_port
+						use tcss_usb3_port2 as usb3_port
+						# SBU is fixed, HSL follows CC
+						register "sbu_orientation" = "TYPEC_ORIENTATION_NORMAL"
+						device generic 1 alias conn1 on end
+					end
+					chip drivers/intel/pmc_mux/conn
+						use usb2_port3 as usb2_port
+						use tcss_usb3_port3 as usb3_port
+						# SBU is fixed, HSL follows CC
+						register "sbu_orientation" = "TYPEC_ORIENTATION_NORMAL"
+						device generic 2 alias conn2 on end
+					end
+				end
+			end
+		end
+		device ref pcie_rp6 on
+			# Enable WWAN PCIE 6 using clk 5
+			register "pch_pcie_rp[PCH_RP(6)]" = "{
+				.clk_src = 5,
+				.clk_req = 5,
+				.flags = PCIE_RP_LTR | PCIE_RP_AER,
+			}"
+			chip soc/intel/common/block/pcie/rtd3
+				register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_C5)"
+				register "reset_off_delay_ms" = "20"
+				register "srcclk_pin" = "5"
+				register "ext_pm_support" = "ACPI_PCIE_RP_EMIT_ALL"
+				register "skip_on_off_support" = "true"
+				register "use_rp_mutex" = "true"
+				device generic 0 alias rp6_rtd3 on
+				end
+			end
+			chip drivers/wwan/fm
+				register "fcpo_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_F15)"
+				register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_F14)"
+				register "perst_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_C5)"
+				register "wake_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_D18)"
+				register "add_acpi_dma_property" = "true"
+				use rp6_rtd3 as rtd3dev
+				device generic 0 on
+				end
+			end
+		end
+		device ref pcie_rp8 on
+			# NOTE: requires GPP_A7 set to Native Function 1 for SRCCLK_OE7
+			register "pch_pcie_rp[PCH_RP(8)]" = "{
+				  .clk_src = 7,
+				  .clk_req = 7,
+				  .flags = PCIE_RP_CLK_REQ_DETECT | PCIE_RP_LTR,
+				  .PcieRpL1Substates = L1_SS_L1_2,
+				  .pcie_rp_detect_timeout_ms = 50,
+			}"
+			chip soc/intel/common/block/pcie/rtd3
+				register "enable_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_H17)"
+				register "enable_delay_ms" = "100"
+				register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_F10)"
+				register "reset_delay_ms" = "20"
+				register "srcclk_pin" = "7"
+				device generic 0 on
+				end
+			end
+		end
+	end
+end

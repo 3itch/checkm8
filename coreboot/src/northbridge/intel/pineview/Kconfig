@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config NORTHBRIDGE_INTEL_PINEVIEW
+	bool
+	select HAVE_DEBUG_RAM_SETUP
+	select VGA
+	select MAINBOARD_HAS_NATIVE_VGA_INIT
+	select HAVE_VGA_TEXT_FRAMEBUFFER if MAINBOARD_DO_NATIVE_VGA_INIT
+	select INTEL_EDID if MAINBOARD_DO_NATIVE_VGA_INIT
+	select INTEL_GMA_ACPI
+	select USE_DDR3
+	select USE_DDR2
+	select NEED_SMALL_2MB_PAGE_TABLES
+
+if NORTHBRIDGE_INTEL_PINEVIEW
+
+config VGA_BIOS_ID
+	string
+	default "8086,a001"
+
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0xe0000000
+
+config ECAM_MMCONF_BUS_NUMBER
+	int
+	default 256
+
+config SMM_RESERVED_SIZE
+	hex
+	default 0x80000
+
+config FIXED_MCHBAR_MMIO_BASE
+	default 0xfed14000
+
+config FIXED_DMIBAR_MMIO_BASE
+	default 0xfed18000
+
+config FIXED_EPBAR_MMIO_BASE
+	default 0xfed19000
+
+# This number must be equal or lower than what's reported in ACPI PCI _CRS
+config DOMAIN_RESOURCE_32BIT_LIMIT
+	default 0xfec00000
+
+endif

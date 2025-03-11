@@ -1,0 +1,232 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+config BOARD_GOOGLE_BASEBOARD_SKYRIM
+	def_bool n
+
+config BOARD_GOOGLE_CRYSTALDRIFT
+	select BOARD_GOOGLE_BASEBOARD_SKYRIM
+
+config BOARD_GOOGLE_FROSTFLOW
+	select BOARD_GOOGLE_BASEBOARD_SKYRIM
+	select DRIVERS_GENESYSLOGIC_GL9755
+	select FEATURE_TABLET_MODE_DPTC
+	select SOC_AMD_COMMON_BLOCK_ACPI_DPTC
+
+config BOARD_GOOGLE_MARKARTH
+	select BOARD_GOOGLE_BASEBOARD_SKYRIM
+	select SOC_AMD_COMMON_BLOCK_ACPI_DPTC
+
+config BOARD_GOOGLE_SKYRIM
+	select BOARD_GOOGLE_BASEBOARD_SKYRIM
+	select SOC_AMD_COMMON_BLOCK_ACPI_DPTC
+
+config BOARD_GOOGLE_WINTERHOLD
+	select BOARD_GOOGLE_BASEBOARD_SKYRIM
+	select SOC_AMD_COMMON_BLOCK_ACPI_DPTC
+	select FEATURE_DYNAMIC_DPTC
+
+if BOARD_GOOGLE_BASEBOARD_SKYRIM
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select ACPI_S1_NOT_SUPPORTED
+	select AMD_FWM_POSITION_C20000_DEFAULT
+	select AMD_SOC_CONSOLE_UART
+	select BOARD_ROMSIZE_KB_16384
+	select DISABLE_KEYBOARD_RESET_PIN
+	select DISABLE_SPI_FLASH_ROM_SHARING
+	select DRIVERS_GENERIC_GPIO_KEYS
+	select DRIVERS_GENERIC_MAX98357A
+	select DRIVERS_ACPI_THERMAL_ZONE
+	select DRIVERS_I2C_GENERIC
+	select DRIVERS_I2C_HID
+	select DRIVERS_I2C_NAU8825
+	select DRIVERS_USB_HUB
+	select DRIVERS_UART_ACPI
+	select DRIVERS_PCIE_GENERIC
+	select DRIVERS_PCIE_RTD3_DEVICE
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_BOARDID
+	select EC_GOOGLE_CHROMEEC_ESPI
+	select EC_GOOGLE_CHROMEEC_SKUID
+	select ELOG
+	select ELOG_GSMI
+	select FW_CONFIG
+	select FW_CONFIG_SOURCE_CHROMEEC_CBI
+	select GOOGLE_SMBIOS_MAINBOARD_VERSION
+	select HAS_RECOVERY_MRC_CACHE
+	select I2C_TPM
+	select MAINBOARD_HAS_CHROMEOS
+	select MAINBOARD_HAS_TPM2
+	select MB_COMPRESS_RAMSTAGE_LZ4
+	select PCIEXP_ASPM
+	select PCIEXP_CLK_PM
+	select PCIEXP_COMMON_CLOCK
+	select PCIEXP_L1_SUB_STATE
+	select SOC_AMD_MENDOCINO
+	select SOC_AMD_COMMON_BLOCK_I2C3_TPM_SHARED_WITH_PSP
+	select SOC_AMD_COMMON_BLOCK_USE_ESPI
+	select SOC_AMD_GFX_CACHE_VBIOS_IN_FMAP if CHROMEOS && RUN_FSP_GOP
+	select SYSTEM_TYPE_LAPTOP
+	select TPM_GOOGLE_TI50
+
+config DEVICETREE
+	default "variants/baseboard/devicetree.cb"
+
+config DRIVER_TPM_I2C_BUS
+	hex
+	default 0x03
+
+config DRIVER_TPM_I2C_ADDR
+	hex
+	default 0x50
+
+config GSC_IRQ_GPIO
+	int
+	default 18
+
+config AMDFW_CONFIG_FILE
+	string
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/amdfw.cfg"
+	help
+	  Custom firmware list excluding the fwTPM binary.
+
+config PSP_LOAD_MP2_FW
+	prompt "Load MP2 Firmware"
+	depends on CHROMEOS
+	default y
+
+config SPL_TABLE_FILE
+	string
+	default "3rdparty/blobs/mainboard/google/skyrim/TypeId0x55_SplTableBl_MDN_CHROME_RO.sbin"
+
+config HAVE_SPL_RW_AB_FILE
+	bool
+	default y
+
+config SPL_RW_AB_TABLE_FILE
+	string
+	default "3rdparty/blobs/mainboard/google/skyrim/TypeId0x55_SplTableBl_MDN_CHROME.sbin"
+
+config PERFORM_SPL_FUSING
+	default n if BOARD_GOOGLE_SKYRIM
+	default y
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/chromeos.fmd"
+
+config MAINBOARD_DIR
+	default "google/skyrim"
+
+config MAINBOARD_FAMILY
+	string
+	default "Google_Skyrim"
+
+config MAINBOARD_PART_NUMBER
+	default "Crystaldrift" if BOARD_GOOGLE_CRYSTALDRIFT
+	default "Frostflow" if BOARD_GOOGLE_FROSTFLOW
+	default "Markarth" if BOARD_GOOGLE_MARKARTH
+	default "Skyrim" if BOARD_GOOGLE_SKYRIM
+	default "Winterhold" if BOARD_GOOGLE_WINTERHOLD
+
+config OVERRIDE_DEVICETREE
+	string
+	default "variants/\$(CONFIG_VARIANT_DIR)/overridetree.cb"
+
+config VARIANT_DIR
+	string
+	default "crystaldrift" if BOARD_GOOGLE_CRYSTALDRIFT
+	default "frostflow" if BOARD_GOOGLE_FROSTFLOW
+	default "markarth" if BOARD_GOOGLE_MARKARTH
+	default "skyrim" if BOARD_GOOGLE_SKYRIM
+	default "winterhold" if BOARD_GOOGLE_WINTERHOLD
+
+config USE_SELECTIVE_GOP_INIT
+	default y if CHROMEOS && RUN_FSP_GOP && BOARD_GOOGLE_SKYRIM
+
+config VBOOT
+	select EC_GOOGLE_CHROMEEC_SWITCHES
+	select VBOOT_LID_SWITCH
+	select VBOOT_SEPARATE_VERSTAGE
+
+config VBOOT_STARTS_BEFORE_BOOTBLOCK
+	bool "Enable PSP_verstage"
+	default y if VBOOT
+	select SEPARATE_SIGNED_PSPFW
+
+config VBOOT_STARTS_IN_BOOTBLOCK
+	bool
+	default y if VBOOT && !VBOOT_STARTS_BEFORE_BOOTBLOCK
+
+if !EM100	# EM100 defaults in soc/amd/common/blocks/spi/Kconfig
+config EFS_SPI_READ_MODE
+	default 2 if BOARD_GOOGLE_SKYRIM          # Dual IO (1-1-2)
+	default 4                                 # Dual IO (1-2-2)
+
+config EFS_SPI_SPEED
+	default 4 if BOARD_GOOGLE_WINTERHOLD
+	default 0	# 66MHz
+
+config EFS_SPI_MICRON_FLAG
+	default 0
+
+config NORMAL_READ_SPI_SPEED
+	default 1	# 33MHz
+
+config ALT_SPI_SPEED
+	default 4 if BOARD_GOOGLE_WINTERHOLD
+	default 0	# 66MHz
+
+endif # !EM100
+
+config OVERRIDE_EFS_SPI_SPEED
+	int
+	default 3 if EM100
+	default 4	# 100MHz
+	help
+	  Override EFS SPI Speed Configuration to be applied based on certain
+	  board version.
+
+config OVERRIDE_EFS_SPI_SPEED_MIN_BOARD
+	hex
+	default 0x1 if BOARD_GOOGLE_CRYSTALDRIFT
+	default 0x1 if BOARD_GOOGLE_FROSTFLOW
+	default 0x1 if BOARD_GOOGLE_MARKARTH
+	default 0x5 if BOARD_GOOGLE_SKYRIM
+	default 0xffffffff
+	help
+	  Minimum board version starting which the Override EFS SPI Speed
+	  configuration has to be applied.
+
+config CONSOLE_CBMEM_BUFFER_SIZE
+	hex
+	default 0x80000
+
+config ENABLE_STB_SPILL_TO_DRAM
+	default y
+	help
+	  Spill-to-DRAM is an STB feature that extends the buffer from using
+	  just the small SRAM buffer to a much larger area reserved in main
+	  memory.
+
+config CARDBUS_PLUGIN_SUPPORT
+	default n
+
+# Exclude support for SPI ROM types that won't be used on Skyrim platforms
+config SPI_FLASH_DONT_INCLUDE_ALL_DRIVERS
+	default y
+
+# Gigadevice is used on Whiterun as an alternative to Winbond
+config SPI_FLASH_GIGADEVICE
+	default y
+
+# XMC chips used on Markarth as an alternative to Winbond
+# These chips identify as ST Micro (Manufacturer ID: 0x20)
+config SPI_FLASH_STMICRO
+	default y
+
+# Winbond chips are used by all Skyrim devices as the primary flash chip
+config SPI_FLASH_WINBOND
+	default y
+
+endif # BOARD_GOOGLE_BASEBOARD_SKYRIM

@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Veyron Mickey"
+
+config BOARD_GOOGLE_VEYRON_MICKEY
+	bool "->  Veyron_Mickey (Asus Chromebit CS10)"

@@ -1,0 +1,13 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_PURISM_LIBREM13_V2
+	bool "Librem 13 v2/v3"
+
+config BOARD_PURISM_LIBREM15_V3
+	bool "Librem 15 v3"
+
+config BOARD_PURISM_LIBREM13_V4
+	bool "Librem 13 v4"
+
+config BOARD_PURISM_LIBREM15_V4
+	bool "Librem 15 v4"

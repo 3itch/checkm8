@@ -1,0 +1,7 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_AMD_COMMON_BLOCK_SMN
+	bool
+	help
+	  Select this option to add functions to access the SMN (system management
+	  network) register space to the build.

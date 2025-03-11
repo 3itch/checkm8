@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_PURISM
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/purism/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/purism/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "Purism"
+
+endif # VENDOR_PURISM

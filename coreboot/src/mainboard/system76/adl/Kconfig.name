@@ -1,0 +1,22 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_SYSTEM76_DARP8
+	bool "darp8"
+
+config BOARD_SYSTEM76_GALP6
+	bool "galp6"
+
+config BOARD_SYSTEM76_GAZE17_3050
+	bool "gaze17 3050"
+
+config BOARD_SYSTEM76_GAZE17_3060_B
+	bool "gaze17 3060-b"
+
+config BOARD_SYSTEM76_LEMP11
+	bool "lemp11"
+
+config BOARD_SYSTEM76_ORYP9
+	bool "oryp9"
+
+config BOARD_SYSTEM76_ORYP10
+	bool "oryp10"

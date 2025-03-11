@@ -1,0 +1,4 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVER_ANALOGIX_ANX7625
+	bool

@@ -1,0 +1,1290 @@
+
+
+		    List of upstream coreboot maintainers
+		     and how to submit coreboot changes
+
+This represents the list of maintainers that work on the upstream coreboot
+code base (on coreboot.org).  Maintainers are assigned to topics and when
+applicable to subtrees of the source tree. You'll find some subtrees that
+don't have a maintainer. If you are looking for reviewers for such a sub-
+tree, it's often a good choice to look at the git history to see who worked
+on it last.
+
+Please try to follow the guidelines below.  This will make things
+easier on the maintainers.  Not all of these guidelines matter for every
+trivial patch so apply some common sense.
+
+
+1.	Make sure your changes compile correctly in multiple configurations. In
+	particular check that changes work for various boards in the tree that
+	it affects:
+
+	Test with: `util/abuild/abuild -c $(nproc) -t vendor/boardname`
+
+2.	When you are happy with a change make it generally available for
+	testing in gerrit and await feedback.
+
+3.	Be prepared to get your changes sent back with seemingly
+	silly requests about formatting and variable names.  These aren't
+	as silly as they seem. One job the maintainers do is to keep
+	things looking the same.  Sometimes this means that the clever
+	hack in your mainboard or chipset to get around a problem actually
+	needs to become a generalized coreboot feature ready for next time.
+
+	PLEASE check your patch with the automated style checker
+	(util/lint/checkpatch.pl) to catch trival style violations.
+	See https://www.coreboot.org/Coding_Style for guidance here.
+
+	PLEASE document known bugs. If it doesn't work for everything
+	or does something very odd once a month document it.
+
+	ALWAYS remember that submissions are made under the terms
+	of the OSDL certificate of contribution and should include a
+	Signed-off-by: line.  The current version of this "Developer's
+	Certificate of Origin" (DCO) is listed at
+	https://www.coreboot.org/Development_Guidelines#Sign-off_Procedure.
+
+4.	Make sure you have the right to send any changes you make. If you
+	do changes at work you may find your employer owns the patch
+	not you.
+
+5.	Happy hacking.
+
+Descriptions of section entries:
+
+	M: Maintainer: FullName <address@domain>
+	   Must be registered to Gerrit (https://review.coreboot.org/).
+	   Should have experience with upstream coreboot development and
+	   +2 rights.
+	R: Designated reviewer: FullName <address@domain>
+	   These reviewers should be CCed on patches.
+	L: Mailing list that is relevant to this area
+	W: Web-page with status/info
+	Q: Patchwork web based patch tracking system site
+	T: SCM tree type and location.
+	   Type is one of: git, hg, quilt, stgit, topgit
+	S: Status, one of the following:
+	   Supported:	Someone is continuously paid to look after this and
+			a reaction to review requests can be expected
+			within a few days, a month at most.
+	   Maintained:	Someone actually looks after it and a reaction to
+			review requests can usually be expected within a
+			few weeks.
+	   Odd Fixes:	It has a maintainer but they don't have time to do
+			much other than throw the odd patch in. See below..
+	   Orphan:	No current maintainer [but maybe you could take the
+			role as you write your new code].
+	   Obsolete:	Old code. Something tagged obsolete generally means
+			it has been replaced by a better system and you
+			should be using that.
+	F: Files and directories with wildcard patterns.
+	   A trailing slash includes all files and subdirectory files.
+	   F:	drivers/net/	all files in and below drivers/net
+	   F:	drivers/net/*	all files in drivers/net, but not below
+	   F:	*/net/*		all files in "any top level directory"/net
+	   One pattern per line.  Multiple F: lines acceptable.
+	N: Files and directories with regex patterns.
+	   N:	[^a-z]tegra	all files whose path contains the word tegra
+	   One pattern per line.  Multiple N: lines acceptable.
+	   scripts/get_maintainer.pl has different behavior for files that
+	   match F: pattern and matches of N: patterns.  By default,
+	   get_maintainer will not look at git log history when an F: pattern
+	   match occurs.  When an N: match occurs, git log history is used
+	   to also notify the people that have git commit signatures.
+	X: Files and directories that are NOT maintained, same rules as F:
+	   Files exclusions are tested before file matches.
+	   Can be useful for excluding a specific subdirectory, for instance:
+	   F:	net/
+	   X:	net/ipv6/
+	   matches all files in and below net excluding net/ipv6/
+	K: Keyword perl extended regex pattern to match content in a
+	   patch or file.  For instance:
+	   K: of_get_profile
+	      matches patches or files that contain "of_get_profile"
+	   K: \b(printk|pr_(info|err))\b
+	      matches patches or files that contain one or more of the words
+	      printk, pr_info or pr_err
+	   One regex pattern per line.  Multiple K: lines acceptable.
+
+Note: For the hard of thinking, this list is meant to remain in alphabetical
+order. If you could add yourselves to it in alphabetical order that would be
+so much easier [Ed]
+
+Maintainers List (try to look for most precise areas first)
+
+		-----------------------------------
+
+################################################################################
+# Mainboards
+################################################################################
+
+51NB MAINBOARDS
+S:	Orphan
+F:	src/mainboard/51nb/
+
+
+
+ACER G43T-AM3
+R:	Julia Kittlinger <julia.kittlinger@pm.me>
+S:	Orphan
+F:	src/mainboard/acer/g43t-am3/
+
+ACER MAINBOARDS
+S:	Orphan
+F:	src/mainboard/acer/
+
+
+
+AMD non-server family 17h and 19h reference boards
+M:	Felix Held <felix-coreboot@felixheld.de>
+M:	Jason Glenesk <jason.glenesk@gmail.com>
+M:	Fred Reitberger <reitbergerfred@gmail.com>
+L:	amd_coreboot_org_changes@googlegroups.com
+S:	Maintained
+F:	src/mainboard/amd/bilby/
+F:	src/mainboard/amd/birman/
+F:	src/mainboard/amd/chausie/
+F:	src/mainboard/amd/majolica/
+F:	src/mainboard/amd/mandolin/
+F:	src/mainboard/amd/mayan/
+
+AMD server family 19h reference boards
+M:	Felix Held <felix-coreboot@felixheld.de>
+M:	Martin Roth <gaumless@gmail.com>
+M:	Varshit Pandya <pandyavarshit@gmail.com>
+S:	Maintained
+F:	src/mainboard/amd/onyx_poc/
+
+AMD reference boards outside of family 17h and 19h
+S:	Odd Fixes
+L:	amd_coreboot_org_changes@googlegroups.com
+F:	src/mainboard/amd/gardenia/
+F:	src/mainboard/amd/pademelon/
+
+
+
+AOPEN MAINBOARDS
+S:	Orphan
+F:	src/mainboard/aopen/
+
+
+
+APPLE MAINBOARDS
+M:	Evgeny Zinoviev <me@ch1p.io>
+S:	Maintained
+F:	src/mainboard/apple/
+
+
+
+ASROCK B75M-ITX MAINBOARD
+M:	Kevin Keijzer <kevin@quietlife.nl>
+S:	Maintained
+F:	src/mainboard/asrock/b75m-itx/
+
+ASROCK B85M PRO4 MAINBOARD
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/mainboard/asrock/b85m_pro4/
+
+ASROCK G41C-GS MAINBOARD & VARIANTS
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/mainboard/asrock/g41c-gs/
+
+ASROCK IMB-1222 MAINBOARD
+M:	Maxim Polyakov <max.senia.poliak@gmail.com>
+S:	Maintained
+F:	src/mainboard/asrock/imb-1222/
+
+ASROCK Z97 EXTREME6 MAINBOARD
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/mainboard/asrock/z97_extreme6/
+
+
+
+ASUS A88XM-E MAINBOARD
+M:	Mike Banon <mikebdp2@gmail.com>
+S:	Maintained
+F:	src/mainboard/asus/a88xm-e/
+
+ASUS AM1I-A MAINBOARD
+M:	Mike Banon <mikebdp2@gmail.com>
+S:	Maintained
+F:	src/mainboard/asus/am1i-a/
+
+ASUS H61 SERIES MAINBOARDS
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/mainboard/asus/h61-series/
+
+ASUS P5QC PRO MAINBOARD & VARIANTS
+M:	Angel Pons <th3fanbus@gmail.com>
+R:	Stefan Ott <coreboot@desire.ch>
+S:	Maintained
+F:	src/mainboard/asus/p5qc/
+
+ASUS P5QPL-AM MAINBOARD & VARIANTS
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/mainboard/asus/p5qpl-am/
+
+ASUS P8Z77 SERIES MAINBOARDS
+M:	Angel Pons <th3fanbus@gmail.com>
+M:	Vlado Cibic <vladocb@protonmail.com>
+S:	Maintained
+F:	src/mainboard/asus/p8z77-series/
+
+
+
+BIOSTAR MAINBOARDS
+S:	Orphan
+F:	src/mainboard/biostar/
+
+
+
+BOSTENTECH MAINBOARDS
+S:	Orphan
+F:	src/mainboard/bostentech/
+
+
+
+CAVIUM MAINBOARDS
+S:	Orphan
+F:	src/mainboard/cavium/
+
+
+
+CLEVO MAINBOARDS
+M:	Felix Singer <felixsinger@posteo.net>
+M:	Michael Niewöhner <foss@mniewoehner.de>
+S:	Supported
+F:	src/mainboard/clevo/
+
+
+
+COMPULAB MAINBOARDS
+S:	Orphan
+F:	src/mainboard/compulab/
+
+
+
+DELL MAINBOARDS
+S:	Orphan
+F:	src/mainboard/dell/
+
+DELL LATITUDE MAINBOARDS
+M:	Nicholas Chin <nic.c3.14@gmail.com>
+S:	Maintained
+F:	src/mainboard/dell/e6400/
+F:	src/mainboard/dell/snb_ivb_latitude/
+F:	src/mainboard/dell/e7240/
+
+
+EMULATION MAINBOARDS
+S:	Orphan
+F:	src/mainboard/emulation/
+
+ERYING MAINBOARDS
+M:	Alicja Michalska <ahplka19@gmail.com>
+S:	Maintained
+F:	src/mainboard/erying/
+
+EXAMPLE MAINBOARDS
+S:	Orphan
+F:	src/mainboard/example/
+
+
+
+FACEBOOK FBG1701 MAINBOARD
+M:	Frans Hendriks <fhendriks@eltan.com>
+M:	Erik van den Bogaert <ebogaert@eltan.com>
+S:	Maintained
+F:	src/mainboard/facebook/fbg1701/
+
+FACEBOOK MONOLITH MAINBOARD
+M:	Frans Hendriks <fhendriks@eltan.com>
+M:	Erik van den Bogaert <ebogaert@eltan.com>
+S:	Maintained
+F:	src/mainboard/facebook/monolith/
+
+
+
+FOXCONN MAINBOARDS
+S:	Orphan
+F:	src/mainboard/foxconn/
+
+
+
+GETAC MAINBOARDS
+S:	Orphan
+F:	src/mainboard/getac/
+
+
+
+GIGABYTE GA-D510UD MAINBOARD
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/mainboard/gigabyte/ga-d510ud/
+
+GIGABYTE GA-H61M SERIES MAINBOARDS
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/mainboard/gigabyte/ga-h61m-series/
+
+
+
+GOOGLE REX MAINBOARDS
+M:	Subrata Banik <subratabanik@google.com>
+M:	Tarun Tuli <tstuli@gmail.com>
+M:	Kapil Porwal <kapilporwal@google.com>
+M:	Jakub Czapiga <czapiga@google.com>
+M:	Eran Mitrani <mitrani@google.com>
+M:	Dinesh Gehlot <digehlot@google.com>
+S:	Maintained
+F:	src/mainboard/google/rex/
+
+GOOGLE BRYA MAINBOARDS
+M:	Subrata Banik <subratabanik@google.com>
+M:	Nick Vaccaro <nvaccaro@chromium.org>
+M:	Eric Lai <ericllai@google.com>
+M:	Kapil Porwal <kapilporwal@google.com>
+M:	Dinesh Gehlot <digehlot@google.com>
+M:	Jayvik Desai <jayvik@google.com>
+S:	Maintained
+F:	src/mainboard/google/brya/
+
+GOOGLE FATCAT MAINBOARDS
+M:	Subrata Banik <subratabanik@google.com>
+M:	Kapil Porwal <kapilporwal@google.com>
+M:	Pranava Y N <pranavayn@google.com>
+M:	Jayvik Desai <jayvik@google.com>
+F:	src/mainboard/google/fatcat/
+
+GOOGLE HATCH MAINBOARDS
+M:	Subrata Banik <subratabanik@google.com>
+M:	Nick Vaccaro <nvaccaro@chromium.org>
+S:	Maintained
+F:	src/mainboard/google/hatch/
+
+GOOGLE VOLTEER MAINBOARDS
+M:	Nick Vaccaro <nvaccaro@chromium.org>
+S:	Maintained
+F:	src/mainboard/google/volteer/
+
+GOOGLE MAINBOARDS (Intel-based, legacy/inactive)
+M:	Matt DeVillier <MrChromebox@gmail.com>
+S:	Maintained
+F:	src/mainboard/google/auron/
+F:	src/mainboard/google/beltino/
+F:	src/mainboard/google/butterfly/
+F:	src/mainboard/google/cyan/
+F:	src/mainboard/google/glados/
+F:	src/mainboard/google/jecht/
+F:	src/mainboard/google/link/
+F:	src/mainboard/google/parrot/
+F:	src/mainboard/google/slippy/
+F:	src/mainboard/google/stout/
+
+GOOGLE AMD-BASED MAINBOARDS
+M:	Martin Roth <martin.roth@amd.corp-partner.google.com>
+M:	Jason Nien <jason.nien@amd.corp-partner.google.com>
+L:	amd_coreboot_org_changes@googlegroups.com
+S:	Supported
+F:	src/mainboard/google/kahlee/
+F:	src/mainboard/google/zork/
+F:	src/mainboard/google/guybrush/
+F:	src/mainboard/google/skyrim/
+
+GOOGLE MEDIATEK-BASED MAINBOARDS
+M:	Hung-Te Lin <hungte@chromium.org>
+M:	Yu-Ping Wu <yupingso@google.com>
+M:	Yidi Lin <yidilin@google.com>
+S:	Supported
+F:	src/mainboard/google/asurada/
+F:	src/mainboard/google/cherry/
+F:	src/mainboard/google/corsola/
+F:	src/mainboard/google/geralt/
+F:	src/mainboard/google/kukui/
+F:	src/mainboard/google/oak/
+F:	src/mainboard/google/rauru/
+
+
+
+HP 280 G2 MAINBOARD
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/mainboard/hp/280_g2/
+
+
+
+IBASE MAINBOARDS
+S:	Orphan
+F:	src/mainboard/ibase/
+
+
+INTEL FROST_CREEK_CRB MAINBOARD
+M:	Yuchi Chen <yuchi.chen@intel.com>
+S:	Supported
+F:	src/mainboard/intel/frost_creek/
+
+INTEL HARCUVAR_CRB MAINBOARD
+M:	Jeff Daly <jeffd@silicom-usa.com>
+M:	Vanessa Eusebio <vanessa.f.eusebio@intel.com>
+S:	Maintained
+F:	src/mainboard/intel/harcuvar/
+
+
+
+INVENTEC MAINBOARDS
+M:	Annie Chen <Chen.AnnieET@inventec.com>
+S:	Maintained
+F:	src/mainboard/inventec/
+
+
+
+KONTRON BSL6 MAINBOARD
+M:	Felix Singer <felixsinger@posteo.net>
+M:	Nico Huber <nico.h@gmx.de>
+S:	Supported
+F:	src/mainboard/kontron/bsl6/
+
+KONTRON MAL10 MAINBOARD
+M:	Maxim Polyakov <max.senia.poliak@gmail.com>
+M:	Nico Huber <nico.h@gmx.de>
+M:	Felix Singer <felixsinger@posteo.net>
+S:	Supported
+F:	src/mainboard/kontron/mal10/
+
+
+
+LENOVO MAINBOARDS
+M:	Alexander Couzens <lynxis@fe80.eu>
+S:	Maintained
+F:	src/mainboard/lenovo/
+
+LENOVO G505S MAINBOARD
+M:	Mike Banon <mikebdp2@gmail.com>
+S:	Maintained
+F:	src/mainboard/lenovo/g505s/
+
+LENOVO X200 MAINBOARD
+R:	Stefan Ott <coreboot@desire.ch>
+S:	Maintained
+F:	src/mainboard/lenovo/x200/
+
+LENOVO X201 MAINBOARD
+R:	Stefan Ott <coreboot@desire.ch>
+S:	Maintained
+F:	src/mainboard/lenovo/x201/
+
+
+
+LIBRETREND LT1000 MAINBOARD
+M:	Piotr Król <piotr.krol@3mdeb.com>
+M:	Michał Żygowski <michal.zygowski@3mdeb.com>
+S:	Maintained
+F:	src/mainboard/libretrend/lt1000/
+
+
+
+MSI H81M-P33 MAINBOARD
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/mainboard/msi/h81m-p33/
+
+MSI MS-7D25 MAINBOARDS
+M:	Michał Żygowski <michal.zygowski@3mdeb.com>
+M:	Michał Kopeć <michal.kopec@3mdeb.com>
+S:	Maintained
+F:	src/mainboard/msi/ms7d25/
+
+
+
+OCP DELTALAKE MAINBOARD
+M:	Arthur Heymans <arthur@aheymans.xyz>
+M:	Christian Walter <christian.walter@9elements.com>
+M:	Johnny Lin <Johnny_Lin@wiwynn.com>
+M:	Jonathan Zhang <jonzhang@fb.com>
+M:	Tim Chu <Tim.Chu@quantatw.com>
+S:	Supported
+F:	src/mainboard/ocp/deltalake/
+
+OCP TIOGAPASS MAINBOARD
+M:	Jonathan Zhang <jonzhang@fb.com>
+M:	Johnny Lin <Johnny_Lin@wiwynn.com>
+M:	Morgan Jang <Morgan_Jang@wiwynn.com>
+M:	Ryback Hung <<Ryback.Hung@quantatw.com>
+M:	Bryant Ou <Bryant.Ou@quantatw.com>
+S:	Maintained
+F:	src/mainboard/ocp/tiogapass/
+
+
+
+OPENCELLULAR MAINBOARDS
+M:	Christian Walter <christian.walter@9elements.com>
+M:	Patrick Rudolph <patrick.rudolph@9elements.com>
+S:	Supported
+F:	src/mainboard/opencellular/elgon/
+
+
+
+PC ENGINES ALL MAINBOARDS
+M:	Piotr Król <piotr.krol@3mdeb.com>
+M:	Michał Żygowski <michal.zygowski@3mdeb.com>
+S:	Supported
+F:	src/mainboard/pcengines/
+
+
+
+PINE64 MAINBOARDS
+S:	Orphan
+F:	src/mainboard/pine64/
+
+
+
+PORTWELL PQ-M107 MAINBOARD
+M:	Frans Hendriks <fhendriks@eltan.com>
+M:	Erik van den Bogaert <ebogaert@eltan.com>
+S:	Maintained
+F:	src/mainboard/portwell/m107/
+
+
+
+PROTECTLI ALL MAINBOARDS
+M:	Piotr Król <piotr.krol@3mdeb.com>
+M:	Michał Żygowski <michal.zygowski@3mdeb.com>
+S:	Maintained
+F:	src/mainboard/protectli/
+
+
+
+PRODRIVE ATLAS MAINBOARD
+M:	Angel Pons <th3fanbus@gmail.com>
+M:	Christian Walter <christian.walter@9elements.com>
+M:	Lean Sheng Tan <sheng.tan@9elements.com>
+S:	Supported
+F:	src/mainboard/prodrive/atlas/
+
+PRODRIVE HERMES MAINBOARD
+M:	Angel Pons <th3fanbus@gmail.com>
+M:	Christian Walter <christian.walter@9elements.com>
+M:	Patrick Rudolph <patrick.rudolph@9elements.com>
+S:	Supported
+F:	src/mainboard/prodrive/hermes/
+
+
+
+PURISM MAINBOARDS
+M:	Jonathon Hall <jonathon.hall@puri.sm>
+S:	Supported
+F:	src/mainboard/purism/
+
+
+
+RAZER MAINBOARDS
+S:	Orphan
+F:	src/mainboard/razer/
+
+
+
+RODA MAINBOARDS
+S:	Orphan
+F:	src/mainboard/roda/
+
+
+
+SAMSUNG CHROMEOS MAINBOARDS
+M:	Matt DeVillier <MrChromebox@gmail.com>
+S:	Maintained
+F:	src/mainboard/samsung/lumpy/
+F:	src/mainboard/samsung/stumpy/
+
+
+
+SAPPHIRE MAINBOARDS
+S:	Orphan
+F:	src/mainboard/sapphire/
+
+
+
+SIEMENS CHILI MAINBAORD
+M:	Felix Singer <felixsinger@posteo.net>
+M:	Nico Huber <nico.h@gmx.de>
+S:	Supported
+F:	src/mainboard/siemens/chili/
+
+SIEMENS MC_xxxx MAINBOARDS
+M:	Werner Zeh <werner.zeh@siemens.com>
+S:	Maintained
+F:	src/mainboard/siemens/mc_apl1/
+F:	src/mainboard/siemens/mc_ehl/
+
+
+
+SIFIVE MAINBOARDS
+M:	Maximilian Brune <maximilian.brune@9elements.com>
+S:	Maintained
+F:	src/mainboard/sifive/
+
+
+
+STAR LABS MAINBOARDS
+M:	Sean Rhodes <sean@starlabs.systems>
+S:	Maintained
+F:	src/mainboard/starlabs/
+
+
+
+SUPERMICRO X11-LGA1151-SERIES
+M:	Michael Niewöhner <foss@mniewoehner.de>
+S:	Maintained
+F:	src/mainboard/supermicro/x11-lga1151-series/
+
+
+
+SYSTEM76 MAINBOARDS
+M:	Jeremy Soller <jeremy@system76.com>
+M:	Tim Crawford <tcrawford@system76.com>
+S:	Maintained
+F:	src/mainboard/system76/
+
+
+
+TI MAINBOARDS
+S:	Orphan
+F:	src/mainboard/ti/
+
+
+TOPTON MAINBOARDS
+M:	Alicja Michalska <ahplka19@gmail.com>
+S:	Maintained
+F:	src/mainboard/topton/
+
+
+
+UP MAINBOARDS
+S:	Orphan
+F:	src/mainboard/up/
+
+################################################################################
+# Architectures
+################################################################################
+
+ARM ARCHITECTURE
+M:	Julius Werner <jwerner@chromium.org>
+S:	Supported
+F:	src/arch/arm/
+F:	src/arch/arm64/
+F:	src/soc/nvidia/
+F:	src/soc/rockchip/
+F:	util/nvidia/
+F:	util/rockchip/
+
+PPC64 ARCHITECTURE
+M:	Ronald Minnich <rminnich@gmail.com>
+M:	Timothy Pearson <tpearson@raptorengineeringinc.com>
+S:	Maintained
+F:	src/arch/ppc64/
+F:	src/cpu/qemu-power8/
+F:	src/mainboard/emulation/qemu-power8/
+
+RISC-V ARCHITECTURE
+M:	Ronald Minnich <rminnich@gmail.com>
+M:	Maximilian Brune <maximilian.brune@9elements.com>
+R:	Philipp Hug <philipp@hug.cx>
+S:	Maintained
+F:	src/arch/riscv/
+F:	src/soc/sifive/
+F:	src/soc/ucb/
+F:	src/mainboard/emulation/*-riscv/
+F:	src/mainboard/sifive/
+F:	util/riscv/
+
+X86 ARCHITECTURE
+M:	Jérémy Compostella <jeremy.compostella@intel.com>
+S:	MAINTAINED
+F:	src/arch/x86/
+F:	src/cpu/x86/
+F:	src/drivers/pc80/
+F:	src/include/pc80/
+F:	src/include/cpu/x86/
+
+################################################################################
+# Embedded Controllers
+################################################################################
+
+CHROME EC
+M:	Boris Mittelberg <bmbm@google.com>
+M:	Caveh Jalali <caveh@chromium.org>
+S:	Maintained
+F:	src/ec/google/
+
+DELL SMSC MEC5035 EC
+M:	Nicholas Chin <nic.c3.14@gmail.com>
+W:	https://github.com/nic3-14159/E6400-EC-research
+S:	Maintained
+F:	src/ec/dell/mec5035/
+
+LENOVO EC
+M:	Alexander Couzens <lynxis@fe80.eu>
+S:	Maintained
+F:	src/ec/lenovo/
+
+STARLABS EC
+M:	Sean Rhodes <sean@starlabs.systems>
+S:	Maintained
+F:	src/ec/starlabs/
+
+SYSTEM76 EC
+M:	Jeremy Soller <jeremy@system76.com>
+M:	Tim Crawford <tcrawford@system76.com>
+S:	Maintained
+F:	src/ec/system76/
+
+ORPHANED ECS
+S:	Orphan
+F:	src/ec/51nb/
+F:	src/ec/acpi/
+F:	src/ec/apple/
+F:	src/ec/compal/
+F:	src/ec/hp/
+F:	src/ec/kontron/
+F:	src/ec/purism/
+F:	src/ec/quanta/
+F:	src/ec/roda/
+F:	src/ec/smsc/
+
+################################################################################
+# Northbridges
+################################################################################
+
+INTEL HASWELL NORTHBRIDGE
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/northbridge/intel/haswell/
+
+INTEL PINEVIEW CHIPSET
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Odd Fixes
+F:	src/northbridge/intel/pineview/
+
+INTEL SANDYBRIDGE NORTHBRIDGE
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Maintained
+F:	src/northbridge/intel/sandybridge/
+
+INTEL X4X CHIPSET
+M:	Angel Pons <th3fanbus@gmail.com>
+S:	Odd Fixes
+F:	src/northbridge/intel/x4x/
+
+################################################################################
+# Platforms
+################################################################################
+
+AMD SUPPORT
+L:	amd_coreboot_org_changes@googlegroups.com
+S:	Odd Fixes
+F:	src/vendorcode/amd/
+F:	src/cpu/amd/
+F:	src/northbridge/amd/
+F:	src/southbridge/amd/
+F:	src/include/cpu/amd/
+
+INTEL SUPPORT
+R:	Intel_Coreboot_Reviewers <intel_coreboot_reviewers@intel.com>
+S:	Maintained
+F:	src/vendorcode/intel/
+F:	src/cpu/intel/
+F:	src/northbridge/intel/
+F:	src/southbridge/intel/
+F:	src/soc/intel/
+F:	src/drivers/intel/
+F:	src/include/cpu/intel/
+
+INTEL FSP 1.1
+M:	Huang Jin <huang.jin@intel.com>
+S:	Supported
+F:	src/drivers/intel/fsp1_1/
+
+INTEL FSP 2.0
+M:	Andrey Petrov <andrey.petrov@gmail.com>
+M:	Ronak Kanabar <ronak.kanabar@intel.com>
+S:	Maintained
+F:	src/drivers/intel/fsp2_0/
+
+INTEL DPTF
+M:	Sumeet Pawnikar <sumeet.r.pawnikar@intel.com>
+S:	Maintained
+F:	src/drivers/intel/dptf/
+
+################################################################################
+# Systems on a Chip
+################################################################################
+
+AMD Cezanne
+M:	Felix Held <felix-coreboot@felixheld.de>
+M:	Jason Glenesk <jason.glenesk@gmail.com>
+M:	Fred Reitberger <reitbergerfred@gmail.com>
+M:	Matt DeVillier <matt.devillier@amd.corp-partner.google.com>
+L:	amd_coreboot_org_changes@googlegroups.com
+S:	Maintained
+F:	src/soc/amd/cezanne/
+F:	src/vendorcode/amd/fsp/cezanne/
+
+AMD common SoC code
+M:	Felix Held <felix-coreboot@felixheld.de>
+M:	Jason Glenesk <jason.glenesk@gmail.com>
+M:	Fred Reitberger <reitbergerfred@gmail.com>
+M:	Matt DeVillier <matt.devillier@amd.corp-partner.google.com>
+L:	amd_coreboot_org_changes@googlegroups.com
+S:	Maintained
+F:	src/soc/amd/common/
+
+AMD Genoa Proof of Concept
+M:	Felix Held <felix-coreboot@felixheld.de>
+M:	Martin Roth <gaumless@gmail.com>
+M:	Varshit Pandya <pandyavarshit@gmail.com>
+S:	Maintained
+F:	src/soc/amd/genoa_poc/
+
+AMD Mendocino
+M:	Felix Held <felix-coreboot@felixheld.de>
+M:	Jason Glenesk <jason.glenesk@gmail.com>
+M:	Fred Reitberger <reitbergerfred@gmail.com>
+M:	Matt DeVillier <matt.devillier@amd.corp-partner.google.com>
+L:	amd_coreboot_org_changes@googlegroups.com
+S:	Supported
+F:	src/soc/amd/mendocino/
+F:	src/vendorcode/amd/fsp/mendocino/
+
+AMD Picasso
+M:	Felix Held <felix-coreboot@felixheld.de>
+M:	Jason Glenesk <jason.glenesk@gmail.com>
+M:	Fred Reitberger <reitbergerfred@gmail.com>
+M:	Matt DeVillier <matt.devillier@amd.corp-partner.google.com>
+L:	amd_coreboot_org_changes@googlegroups.com
+S:	Maintained
+F:	src/soc/amd/picasso/
+F:	src/vendorcode/amd/fsp/picasso/
+
+AMD Phoenix
+M:	Felix Held <felix-coreboot@felixheld.de>
+M:	Jason Glenesk <jason.glenesk@gmail.com>
+M:	Fred Reitberger <reitbergerfred@gmail.com>
+M:	Matt DeVillier <matt.devillier@amd.corp-partner.google.com>
+L:	amd_coreboot_org_changes@googlegroups.com
+S:	Supported
+F:	src/soc/amd/phoenix/
+F:	src/vendorcode/amd/fsp/phoenix/
+
+AMD Stoneyridge
+M:	Felix Held <felix-coreboot@felixheld.de>
+M:	Matt DeVillier <matt.devillier@amd.corp-partner.google.com>
+L:	amd_coreboot_org_changes@googlegroups.com
+S:	Odd Fixes
+F:	src/soc/amd/stoneyridge/
+
+INTEL ALDERLAKE SOC
+M:	Subrata Banik <subratabanik@google.com>
+M:	Nick Vaccaro <nvaccaro@chromium.org>
+M:	Kapil Porwal <kapilporwal@google.com>
+M:	Dinesh Gehlot <digehlot@google.com>
+M:	Jayvik Desai <jayvik@google.com>
+S:	Maintained
+F:	src/soc/intel/alderlake/
+
+INTEL APOLLOLAKE_SOC
+M:	Sean Rhodes <sean@starlabs.systems>
+S:	Odd Fixes
+F:	src/soc/intel/apollolake/
+
+INTEL BRASWELL SOC
+M:	Piotr Król <piotr.krol@3mdeb.com>
+M:	Michał Żygowski <michal.zygowski@3mdeb.com>
+M:	Frans Hendriks <fhendriks@eltan.com>
+S:	Maintained
+F:	/src/soc/intel/braswell/
+F:	/src/vendorcode/intel/fsp/fsp1_1/braswell/
+
+INTEL CANNONLAKE SOC
+S:	Orphan
+F:	src/soc/intel/cannonlake/
+
+INTEL DENVERTON-NS SOC
+M:	Jeff Daly <jeffd@silicom-usa.com>
+M:	Vanessa Eusebio <vanessa.f.eusebio@intel.com>
+S:	Maintained
+F:	src/soc/intel/denverton_ns/
+
+INTEL ELKHARTLAKE SOC
+M:	Lean Sheng Tan <sheng.tan@9elements.com>
+M:	Werner Zeh <werner.zeh@siemens.com>
+S:	Maintained
+F:	src/soc/intel/elkhartlake/
+
+INTEL METEORLAKE SOC
+M:	Subrata Banik <subratabanik@google.com>
+M:	Tarun Tuli <tstuli@gmail.com>
+M:	Kapil Porwal <kapilporwal@google.com>
+M:	Jakub Czapiga <czapiga@google.com>
+M:	Eran Mitrani <mitrani@google.com>
+M:	Dinesh Gehlot <digehlot@google.com>
+S:	Maintained
+F:	src/soc/intel/meteorlake/
+
+INTEL PANTHERLAKE SOC
+M:	Subrata Banik <subratabanik@google.com>
+M:	Kapil Porwal <kapilporwal@google.com>
+M:	Pranava Y N <pranavayn@google.com>
+M:	Jayvik Desai <jayvik@google.com>
+S:	Maintained
+F:	src/soc/intel/pantherlake/
+
+INTEL TIGERLAKE SOC
+M:	Subrata Banik <subratabanik@google.com>
+M:	Nick Vaccaro <nvaccaro@chromium.org>
+S:	Maintained
+F:	src/soc/intel/tigerlake/
+
+INTEL Atom Snow Ridge SoC
+M:	Yuchi Chen <yuchi.chen@intel.com>
+M:	Vasiliy Khoruzhick <vasilykh@arista.com>
+S:	Maintained
+F:	src/soc/intel/common/block/imc/
+F:	src/soc/intel/common/block/systemagent-server/
+F:	src/soc/intel/snowridge/
+F:	src/vendorcode/intel/fsp/fsp2_0/snowridge/
+
+INTEL Xeon Scalable Processor Family
+M:	Jonathan Zhang <jon.zhixiong.zhang@gmail.com>
+M:	Johnny Lin <Johnny_Lin@wiwynn.com>
+M:	Tim Chu <Tim.Chu@quantatw.com>
+M:	Christian Walter <christian.walter@9elements.com>
+M:	Shuo Liu <shuo.liu@intel.com>
+M:	Patrick Rudolph <patrick.rudolph@9elements.com>
+M:	Lean Sheng Tan <sheng.tan@9elements.com>
+S:	Supported
+F:	src/soc/intel/xeon_sp/
+F:	src/vendorcode/intel/fsp/fsp2_0/skylake_sp/
+F:	src/vendorcode/intel/fsp/fsp2_0/copperlake_sp/
+F:	src/vendorcode/intel/fsp/fsp2_0/sapphirerapids_sp/
+F:	src/vendorcode/intel/fsp/fsp2_0/graniterapids/
+
+MEDIATEK SOCS
+M:	Hung-Te Lin <hungte@chromium.org>
+M:	Yu-Ping Wu <yupingso@google.com>
+M:	Yidi Lin <yidilin@google.com>
+S:	Supported
+F:	src/soc/mediatek/
+
+MEDIATEK MT8192
+M:	Xi Chen <xixi.chen@mediatek.com>
+S:	Maintained
+F:	src/soc/mediatek/mt8192/
+F:	src/vendorcode/mediatek/mt8192/
+
+ORPHANED ARM SOCS
+S:	Orphan
+F:	src/cpu/armltd/
+F:	src/soc/ti/
+F:	src/soc/qualcomm/
+F:	src/soc/samsung/
+F:	util/exynos/
+F:	util/ipqheader/
+
+################################################################################
+# Payloads
+################################################################################
+
+NVRAM
+F:	util/nvramtool/
+F:	payloads/nvramcui/
+
+LIBPAYLOAD
+F:	payloads/libpayload/
+
+COREINFO PAYLOAD
+F:	payloads/coreinfo/
+
+EXTERNAL PAYLOADS INTEGRATION
+M:	Martin Roth <gaumless@gmail.com>
+F:	payloads/external/
+
+COREDOOM PAYLOAD INTEGRATION
+M:	Nicholas Chin <nic.c3.14@gmail.com>
+W:	https://github.com/nic3-14159/coreDOOM
+S:	Maintained
+F:	payloads/external/coreDOOM/
+
+LINUXBOOT PAYLOAD INTEGRATION
+M:	Christian Walter <christian.walter@9elements.com>
+M:	Marcello Sylvester Bauer <info@marcellobauer.com>
+S:	Supported
+F:	payloads/external/LinuxBoot/
+
+EDK2 PAYLOAD INTEGRATION
+M:	Benjamin Doron <benjamin.doron00@gmail.com>
+M:	Matt DeVillier <matt.devillier@gmail.com>
+M:	Sean Rhodes <sean@starlabs.systems>
+M:	Lean Sheng Tan <sheng.tan@9elements.com>
+S:	Supported
+F:	payloads/external/edk2/
+
+################################################################################
+# Utilities
+################################################################################
+
+ABUILD
+M:	Martin Roth <gaumless@gmail.com>
+S:	Supported
+F:	util/abuild/
+
+BOARD STATUS
+F:	util/board_status/
+
+BUILD SYSTEM
+M:	Martin Roth <gaumless@gmail.com>
+S:	Supported
+F:	Makefile
+F:	*.inc
+F:	src/include/kconfig.h
+F:	util/kconfig/
+F:	util/sconfig/
+F:	util/xcompile/
+F:	util/genbuild_h/
+
+TOOLCHAIN
+M:	Martin Roth <gaumless@gmail.com>
+M:	Felix Singer <felixsinger@posteo.net>
+S:	Supported
+F:	util/crossgcc/
+
+DOCKER
+M:	Martin Roth <gaumless@gmail.com>
+M:	Felix Singer <felixsinger@posteo.net>
+S:	Supported
+F:	util/docker/
+
+GIT
+F:	.git*
+F:	/util/gitconfig
+
+HDA DECODER
+M:	Nicholas Sudsgaard <devel+coreboot@nsudsgaard.com>
+S:	Maintained
+F:	util/hda-decoder/
+
+LINT SCRIPTS
+M:	Martin Roth <gaumless@gmail.com>
+S:	Supported
+F:	util/lint/
+
+IFDTOOL
+F:	util/ifdtool/
+
+INTELTOOL
+M:	Pratik Prajapati <pratikkumar.v.prajapati@intel.com>
+F:	util/inteltool/
+
+INTELMETOOL
+M:	Christian Walter <christian.walter@9elements.com>
+F:	util/intelmetool/
+
+INTELP2M
+M:	Maxim Polyakov <max.senia.poliak@gmail.com>
+S:	Maintained
+F:	util/intelp2m/
+
+ME_CLEANER
+M:	Nicola Corna <nicola@corna.info>
+W:	https://github.com/corna/me_cleaner
+S:	Maintained
+F:	util/me_cleaner/
+
+LIVEISO
+M:	Felix Singer <felixsinger@posteo.net>
+S:	Supported
+F:	util/liveiso/
+
+################################################################################
+# Miscellaneous
+################################################################################
+
+ASPEED AST2050 DRIVER & COMMON CODE
+M:	Timothy Pearson <tpearson@raptorengineeringinc.com>
+S:	Supported
+F:	src/drivers/aspeed/common/
+F:	src/drivers/aspeed/ast2050/
+
+ACPI
+R:	Cliff Huang <cliff.huang@intel.com>
+M:	Lance Zhao <lance.zhao@gmail.com>
+M:	Tim Wawrzynczak <inforichland@gmail.com>
+S:	Supported
+F:	src/acpi/
+F:	src/arch/x86/acpi/
+F:	util/acpi/
+
+LZ4 COMPRESSION
+M:	Julius Werner <jwerner@chromium.org>
+S:	Supported
+F:	src/commonlib/lz4*
+F:	payloads/libpayload/liblz4/
+F:	util/cbfstool/lz4/
+
+BINARY OBJECTS
+F:	3rdparty/blobs/
+
+VERIFIED BOOT
+M:	Julius Werner <jwerner@chromium.org>
+M:	Yu-Ping Wu <yupingso@google.com>
+S:	Supported
+F:	3rdparty/vboot/
+F:	src/security/vboot/
+F:	src/include/tpm.h
+F:	src/include/tpm_lite/
+
+RESOURCE ALLOCATOR
+F:	src/device/*
+F:	src/include/device/
+F:	src/include/cpu/cpu.h
+
+OPTION ROM EXECUTION & X86EMU
+F:	src/device/oprom/
+
+CBFS
+M:	Julius Werner <jwerner@chromium.org>
+F:	src/include/cbfs*
+F:	src/commonlib/bsd/include/commonlib/bsd/cbfs*
+F:	src/commonlib/bsd/cbfs*
+F:	src/lib/cbfs.c
+
+CBFSTOOL
+F:	util/cbfstool/
+
+CBMEM
+F:	src/include/cbmem.h
+F:	src/include/cbmem_id.h
+F:	util/cbmem/
+
+CONSOLE
+F:	src/console/
+F:	src/include/console/
+F:	src/drivers/uart/
+
+TPM SUPPORT
+M:	Christian Walter <christian.walter@9elements.com>
+S:	Supported
+F:	src/drivers/*/tpm/
+F:	src/security/tpm/
+
+SUPERIOS & SUPERIOTOOL
+S:	Orphan
+F:	src/superio/
+F:	util/superiotool/
+
+SPD UTILITIES
+M:	Reka Norman <rekanorman@chromium.org>
+S:	Maintained
+F:	util/spd_tools/
+F:	util/spdtool/
+
+MEMLAYOUT
+M:	Julius Werner <jwerner@chromium.org>
+S:	Supported
+F:	*/memlayout.h
+F:	*.ld
+
+ELTAN VENDORCODE
+M:	Frans Hendriks <fhendriks@eltan.com>
+M:	Erik van den Bogaert <ebogaert@eltan.com>
+S:	Maintained
+F:	src/vendorcode/eltan/
+
+TAS5825M DRIVER
+M:	Jeremy Soller <jeremy@system76.com>
+M:	Tim Crawford <tcrawford@system76.com>
+S:	Maintained
+F:	src/drivers/i2c/tas5825m/
+
+TESTS
+M:	Jakub Czapiga <czapiga@google.com>
+S:	Maintained
+F:	tests/
+F:	payloads/libpayload/tests/
+
+COREBOOT RELEASES
+M:	Felix Singer <felixsinger@posteo.net>
+M:	Jason Glenesk <jason.glenesk@gmail.com>
+M:	Angel Pons <th3fanbus@gmail.com>
+M:	Martin Roth <gaumless@gmail.com>
+M:	Matt DeVillier <MrChromebox@gmail.com>
+S:	Maintained
+F:	Documentation/releases/
+F:	util/release/
+
+MISSING: TIMERS / DELAYS
+
+MISSING: TIMESTAMPS
+
+MISSING: FMAP
+
+MISSING: GPIO
+
+MISSING: SMP
+
+MISSING: DMP / QEMU-X86
+
+MISSING: ELOG
+
+MISSING: SPI
+
+# *** Infrastructure Owners ***
+# This is intended to let people know who they should contact for issues with various infrastructure pieces.
+# Hardware
+#	Owners: Patrick
+#	Backups:
+
+# Web Server
+#	Owners: Patrick
+#	Backups:
+
+# Website
+#	Owners: Martin
+#	Backups: Patrick
+
+# Documentation Website
+#	Owners: Patrick
+#	Backups:
+
+CODE OF CONDUCT
+M:	Ronald Minnich <rminnich@gmail.com>
+M:	Martin Roth <martin@coreboot.org>
+S:	Maintained
+F:	Documentation/community/code_of_conduct.md
+
+# Wiki
+#	Owners: Patrick
+#	Backups:
+
+# Gerrit
+#	Owners: Patrick
+#	Backups: Martin
+
+# Jenkins
+#	Owners: Patrick, Martin
+#	Backups:
+
+# Bug Tracker
+#	Owners: Lynxis,
+#	Backups: Martin,
+
+# Mailing List
+#	Owners: Patrick
+#	Backups: Martin
+
+# Software Freedom Conservancy
+#	Main contact: Martin
+#	“Official” contact: David, Matt, Werner

@@ -1,0 +1,69 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if MEMTEST_SECONDARY_PAYLOAD
+
+comment "Memtest86+"
+
+choice
+	prompt "Memtest86+ 5/6"
+
+config MEMTEST86PLUS_V6
+	bool "Memtest86+ V6"
+
+config MEMTEST86PLUS_V5
+	bool "Memtest86+ V5"
+
+endchoice
+
+choice
+	prompt "Target architecture"
+	depends on MEMTEST86PLUS_V6
+
+config MEMTEST86PLUS_ARCH_64
+	bool "64 bit"
+
+config MEMTEST86PLUS_ARCH_32
+	bool "32 bit"
+
+endchoice
+
+choice
+	prompt "Memtest86+ revision"
+	depends on MEMTEST_SECONDARY_PAYLOAD
+
+config MEMTEST_STABLE
+	bool "Stable"
+	help
+	  Stable Memtest86+ version.
+
+	  For reproducible builds, this option must be selected.
+config MEMTEST_MAIN
+	bool "Main"
+	help
+	  Newest Memtest86+ version.
+
+	  This option will fetch the newest version of the Memtest86+ code,
+	  updating as new changes are committed.  This makes the build
+	  non-reproducible, as it can fetch different code each time.
+
+config MEMTEST_REVISION
+	bool "git revision"
+	help
+	  Select this option if you have a specific commit or branch
+	  that you want to use as the revision from which to
+	  build Memtest86+. Using a branch version makes the build
+	  non-reproducible, as it can fetch different code each time.
+
+	  You will be able to specify the name of a branch or a commit id
+	  later.
+
+endchoice
+
+config MEMTEST_REVISION_ID
+	string "Insert a commit's SHA-1 or a branch name"
+	depends on MEMTEST_REVISION
+	default "origin/main"
+	help
+	   The commit's SHA-1 or branch name of the revision to use.
+
+endif

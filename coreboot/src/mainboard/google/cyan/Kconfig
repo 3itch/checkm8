@@ -1,0 +1,120 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_BASEBOARD_CYAN
+	def_bool n
+	select ACPI_GNVS_USB_CHARGECTL
+	select BOARD_ROMSIZE_KB_8192
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_BOARDID
+	select EC_GOOGLE_CHROMEEC_LPC
+	select EC_GOOGLE_CHROMEEC_MEC
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select HAVE_SPD_IN_CBFS
+	select INTEL_GMA_HAVE_VBT
+	select MAINBOARD_HAS_CHROMEOS
+	select MEMORY_MAPPED_TPM
+	select MAINBOARD_HAS_TPM1
+	select PCIEXP_L1_SUB_STATE if !BOARD_GOOGLE_CYAN
+	select SOC_INTEL_BRASWELL
+	select SYSTEM_TYPE_LAPTOP
+	select USE_GOOGLE_FSP
+
+config BOARD_GOOGLE_BANON
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_CELES
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_CYAN
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_EDGAR
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_KEFKA
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_REKS
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_RELM
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_SETZER
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_TERRA
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_ULTIMA
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+config BOARD_GOOGLE_WIZPIG
+	select BOARD_GOOGLE_BASEBOARD_CYAN
+
+if BOARD_GOOGLE_BASEBOARD_CYAN
+
+config VBOOT
+	select EC_GOOGLE_CHROMEEC_SWITCHES
+	select VBOOT_LID_SWITCH
+	select VBOOT_VBNV_FLASH
+
+config DISPLAY_SPD_DATA
+	bool "Display Memory Serial Presence Detect Data"
+	default n
+	help
+	  When enabled displays the memory configuration data.
+
+config MAINBOARD_DIR
+	default "google/cyan"
+
+config MAINBOARD_FAMILY
+	string
+	default "Intel_Strago" if !BOARD_GOOGLE_CYAN
+	default ""
+
+config VARIANT_DIR
+	default "banon" if BOARD_GOOGLE_BANON
+	default "celes" if BOARD_GOOGLE_CELES
+	default "cyan" if BOARD_GOOGLE_CYAN
+	default "edgar" if BOARD_GOOGLE_EDGAR
+	default "kefka" if BOARD_GOOGLE_KEFKA
+	default "reks" if BOARD_GOOGLE_REKS
+	default "relm" if BOARD_GOOGLE_RELM
+	default "setzer" if BOARD_GOOGLE_SETZER
+	default "terra" if BOARD_GOOGLE_TERRA
+	default "ultima" if BOARD_GOOGLE_ULTIMA
+	default "wizpig" if BOARD_GOOGLE_WIZPIG
+
+config MAINBOARD_PART_NUMBER
+	default "Banon" if BOARD_GOOGLE_BANON
+	default "Celes" if BOARD_GOOGLE_CELES
+	default "Cyan" if BOARD_GOOGLE_CYAN
+	default "Edgar" if BOARD_GOOGLE_EDGAR
+	default "Kefka" if BOARD_GOOGLE_KEFKA
+	default "Reks" if BOARD_GOOGLE_REKS
+	default "Relm" if BOARD_GOOGLE_RELM
+	default "Setzer" if BOARD_GOOGLE_SETZER
+	default "Terra" if BOARD_GOOGLE_TERRA
+	default "Ultima" if BOARD_GOOGLE_ULTIMA
+	default "Wizpig" if BOARD_GOOGLE_WIZPIG
+
+config OVERRIDE_DEVICETREE
+	default "variants/\$(CONFIG_VARIANT_DIR)/overridetree.cb"
+
+config CBFS_SIZE
+	default 0x200000
+
+config MAINBOARD_SMBIOS_MANUFACTURER
+	string
+	default "GOOGLE"
+
+config CONSOLE_SERIAL
+	default n
+
+config ENABLE_BUILTIN_COM1
+	default y if CONSOLE_SERIAL
+
+endif # BOARD_GOOGLE_BASEBOARD_CYAN

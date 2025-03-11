@@ -1,0 +1,23 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_AMD_COMMON_BLOCK_ACPIMMIO
+	bool
+	help
+	  Select this option to enable hardware blocks in the AcpiMmio
+	  address space (0xfed8xxxx).
+
+if SOC_AMD_COMMON_BLOCK_ACPIMMIO
+
+config SOC_AMD_COMMON_BLOCK_ACPIMMIO_BIOSRAM
+	bool
+	help
+	  Add functions to access settings stored in the biosram region.
+	  This is only used by the SoCs using binaryPI and the old AGESA.
+
+config SOC_AMD_COMMON_BLOCK_ACPIMMIO_PM_IO_ACCESS
+	bool
+	help
+	  Add functions to access the PM register block via the indirect
+	  IO register access interface.
+
+endif # SOC_AMD_COMMON_BLOCK_ACPIMMIO

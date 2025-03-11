@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# DESCR: Run checkpatch on directories that are known good
+
+PIDS=""
+DIRS="src/acpi \
+src/cpu/armltd src/cpu/qemu-power8 src/cpu/qemu-x86 \
+src/drivers/ti \
+src/ec/purism \
+src/include/boot src/include/superio src/include/sys \
+src/mainboard/adlink src/mainboard/purism src/mainboard/ti \
+src/superio/acpi src/superio/common \
+"
+
+for directory in $DIRS; do
+	util/lint/lint-007-checkpatch "$directory" &
+	PIDS="$PIDS $!"
+done
+
+# wait for tests to finish.
+for pid in $PIDS; do
+	wait "$pid"
+done

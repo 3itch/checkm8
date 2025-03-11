@@ -1,0 +1,17 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#ifndef AMD_PICASSO_CPU_H
+#define AMD_PICASSO_CPU_H
+
+#define RAVEN1_B0_CPUID			CPUID_FROM_FMS(0x17, 0x11, 0)
+#define PICASSO_B0_CPUID		CPUID_FROM_FMS(0x17, 0x18, 0)
+#define RAVEN2_A0_CPUID			CPUID_FROM_FMS(0x17, 0x20, 0)
+
+#define RAVEN1_VBIOS_VID_DID		0x100215dd
+#define RAVEN1_VBIOS_REV		0x81
+#define PICASSO_VBIOS_VID_DID		0x100215d8
+#define PICASSO_VBIOS_REV		0xc1
+#define RAVEN2_VBIOS_VID_DID		0x100215dd  /* VID/DID in RV2 VBIOS header */
+#define RAVEN2_VBIOS_REV		0xc4
+
+#endif /* AMD_PICASSO_CPU_H */

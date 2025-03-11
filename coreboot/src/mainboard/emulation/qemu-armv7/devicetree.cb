@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+# TODO fill with Versatile Express board data in QEMU.
+chip cpu/armltd/cortex-a9
+	device cpu_cluster 0 on end
+end

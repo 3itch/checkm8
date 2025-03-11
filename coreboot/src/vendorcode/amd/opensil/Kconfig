@@ -1,0 +1,35 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if SOC_AMD_OPENSIL
+
+config SOC_AMD_OPENSIL_STUB
+	bool
+	help
+	  Select this option to include the openSIL stub in the build that can
+	  be used for build-testing before the actual openSIL source code for a
+	  SoC is released.
+
+config SOC_AMD_OPENSIL_GENOA_POC
+	bool
+	help
+	  Select this on SoCs that use the Genoa proof of concept version of
+	  openSIL.
+
+config AMD_OPENSIL_PATH
+	string "Path to openSIL source"
+	depends on !SOC_AMD_OPENSIL_STUB
+	default "$(top)/src/vendorcode/amd/opensil/genoa_poc/opensil" if SOC_AMD_OPENSIL_GENOA_POC
+	help
+	  Set to the path of the openSIL directory containing meson.build.
+	  example
+
+config AMD_OPENSIL_MPIO_CHIP_H_FILE
+	string "Location of specific MPIO chip.h implementation"
+	default "$(top)/src/vendorcode/amd/opensil/genoa_poc/mpio/chip.h" if SOC_AMD_OPENSIL_GENOA_POC
+	default "$(top)/src/vendorcode/amd/opensil/stub/mpio/chip.h"
+	help
+	  Set to the location of the MPIO chip.h in the selected openSIL
+	  implementation, so that the common MPIO chip.h file can include the
+	  specific one.
+
+endif

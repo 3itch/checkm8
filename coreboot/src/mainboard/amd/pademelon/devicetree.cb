@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+chip soc/amd/stoneyridge
+	register "uma_mode" = "UMAMODE_AUTO_LEGACY"
+
+	device domain 0 on
+		subsystemid 0x1022 0x1410 inherit
+		device ref iommu on end
+		device ref gfx on end
+		device ref gfx_hda on end
+		device ref gpp_bridge_1 on end # mini PCIe slot x1
+		device ref gpp_bridge_3 on end # LAN RTL8111F
+		device ref gpp_bridge_4 on end # LAN RTL8111F
+		device ref hda_bridge on end
+		device ref hda on end
+		device ref xhci on end
+		device ref sata on end
+		device ref ehci on end
+		device ref lpc_bridge on
+			chip superio/fintek/f81803a
+				device pnp 4e.1 on      # COM1
+					io 0x60 = 0x3f8
+					irq 0x70 = 4
+				end
+				device pnp 4e.2 on      # COM2
+					io 0x60 = 0x2f8
+					irq 0x70 = 3
+				end
+				device pnp 4e.4 on	# HWM
+					io 0x60 = 0x220
+					irq 0x70 = 0
+				end
+				device pnp 4e.5 off end	# KBC
+				device pnp 4e.6 off end # GPIO
+				device pnp 4e.7 off end # WDT
+				device pnp 4e.a off end # PME
+			end # f81803a
+		end
+		device ref sdhci on end
+	end #domain
+end #soc/amd/stoneyridge

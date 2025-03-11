@@ -1,0 +1,16 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_ASUS_H61M_CS
+	bool "H61M-CS"
+
+config BOARD_ASUS_P8H61_M_LX
+	bool "P8H61-M LX"
+
+config BOARD_ASUS_P8H61_M_LX3_R2_0
+	bool "P8H61-M LX3 R2.0"
+
+config BOARD_ASUS_P8H61_M_PRO
+	bool "P8H61-M PRO"
+
+config BOARD_ASUS_P8H61_M_PRO_CM6630
+	bool "P8H61-M PRO CM6630"

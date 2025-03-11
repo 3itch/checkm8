@@ -1,0 +1,19 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+
+#include <baseboard/ec.h>
+
+/* Enable PS/2 Mouse */
+#define SIO_EC_ENABLE_PS2M
+#define SIO_EC_PS2M_IRQ Interrupt(ResourceConsumer, Level, ActiveLow, Shared) {12}
+
+#undef MAINBOARD_EC_S3_WAKE_EVENTS
+#undef MAINBOARD_EC_S3_DEVICE_EVENTS
+#define MAINBOARD_EC_S3_WAKE_EVENTS \
+	(MAINBOARD_EC_S5_WAKE_EVENTS |\
+	 EC_HOST_EVENT_MASK(EC_HOST_EVENT_KEY_PRESSED) |\
+	 EC_HOST_EVENT_MASK(EC_HOST_EVENT_DEVICE) |\
+	 EC_HOST_EVENT_MASK(EC_HOST_EVENT_MODE_CHANGE) | \
+	 EC_HOST_EVENT_MASK(EC_HOST_EVENT_MKBP))
+/* Enable trackpoint S3 wakeups */
+#define MAINBOARD_EC_S3_DEVICE_EVENTS \
+	(EC_DEVICE_EVENT_MASK(EC_DEVICE_EVENT_TRACKPAD))

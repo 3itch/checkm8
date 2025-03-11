@@ -1,0 +1,87 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#include <stdint.h>
+#include <cbmem.h>
+#include <cpu/x86/msr.h>
+#include <cpu/x86/mtrr.h>
+#include <cpu/amd/mtrr.h>
+#include <cpu/x86/cache.h>
+#include <northbridge/amd/agesa/agesa_helper.h>
+
+/* TODO: Do we want MTRR_DEF_TYPE_MSR too? */
+static const uint32_t msr_backup[] = {
+	MTRR_FIX_64K_00000,
+	MTRR_FIX_16K_80000,
+	MTRR_FIX_16K_A0000,
+	MTRR_FIX_4K_C0000,
+	MTRR_FIX_4K_C8000,
+	MTRR_FIX_4K_D0000,
+	MTRR_FIX_4K_D8000,
+	MTRR_FIX_4K_E0000,
+	MTRR_FIX_4K_E8000,
+	MTRR_FIX_4K_F0000,
+	MTRR_FIX_4K_F8000,
+	MTRR_PHYS_BASE(0),
+	MTRR_PHYS_MASK(0),
+	MTRR_PHYS_BASE(1),
+	MTRR_PHYS_MASK(1),
+	MTRR_PHYS_BASE(2),
+	MTRR_PHYS_MASK(2),
+	MTRR_PHYS_BASE(3),
+	MTRR_PHYS_MASK(3),
+	MTRR_PHYS_BASE(4),
+	MTRR_PHYS_MASK(4),
+	MTRR_PHYS_BASE(5),
+	MTRR_PHYS_MASK(5),
+	MTRR_PHYS_BASE(6),
+	MTRR_PHYS_MASK(6),
+	MTRR_PHYS_BASE(7),
+	MTRR_PHYS_MASK(7),
+	SYSCFG_MSR,
+	TOP_MEM_MSR,
+	TOP_MEM2_MSR,
+};
+
+void backup_mtrr(void)
+{
+	msr_t syscfg_msr;
+	msr_t *mtrr_save = (msr_t *)cbmem_add(CBMEM_ID_AGESA_MTRR,
+					      sizeof(msr_t) * ARRAY_SIZE(msr_backup));
+	if (!mtrr_save)
+		return;
+
+	/* Enable access to AMD RdDram and WrDram extension bits */
+	syscfg_msr = rdmsr(SYSCFG_MSR);
+	syscfg_msr.lo |= SYSCFG_MSR_MtrrFixDramModEn;
+	wrmsr(SYSCFG_MSR, syscfg_msr);
+
+	for (int i = 0; i < ARRAY_SIZE(msr_backup); i++)
+		*mtrr_save++ = rdmsr(msr_backup[i]);
+
+	/* Disable access to AMD RdDram and WrDram extension bits */
+	syscfg_msr = rdmsr(SYSCFG_MSR);
+	syscfg_msr.lo &= ~SYSCFG_MSR_MtrrFixDramModEn;
+	wrmsr(SYSCFG_MSR, syscfg_msr);
+}
+
+void restore_mtrr(void)
+{
+	msr_t syscfg_msr;
+	msr_t *mtrr_save = (msr_t *)cbmem_find(CBMEM_ID_AGESA_MTRR);
+
+	if (!mtrr_save)
+		return;
+
+	/* Enable access to AMD RdDram and WrDram extension bits */
+	syscfg_msr = rdmsr(SYSCFG_MSR);
+	syscfg_msr.lo |= SYSCFG_MSR_MtrrFixDramModEn;
+	wrmsr(SYSCFG_MSR, syscfg_msr);
+
+	for (int i = 0; i < ARRAY_SIZE(msr_backup); i++)
+		wrmsr(msr_backup[i], *mtrr_save++);
+
+	/* Disable access to AMD RdDram and WrDram extension bits */
+	syscfg_msr = rdmsr(SYSCFG_MSR);
+	syscfg_msr.lo &= ~SYSCFG_MSR_MtrrFixDramModEn;
+	wrmsr(SYSCFG_MSR, syscfg_msr);
+}

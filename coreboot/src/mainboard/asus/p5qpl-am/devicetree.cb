@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+chip northbridge/intel/x4x		# Northbridge
+	device cpu_cluster 0 on ops x4x_cpu_bus_ops end		# APIC cluster
+	device domain 0 on
+		ops x4x_pci_domain_ops		# PCI domain
+		device pci 0.0 on end			# Host Bridge
+		device pci 1.0 on end			# PEG
+		device pci 2.0 on end			# Integrated graphics controller
+		chip southbridge/intel/i82801gx		# Southbridge
+			register "pirqa_routing" = "0x0b"
+			register "pirqb_routing" = "0x0b"
+			register "pirqc_routing" = "0x0b"
+			register "pirqd_routing" = "0x0b"
+			register "pirqe_routing" = "0x80"
+			register "pirqf_routing" = "0x80"
+			register "pirqg_routing" = "0x80"
+			register "pirqh_routing" = "0x0b"
+			# GPI routing
+			#  0 No effect (default)
+			#  1 SMI# (if corresponding ALT_GPI_SMI_EN bit is also set)
+			#  2 SCI (if corresponding GPIO_EN bit is also set)
+
+			register "ide_enable_primary" = "true"
+			register "gpe0_en" = "0x04000440"
+
+			register "gen1_dec" = "0x00000295" # HWM
+
+			device pci 1b.0 on  end		# Audio
+			device pci 1c.0 on  end		# PCIe 1: PCIe x1 slot
+			device pci 1c.1 on		# PCIe 2: NIC
+				device pci 00.0 on end
+			end
+			device pci 1c.2 off end		# PCIe 3
+			device pci 1c.3 off end		# PCIe 4
+			device pci 1d.0 on  end		# USB
+			device pci 1d.1 on  end		# USB
+			device pci 1d.2 on  end		# USB
+			device pci 1d.3 on  end		# USB
+			device pci 1d.7 on  end		# USB
+			device pci 1e.0 on  end		# PCI bridge
+			device pci 1e.2 off end		# AC'97 Audio Controller
+			device pci 1e.3 off end		# AC'97 Modem Controller
+			device pci 1f.0 on  end		# ISA bridge
+			device pci 1f.1 on  end		# PATA/IDE
+			device pci 1f.2 on  end		# SATA
+			device pci 1f.3 on  end		# SMbus
+		end
+	end
+end

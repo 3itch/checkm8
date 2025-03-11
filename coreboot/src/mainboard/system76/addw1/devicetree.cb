@@ -1,0 +1,165 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+chip soc/intel/cannonlake
+	register "common_soc_config" = "{
+		// Touchpad I2C bus
+		.i2c[0] = {
+			.speed = I2C_SPEED_FAST,
+			.rise_time_ns = 80,
+			.fall_time_ns = 110,
+		},
+	}"
+
+# CPU (soc/intel/cannonlake/cpu.c)
+	# Power limit
+	register "power_limits_config" = "{
+		.tdp_pl1_override = 45,
+		.tdp_pl2_override = 90,
+	}"
+
+	# Enable Enhanced Intel SpeedStep
+	register "eist_enable" = "true"
+
+# FSP Memory (soc/intel/cannonlake/romstage/fsp_params.c)
+	register "enable_c6dram" = "1"
+
+# FSP Silicon (soc/intel/cannonlake/fsp_params.c)
+	# Misc
+	register "AcousticNoiseMitigation" = "1"
+
+	# Power
+	register "PchPmSlpS3MinAssert" = "3" # 50ms
+	register "PchPmSlpS4MinAssert" = "1" # 1s
+	register "PchPmSlpSusMinAssert" = "4" # 4s
+	register "PchPmSlpAMinAssert" = "4" # 2s
+
+	# Thermal
+	register "tcc_offset" = "8"
+
+	# Serial IRQ Continuous
+	register "serirq_mode" = "SERIRQ_CONTINUOUS"
+
+# PM Util (soc/intel/cannonlake/pmutil.c)
+	# GPE configuration
+	# Note that GPE events called out in ASL code rely on this
+	# route. i.e. If this route changes then the affected GPE
+	# offset bits also need to be changed.
+	register "gpe0_dw0" = "PMC_GPP_K"
+	register "gpe0_dw1" = "PMC_GPP_G"
+	register "gpe0_dw2" = "PMC_GPP_E"
+
+# Actual device tree
+	device domain 0 on
+		subsystemid 0x1558 0x65d1 inherit
+		device ref peg0		on
+			# PCI Express Graphics #0 x16, Clock 8 (NVIDIA GPU)
+			register "PcieClkSrcUsage[8]" = "0x40"
+			register "PcieClkSrcClkReq[8]" = "8"
+		end
+		device ref igpu		on	end
+		device ref dptf		on
+			register "Device4Enable" = "1"
+		end
+		device ref thermal	on	end
+		device ref xhci		on
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_TYPE_C(OC_SKIP),	/* USB 3.1 Gen 2 TYPE-C and DisplayPort */
+				[1] = USB2_PORT_TYPE_C(OC_SKIP),	/* USB 3.1 Gen 2 TYPE-C */
+				[2] = USB2_PORT_MID(OC_SKIP),		/* USB 3.1 Gen 2 */
+				[4] = USB2_PORT_MID(OC_SKIP),		/* USB 3.1 Gen 1 audio */
+				[5] = USB2_PORT_MID(OC_SKIP),		/* USB 3.1 Gen 1 back */
+				[6] = USB2_PORT_MID(OC_SKIP),		/* Fingerprint */
+				[7] = USB2_PORT_MID(OC_SKIP),		/* Per-Key RGB keyboard */
+				[8] = USB2_PORT_MID(OC_SKIP),		/* Camera */
+				[13] = USB2_PORT_MID(OC_SKIP),		/* Bluetooth */
+			}"
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB 3.1 Gen 2 TYPE-C and DisplayPort */
+				[1] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB 3.1 Gen 2 right */
+				[2] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB 3.1 Gen 2 TYPE-C (without TBT) */
+				[3] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB 3.1 Gen 2 TYPE-C (without TBT) */
+				[4] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB 3.1 Gen 1 audio */
+				[5] = USB3_PORT_DEFAULT(OC_SKIP),	/* USB 3.1 Gen 1 back */
+			}"
+		end
+		device ref shared_sram	on	end
+		device ref cnvi_wifi	on
+			chip drivers/wifi/generic
+				register "wake" = "PME_B0_EN_BIT"
+				device generic 0 on end
+			end
+		end
+		device ref i2c0		on	end
+		device ref sata		on
+			register "SataPortsEnable" = "{
+				[0] = 1, /* HDD (SATA0B) */
+				[1] = 1, /* SSD1 (SATA1A) */
+			}"
+		end
+		device ref pcie_rp17	on
+			# PCI Express root port #17 x4, Clock 0 (Thunderbolt)
+			register "PcieRpEnable[16]" = "1"
+			register "PcieRpLtrEnable[16]" = "1"
+			register "PcieRpHotPlug[16]" = "1"
+			register "PcieClkSrcUsage[0]" = "16"
+			register "PcieClkSrcClkReq[0]" = "0"
+		end
+		device ref pcie_rp21	on
+			# PCI Express root port #21 x4, Clock 10 (SSD2)
+			register "PcieRpEnable[20]" = "1"
+			register "PcieRpLtrEnable[20]" = "1"
+			register "PcieClkSrcUsage[10]" = "20"
+			register "PcieClkSrcClkReq[10]" = "10"
+			register "PcieRpSlotImplemented[20]" = "1"
+		end
+		device ref pcie_rp9	on
+			# PCI Express root port #9 x4, Clock 9 (SSD1)
+			register "PcieRpEnable[8]" = "1"
+			register "PcieRpLtrEnable[8]" = "1"
+			register "PcieClkSrcUsage[9]" = "8"
+			register "PcieClkSrcClkReq[9]" = "9"
+			register "PcieRpSlotImplemented[8]" = "1"
+		end
+		device ref pcie_rp14	on
+			# PCI Express root port #14 x1, Clock 5 (GLAN)
+			register "PcieRpEnable[13]" = "1"
+			register "PcieRpLtrEnable[13]" = "1"
+			register "PcieClkSrcUsage[5]" = "13"
+			register "PcieClkSrcClkReq[5]" = "5"
+			register "PcieRpSlotImplemented[13]" = "1"
+		end
+		device ref pcie_rp15	on
+			# PCI Express root port #15 x1, Clock 7 (Card Reader)
+			register "PcieRpEnable[14]" = "1"
+			register "PcieRpLtrEnable[14]" = "1"
+			register "PcieClkSrcUsage[7]" = "14"
+			register "PcieClkSrcClkReq[7]" = "7"
+			register "PcieRpSlotImplemented[14]" = "1"
+		end
+		device ref pcie_rp16	on
+			# PCI Express root port #16 x1, Clock 6 (WLAN)
+			register "PcieRpEnable[15]" = "1"
+			register "PcieRpLtrEnable[15]" = "1"
+			register "PcieClkSrcUsage[6]" = "15"
+			register "PcieClkSrcClkReq[6]" = "6"
+			register "PcieRpSlotImplemented[15]" = "1"
+		end
+		device ref lpc_espi	on
+			register "gen1_dec" = "0x00040069"
+			register "gen2_dec" = "0x00fc0e01"
+			register "gen3_dec" = "0x00fc0f01"
+			chip drivers/pc80/tpm
+				device pnp 0c31.0 on end
+			end
+		end
+		device ref hda		on
+			register "PchHdaAudioLinkHda" = "1"
+		end
+		device ref smbus	on
+			chip drivers/i2c/tas5825m
+				register "id" = "0"
+				device i2c 4e on end # (8bit address: 0x9c)
+			end
+		end
+	end
+end

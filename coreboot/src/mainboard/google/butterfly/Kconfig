@@ -1,0 +1,45 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_GOOGLE_BUTTERFLY
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select ACPI_GNVS_USB_CHARGECTL
+	select BOARD_ROMSIZE_KB_8192
+	select EC_QUANTA_ENE_KB3940Q
+	select GFX_GMA_PANEL_1_ON_LVDS
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_CMOS_DEFAULT
+	select HAVE_IFD_BIN
+	select HAVE_ME_BIN
+	select HAVE_OPTION_TABLE
+	select INTEL_INT15
+	select MAINBOARD_HAS_CHROMEOS
+	select MAINBOARD_HAS_LIBGFXINIT
+	select MEMORY_MAPPED_TPM
+	select MAINBOARD_HAS_TPM1
+	select NORTHBRIDGE_INTEL_SANDYBRIDGE
+	select SANDYBRIDGE_VBOOT_IN_ROMSTAGE
+	select SERIRQ_CONTINUOUS_MODE	# Workaround for EC/KBC IRQ1.
+	select SOUTHBRIDGE_INTEL_C216
+	select SYSTEM_TYPE_LAPTOP
+
+config VBOOT
+	select VBOOT_VBNV_CMOS
+
+config MAINBOARD_DIR
+	default "google/butterfly"
+
+config MAINBOARD_PART_NUMBER
+	default "Butterfly"
+
+config MAINBOARD_VENDOR
+	string
+	default "Hewlett-Packard"
+
+config MAINBOARD_SMBIOS_MANUFACTURER
+	string
+	default "GOOGLE"
+
+endif # BOARD_GOOGLE_BUTTERFLY

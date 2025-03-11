@@ -1,0 +1,52 @@
+#!/usr/bin/env sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# DESCR: Checkpatch on .c, .h, & Kconfig files in the tree
+
+LINTDIR="$(
+  cd -- "$(dirname "$0")" > /dev/null 2>&1 || return
+  pwd -P
+)"
+
+# shellcheck source=helper_functions.sh
+. "${LINTDIR}/helper_functions.sh"
+
+# GNU BRE syntax list of files to examine
+INCLUDED_FILES='.*\.[ch]\|Kconfig.*$'
+
+EXCLUDED_DIRS="^payloads/libpayload/util/kconfig\|\
+^payloads/libpayload/curses/PDCurses\|\
+^src/vendorcode/wuffs\|\
+^util/coreboot-configurator\|\
+^util/crossgcc/patches\|\
+^util/inteltool\|\
+^util/kconfig\|\
+^util/superiotool\|\
+^Documentation"
+
+opts="--max-line-length 96"
+
+# default: test src and util
+if [ "$1" = "" ]; then
+	INCLUDED_DIRS="src util tests"
+# special mode: take diff from stdin, but exclude the dirs
+elif [ "$1" = "diff" ]; then
+	args=$( echo $EXCLUDED_DIRS | \
+		sed -e 's,\\|, ,g' -e 's,\^,--exclude=,g' )
+	util/lint/checkpatch.pl --quiet --no-signoff $opts $args -
+	exit $?
+# Space separated list of directories to test
+else
+	INCLUDED_DIRS="$1"
+fi
+
+# We want word splitting here, so disable the shellcheck warnings
+# shellcheck disable=SC2046,SC2086
+FILELIST=$( ${FIND_FILES} $INCLUDED_DIRS | \
+		grep $INCLUDED_FILES | \
+		grep -v $EXCLUDED_DIRS )
+
+for FILE in $FILELIST; do
+	util/lint/checkpatch.pl --show-types --file --quiet $opts "$FILE"
+done

@@ -1,0 +1,330 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if PAYLOAD_EDK2
+
+config PAYLOAD_FILE
+	string "edk2 binary"
+	default "$(obj)/UEFIPAYLOAD.fd" if EDK2_UEFIPAYLOAD
+	default "$(obj)/ShimmedUniversalPayload.elf" if EDK2_UNIVERSAL_PAYLOAD
+	help
+	  The result of a UefiPayloadPkg build
+
+choice
+	prompt "EDK II build type"
+	default EDK2_UEFIPAYLOAD
+	help
+	  Select the build type for edk2. UniversalPayload is recommended, as it is
+	  replacing UefiPayloadPkg. Whilst in the transition phase between the two,
+	  both options exist.
+
+config EDK2_UEFIPAYLOAD
+	bool "Build UefiPayloadPkg"
+	help
+	  Build the standard UefiPayloadPkg
+
+config EDK2_UNIVERSAL_PAYLOAD
+	bool "Build Universal Payload"
+	help
+	  Select this option if you want to build a coreboot image
+	  with EDK2s Universal Payload. If you don't know what this is
+	  about, just leave it enabled.
+
+	  Universal Payload should ideally only be built from upstream EDK2,
+	  https://github.com/tianocore/edk2, as this is regularly build tested
+	  and it encourages patches to be merged upstream.
+
+	  Whilst the required patches are being merged, this is pointed to
+	  Star Labs GitHub repository which contains these patches and is based
+	  on a known working commit.
+
+	  See https://universalscalablefirmware.github.io/documentation/ for more information.
+
+endchoice
+
+choice
+	prompt "Tianocore's EDK II payload"
+	default EDK2_REPO_CUSTOM if EDK2_UNIVERSAL_PAYLOAD
+	default EDK2_REPO_MRCHROMEBOX
+	help
+	  Select which type of payload edk2 will build (default is UefiPayload)
+	  UefiPayload: MrChromebox's customized fork of edk2 which works on most
+	  x86_64 devices
+	  Upstream: Use upstream edk2 payload from https://github.com/tianocore/edk2
+
+config EDK2_REPO_MRCHROMEBOX
+	bool "MrChromebox' edk2 fork"
+	help
+	  Select this option to build using MrChromebox's custom edk2 fork,
+	  which incorporates fixes/improvements from System 76's and 9elements' trees.
+
+config EDK2_REPO_OFFICIAL
+	bool "Official edk2 repository"
+	help
+	  Select this option if you want to use the official edk2 repository to build
+	  edk2.
+
+	  Please note, commit c4fdec0a83d6 ("UefiCpuPkg/MtrrLib: Improve MtrrDebugPrintAllMtrrsWorker"),
+	  and the preceding MTRR patches, must be in the branch used or edk2 will not boot due
+	  to trampling MTRRs set up by coreboot.
+
+config EDK2_REPO_CUSTOM
+	bool "Specify your own repository"
+	help
+	  Specify your own edk2 repository and branch to use.
+
+endchoice
+
+config EDK2_REPOSITORY
+	string "URL to git repository for edk2"
+	default "https://github.com/starlabsltd/edk2" if EDK2_UNIVERSAL_PAYLOAD
+	default "https://github.com/mrchromebox/edk2" if EDK2_REPO_MRCHROMEBOX
+	default "https://github.com/tianocore/edk2" if EDK2_REPO_OFFICIAL
+	default "" if EDK2_REPO_CUSTOM
+	help
+	  coreboot supports an array of build options which can be found below. These options
+	  will only have an effect if the relevant options exist in the target repository.
+
+config EDK2_TAG_OR_REV
+	string "Insert a commit's SHA-1 or a branch name"
+	default "origin/uefipayload_2408" if EDK2_REPO_MRCHROMEBOX
+	default "origin/universalpayload" if EDK2_UNIVERSAL_PAYLOAD
+	default "origin/master" if EDK2_REPO_OFFICIAL
+	default "" if EDK2_REPO_CUSTOM
+	help
+	  The commit's SHA-1 or branch name of the revision to use. This must exist in
+	  EDK2_REPOSITORY, and in the case of a branch name, prefixed with origin i.e.
+	  "origin/uefipayload_202202"
+
+config EDK2_USE_EDK2_PLATFORMS
+	bool "Use edk2-platforms repository"
+	default n
+	help
+	  Clone edk2-platforms repository to the edk2 workspace for additional modules.
+
+if EDK2_USE_EDK2_PLATFORMS
+
+config EDK2_PLATFORMS_REPOSITORY
+	string "URL to git repository for edk2-platforms"
+	default "https://github.com/tianocore/edk2-platforms"
+	help
+	  URL to the edk2-platfors repository to clone.
+
+config EDK2_PLATFORMS_TAG_OR_REV
+	string "Insert a commit's SHA-1 or a branch name"
+	default "origin/master"
+	help
+	  The commit's SHA-1 or branch name of the revision to use. This must exist in
+	  EDK2_PLATFORMS_REPOSITORY, and in the case of a branch name, prefixed with
+	  origin i.e. "origin/master"
+
+endif
+
+choice
+	prompt "edk2 build"
+	default EDK2_RELEASE
+	help
+	  Select whether to generate a debug or release build for
+	  edk2; default is to generate a release build.
+
+config EDK2_DEBUG
+	bool "Generate edk2 debug build"
+	help
+	  Generate a debug build.
+
+config EDK2_RELEASE
+	bool "Generate edk2 release build"
+	help
+	  Generate a release build.
+
+endchoice
+
+config EDK2_BOOTSPLASH_FILE
+	string "edk2 Bootsplash path and filename"
+	default "Documentation/coreboot_logo.bmp"
+	help
+	  The path and filename of the file to use as graphical bootsplash
+	  image. If this option is not configured, the default
+	  coreboot logo (European Brown Hare) will used.
+
+	  You can use any image format supported by imagemagick, a list of which
+	  can be found [here](https://imagemagick.org/script/formats.php).
+
+	  The build process will automatically convert this to the format that
+	  edk2 requires, which is an uncompressed BMP, in BMP3 format. It does
+	  this using imagemagick (`convert splosh.bmp BMP3:splash.bmp`).
+
+	  The newly formatted file will be the dimensions size as the original
+	  one.
+
+	  The build process will automatically do this conversion, so it can
+	  be supplied with any format that imagemagick can process (which is
+	  pretty much any!).
+
+	  This image will also be used as the BGRT boot image, which may
+	  persist through your OS boot process.
+
+	  See ACPI spec 6.3, 5.2.22 Boot Graphics Resource Table (BGRT), and
+	  Microsoft's documentation on BGRT positioning:
+	  Docs/Windows/Windows Drivers/Bring up guide/Boot screen components
+
+	  Accordingly, the image used should be no taller/wider than 40% of
+	  the display panel's native pixel height/width (or resolution set).
+
+	  If an absolute path is not given, the path will assumed to be
+	  relative to the coreboot root directory.
+
+config EDK2_BOOT_MANAGER_ESCAPE
+	bool "Use Escape key for Boot Manager"
+	default n
+	help
+	  Use Escape as the hot-key to access the Boot Manager. This replaces
+	  the default key of F2.
+
+config EDK2_BOOT_TIMEOUT
+	int "Set the timeout for boot menu prompt"
+	default 2
+	help
+	  The length of time in seconds for which the boot splash/menu prompt will be displayed.
+	  For boards with an internal display, the default value of 2s is generally sufficient.
+	  For boards with an external display, a value of 5s is generally sufficient.
+
+config EDK2_CBMEM_LOGGING
+	bool "Enable edk2 logging to CBMEM"
+	help
+	  Select this option if you want to enable edk2 logging to CBMEM.
+	  You may want to increase the default cbmem buffer size when selecting
+	  this option, especially if using a debug (vs release) build.
+	  Selecting this option will increase the payload size in CBFS by 0x10000.
+
+config EDK2_CPU_TIMER_LIB
+	bool
+	default n
+	help
+	  For recent Intel and AMD CPUs, the 0x15 CPUID instruction will return Time
+	  Stamp Counter Frequence. For CPUs that do not support this instruction,
+	  EDK2 must include a different library which is the reason why this must be
+	  configured at build time.
+
+	  If this is enabled, and the CPU doesn't support 0x15, it will fail to
+	  boot. If it is not enabled, and the CPU does support 0x15, it will still
+	  boot but without support for the leaf. Consequently, it is disabled by
+	  default.
+
+config EDK2_FOLLOW_BGRT_SPEC
+	bool "Center logo 38.2% from the top of screen"
+	depends on EDK2_REPO_MRCHROMEBOX
+	default n
+	help
+	  Follow the BGRT Specification implemented by Microsoft and
+	  the Boot Logo 38.2% will be vertically centered 38.2% from
+	  the top of the display.
+
+config EDK2_FULL_SCREEN_SETUP
+	bool "Use the full screen for the edk2 frontpage"
+	default y
+	help
+	  Allow edk2 to use the full screen to display the frontpage
+	  (aka "Boot Menu"). With this option disable, it will be
+	  limited to 640x480.
+
+config EDK2_HAVE_EFI_SHELL
+	bool "Include EFI Shell"
+	default y
+	help
+	  Include the EFI shell Binary
+
+config EDK2_PRIORITIZE_INTERNAL
+	bool "Prioritize internal boot devices"
+	depends on EDK2_REPO_MRCHROMEBOX
+	default y
+	help
+	  Prioritize internal boot devices over external devices
+
+config EDK2_PS2_SUPPORT
+	bool "Support PS/2 Keyboards"
+	default y
+	help
+	  Include support for PS/2 keyboards
+
+config EDK2_SD_MMC_TIMEOUT
+	int "Timeout in ms for initializing SD and eMMC devices"
+	default 10
+	help
+	  The amount of time allowed to initialize the SD Card reader and/or eMMC drive.
+	  Most only require 10ms, but certain readers can take 1s.
+
+config EDK2_SERIAL_SUPPORT
+	bool "Support serial output"
+	default y if EDK2_DEBUG
+	default n
+	help
+	  Enable serial port output in edk2. Serial output limits the performance of edk2's
+	  FrontPage.
+
+config EDK2_SECURE_BOOT_SUPPORT
+	bool "Enable UEFI Secure Boot support"
+	depends on EDK2_REPO_MRCHROMEBOX && SMMSTORE_V2
+	default y if EDK2_REPO_MRCHROMEBOX && SMMSTORE_V2
+	help
+	  Select this option to enable UEFI SecureBoot support in edk2.
+	  UEFI SecureBoot will be disabled by default and can be enabled from the menu option.
+
+config EDK2_GOP_DRIVER
+	bool "Add a GOP driver to the Tianocore build"
+	depends on INTEL_GMA_ADD_VBT && NO_GFX_INIT && EDK2_REPO_MRCHROMEBOX
+	default y if INTEL_GMA_ADD_VBT && NO_GFX_INIT && EDK2_REPO_MRCHROMEBOX
+	help
+	  Select this option to have edk2 use an external GOP driver for display init.
+
+config EDK2_GOP_FILE
+	string "GOP driver file"
+	depends on EDK2_GOP_DRIVER
+	default "IntelGopDriver.efi"
+	help
+	  The name of the GOP driver file passed to edk2.
+
+config EDK2_DISABLE_TPM
+	bool "Disable TPM support in edk2"
+	default y if EDK2_REPO_MRCHROMEBOX && TPM_GOOGLE_CR50 && SOC_AMD_COMMON
+	help
+	  Select this option to disable TPM support in edk2. This is necessary to avoid boot
+	  hangs on some boards with a CR50 TPM, particularly those with an AMD Zen SoC.
+
+config EDK2_UFS_ENABLE
+	bool "Enable UFS DXE driver in edk2"
+	depends on EDK2_REPO_MRCHROMEBOX
+	default n
+	help
+	  Select this option to enable the UFS DXE driver in MrChromebox's fork of edk2.
+	  It is needed for boards with UFS storage, but can cause issues with other boards,
+	  so should only be enabled when needed.
+
+config EDK2_PCO_MMIO_EMMC
+	bool "Enable MMIO eMMC driver for AMD Picasso boards in edk2"
+	depends on EDK2_REPO_MRCHROMEBOX
+	default n
+	help
+	  Select this option to enable the MMIO eMMC DXE driver in MrChromebox's fork of edk2.
+	  It is needed for AMD Picasso boards with eMMC storage, but will conflict with the
+	  PCI-based eMMC driver, so should only be enabled for AMD Picasso boards.
+
+config EDK2_USE_LAPIC_TIMER
+	bool "Use LAPIC timer instead of HPET"
+	default n
+	help
+	  Select this option to use the LAPIC timer instead of HPET in edk2. The LAPIC is closer
+	  to the CPU than the HPET (on the PCH), resulting in lower latency / higher resolution.
+	  This setting is at least needed for platforms with Core 2 processors, which are reported
+	  to have issues with HPET.
+
+config EDK2_CUSTOM_BUILD_PARAMS
+	string "edk2 additional custom build parameters"
+	default ""
+	help
+	  edk2 has build options that are not modified by coreboot, and these can be
+	  found in `UefiPayloadPkg/UefiPayloadPkg.dsc`. Forks may also support
+	  additional build options that should have been upstreamed but have not.
+
+	  This option can support both macros `-D` and Pcds `--pcd`.
+
+endif

@@ -1,0 +1,82 @@
+# SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0-or-later
+#
+# This file is sourced from src/security/Kconfig for menuconfig convenience.
+
+menu "CBFS verification"
+
+config CBFS_VERIFICATION
+	bool "Enable CBFS verification"
+	select VBOOT_LIB
+	help
+	  Say yes here to enable code that cryptographically verifies each CBFS
+	  file as it gets loaded by chaining it to a trust anchor that is
+	  embedded in the bootblock. This only makes sense if you use some
+	  out-of-band mechanism to guarantee the integrity of the bootblock
+	  itself, such as Intel Boot Guard or flash write-protection.
+
+	  If a CBFS image was created with this option enabled, cbfstool will
+	  automatically update the hash embedded in the bootblock whenever it
+	  modifies the CBFS.
+
+if CBFS_VERIFICATION
+
+config TOCTOU_SAFETY
+	bool "Protect against time-of-check vs. time-of-use vulnerabilities"
+	depends on !NO_FMAP_CACHE
+	depends on !NO_CBFS_MCACHE
+	depends on !USE_OPTION_TABLE && !FSP_CAR  # Known to access CBFS before CBMEM init
+	depends on !VBOOT || VBOOT_CBFS_INTEGRATION
+	depends on NO_XIP_EARLY_STAGES
+	help
+	  Say yes here to eliminate time-of-check vs. time-of-use vulnerabilities
+	  for CBFS verification. This means that data from flash must be verified
+	  every time it is loaded (not just the first time), which requires a bit
+	  more overhead and is incompatible with certain configurations.
+
+	  Using this option only makes sense when the mechanism securing the
+	  bootblock is also safe against these vulnerabilities (i.e. there's no
+	  point in enabling this when you just rely on flash write-protection).
+
+config CBFS_ALLOW_UNVERIFIED_DECOMPRESSION
+	bool "Run decompression algorithms on potentially untrusted code"
+	default n
+	help
+	  This controls whether cbfs_unverified_area_...() access functions may
+	  decompress files. This exposes the attack surface of all supported
+	  decompression algorithms. Even if you don't compress the files you are
+	  planning to load with these functions, since file metadata is also
+	  unverified, an attacker can potentially replace them with compressed
+	  files to access a vulnerability in the decompression code.
+
+	  If you don't need to load compressed files from unverified areas, say
+	  no here for tighter security.
+
+config CBFS_HASH_ALGO
+	int
+	default 1 if CBFS_HASH_SHA1
+	default 2 if CBFS_HASH_SHA256
+	default 3 if CBFS_HASH_SHA512
+
+choice
+	prompt "Hash algorithm"
+	default CBFS_HASH_SHA256
+	help
+	  Select the hash algorithm used in CBFS verification. Note that SHA-1 is
+	  generally considered insecure today and should not be used without good
+	  reason. When using CBFS verification together with measured boot, using
+	  the same hash algorithm (usually SHA-256) for both is more efficient.
+
+config CBFS_HASH_SHA1
+	bool "SHA-1"
+
+config CBFS_HASH_SHA256
+	bool "SHA-256"
+
+config CBFS_HASH_SHA512
+	bool "SHA-512"
+
+endchoice
+
+endif
+
+endmenu

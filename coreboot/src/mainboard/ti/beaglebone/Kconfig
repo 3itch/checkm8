@@ -1,0 +1,34 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_TI_BEAGLEBONE
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select SOC_TI_AM335X
+	select BOARD_ROMSIZE_KB_32768
+	select MISSING_BOARD_RESET
+	select COMMONLIB_STORAGE
+	select COMMONLIB_STORAGE_SD
+
+config MAINBOARD_DIR
+	default "ti/beaglebone"
+
+config MAINBOARD_PART_NUMBER
+	default "Beaglebone"
+
+config MAX_CPUS
+	int
+	default 1
+
+config DRAM_SIZE_MB
+	int
+	default 512
+
+config UART_FOR_CONSOLE
+	int
+	default 0
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/board.fmd"
+
+endif # BOARD_TI_BEAGLEBONE

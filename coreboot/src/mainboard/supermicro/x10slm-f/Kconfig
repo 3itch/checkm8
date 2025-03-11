@@ -1,0 +1,35 @@
+## SPDX-License-Identifier: GPL-2.0-or-later
+
+if BOARD_SUPERMICRO_X10SLM_PLUS_F
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOARD_ROMSIZE_KB_16384
+	select DRIVERS_ASPEED_AST2050 # Supports AST2400 too.
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_OPTION_TABLE
+	select HAVE_CMOS_DEFAULT
+	select NORTHBRIDGE_INTEL_HASWELL
+	select SERIRQ_CONTINUOUS_MODE
+	select SOUTHBRIDGE_INTEL_LYNXPOINT
+	select SUPERIO_NUVOTON_COMMON_COM_A
+	select SUPERIO_NUVOTON_NCT6776
+
+config CBFS_SIZE
+	default 0xb00000
+
+config MAINBOARD_DIR
+	default "supermicro/x10slm-f"
+
+config MAINBOARD_PART_NUMBER
+	default "X10SLM+-F"
+
+config ENABLE_DDR_2X_REFRESH
+	default y
+
+config SUPERMICRO_BOARDID
+	string
+	default "0811"
+
+endif

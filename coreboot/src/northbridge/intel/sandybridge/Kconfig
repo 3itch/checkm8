@@ -1,0 +1,211 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config NORTHBRIDGE_INTEL_SANDYBRIDGE
+	bool
+	select CACHE_MRC_SETTINGS
+	select CPU_INTEL_MODEL_206AX
+	select HAVE_DEBUG_RAM_SETUP
+	select INTEL_GMA_ACPI
+	select NEED_SMALL_2MB_PAGE_TABLES
+	select USE_DDR3
+
+if NORTHBRIDGE_INTEL_SANDYBRIDGE
+
+config CHIPSET_DEVICETREE
+	default "northbridge/intel/sandybridge/chipset.cb"
+
+config SANDYBRIDGE_VBOOT_IN_ROMSTAGE
+	bool
+	default n
+	help
+	  Selected by boards to force VBOOT_STARTS_IN_ROMSTAGE.
+
+config SANDYBRIDGE_VBOOT_IN_BOOTBLOCK
+	depends on VBOOT
+	depends on !SANDYBRIDGE_VBOOT_IN_ROMSTAGE
+	bool "Start verstage in bootblock"
+	default y
+	select VBOOT_STARTS_IN_BOOTBLOCK
+	help
+	  Sandy Bridge can either start verstage in a separate stage
+	  right after the bootblock has run or it can start it
+	  after romstage for compatibility reasons.
+	  Sandy Bridge however uses a mrc.bin to initialize memory which
+	  needs to be located at a fixed offset. Therefore even with
+	  a separate verstage starting after the bootblock that same
+	  binary is used meaning a jump is made from RW to the RO region
+	  and back to the RW region after the binary is done.
+
+config VBOOT
+	select VBOOT_MUST_REQUEST_DISPLAY
+	select VBOOT_STARTS_IN_ROMSTAGE if !SANDYBRIDGE_VBOOT_IN_BOOTBLOCK
+
+config USE_NATIVE_RAMINIT
+	bool "Use native raminit"
+	default y
+	help
+	  Select if you want to use coreboot implementation of raminit rather than
+	  System Agent/MRC.bin. You should answer Y.
+
+config NATIVE_RAMINIT_IGNORE_MAX_MEM_FUSES
+	bool "[OVERCLOCK] Ignore CAPID fuses that limit max DRAM frequency"
+	default n
+	depends on USE_NATIVE_RAMINIT
+	help
+	  Ignore the CAPID fuses that might limit the maximum DRAM frequency
+	  on overclocking-capable parts. By selecting this option, the fuse
+	  values will be ignored and the only limits on DRAM frequency are
+	  determined by SPD values, per-board devicetree settings and hard
+	  limits in the northbridge's MPLL. Disabled by default as it can
+	  cause instability.
+	  Consider this to be an overclocking option. Handle with care!
+
+config NATIVE_RAMINIT_IGNORE_XMP_MAX_DIMMS
+	bool "[OVERCLOCK] Ignore XMP max DIMMs per channel"
+	default n
+	depends on USE_NATIVE_RAMINIT
+	help
+	  The more DIMMs are in a channel, the more signal integrity worsens.
+	  Because of this, some DIMMs only support running at XMP timings if
+	  the number of DIMMs in the channel is below a limit. This limit is
+	  usually 1, i.e. there must be no other DIMMs in the channel to use
+	  XMP timings. Otherwise, non-XMP timings are used.
+	  When this option is enabled, the max DIMMs per channel restriction
+	  in XMP is ignored. Depending on available margins, this could work
+	  but it can also result in system instability.
+	  Consider this to be an overclocking option. Handle with care!
+
+config NATIVE_RAMINIT_IGNORE_XMP_REQUESTED_VOLTAGE
+	bool "Ignore XMP profile requested voltage"
+	default n
+	depends on USE_NATIVE_RAMINIT
+	help
+	  Native raminit only supports 1.5V operation, but there are DIMMs
+	  which request 1.65V operation in XMP profiles. This option allows
+	  raminit to use these XMP profiles anyway, instead of falling back
+	  to non-XMP settings.
+	  Disabled by default because it allows forcing memory to run out of
+	  specification. Consider this to be an overclocking option.
+	  Handle with care!
+
+config CBFS_SIZE
+	default 0x100000
+
+config VGA_BIOS_ID
+	string
+	default "8086,0106"
+
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0xf0000000
+	help
+	  The MRC blob requires it to be at 0xf0000000.
+
+config ECAM_MMCONF_BUS_NUMBER
+	int
+	default 64
+
+# This number must be equal or lower than what's reported in ACPI PCI _CRS
+config DOMAIN_RESOURCE_32BIT_LIMIT
+	default ECAM_MMCONF_BASE_ADDRESS
+
+config DCACHE_RAM_BASE
+	hex
+	default 0xfefe0000
+
+config DCACHE_BSP_STACK_SIZE
+	hex
+	default 0x10000
+	help
+	  The amount of BSP stack anticipated in bootblock and
+	  other stages.
+
+if USE_NATIVE_RAMINIT
+
+config DCACHE_RAM_SIZE
+	hex
+	default 0x20000
+
+config DCACHE_RAM_MRC_VAR_SIZE
+	hex
+	default 0x0
+
+config RAMINIT_ALWAYS_ALLOW_DLL_OFF
+	bool "Also enable memory DLL-off mode on desktops and servers"
+	default n
+	help
+	  If enabled, allow enabling DLL-off mode for platforms other than
+	  mobile. Saves power at the expense of higher exit latencies. Has
+	  no effect on mobile platforms, where DLL-off is always allowed.
+	  Power down is disabled for stability when running at high clocks.
+
+config RAMINIT_ENABLE_ECC
+	bool "Enable ECC if supported"
+	default y
+	help
+	  Enable ECC if supported by both, host and RAM.
+
+endif # USE_NATIVE_RAMINIT
+
+if !USE_NATIVE_RAMINIT
+
+config DCACHE_RAM_SIZE
+	hex
+	default 0x17000
+
+config DCACHE_RAM_MRC_VAR_SIZE
+	hex
+	default 0x9000
+
+config MRC_FILE
+	string "Intel System Agent path and filename"
+	default "3rdparty/blobs/northbridge/intel/sandybridge/systemagent-r6.bin"
+	help
+	  The path and filename of the file to use as System Agent
+	  binary.
+
+endif # !USE_NATIVE_RAMINIT
+
+config INTEL_GMA_BCLV_OFFSET
+	default 0x48254
+
+config FIXED_MCHBAR_MMIO_BASE
+	default 0xfed10000
+
+config FIXED_DMIBAR_MMIO_BASE
+	default 0xfed18000
+
+config FIXED_EPBAR_MMIO_BASE
+	default 0xfed19000
+
+config PRERAM_CBFS_CACHE_SIZE
+	default 0x0
+
+choice
+	prompt "Default IGD Memory Allocation"
+	default IGD_DEFAULT_UMA_SIZE_32MB
+	help
+	  The amount of system memory allocated for the integrated GPU if not
+	  set via an option table.
+
+config IGD_DEFAULT_UMA_SIZE_32MB
+	bool "32MB"
+
+config IGD_DEFAULT_UMA_SIZE_64MB
+	bool "64MB"
+
+config IGD_DEFAULT_UMA_SIZE_96MB
+	bool "96MB"
+
+config IGD_DEFAULT_UMA_SIZE_128MB
+	bool "128MB"
+
+endchoice
+
+config IGD_DEFAULT_UMA_INDEX
+	int
+	default 0 if IGD_DEFAULT_UMA_SIZE_32MB
+	default 1 if IGD_DEFAULT_UMA_SIZE_64MB
+	default 2 if IGD_DEFAULT_UMA_SIZE_96MB
+	default 3 if IGD_DEFAULT_UMA_SIZE_128MB
+
+endif

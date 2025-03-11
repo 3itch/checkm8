@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config NORTHBRIDGE_AMD_PI
+	bool
+	default y if CPU_AMD_PI
+	default n
+
+if NORTHBRIDGE_AMD_PI
+
+config BOTTOMIO_POSITION
+	hex "Bottom of 32-bit IO space"
+	default 0xD0000000
+	help
+	  If PCI peripherals with big BARs are connected to the system
+	  the bottom of the IO must be decreased to allocate such
+	  devices.
+
+	  Declare the beginning of the 128MB-aligned MMIO region.  This
+	  option is useful when PCI peripherals requesting large address
+	  ranges are present.
+
+config S3_VGA_ROM_RUN
+	bool
+	default n
+
+source "src/northbridge/amd/pi/00730F01/Kconfig"
+
+endif # NORTHBRIDGE_AMD_PI

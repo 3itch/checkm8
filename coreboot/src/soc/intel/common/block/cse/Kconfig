@@ -1,0 +1,476 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DISABLE_HECI1_AT_PRE_BOOT
+	bool "Disable HECI1 at the end of boot"
+	depends on SOC_INTEL_COMMON_BLOCK_CSE
+	default n
+	help
+	  This config decides the state of HECI1(CSE) device at the end of boot.
+	  Mainboard users to select this config to make HECI1 `function disable`
+	  prior to handing off to payload.
+
+config MAX_HECI_DEVICES
+	int
+	default 6
+
+config SOC_INTEL_COMMON_BLOCK_CSE
+	bool
+	default n
+	help
+	  Driver for communication with Converged Security Engine (CSE)
+	  over Host Embedded Controller Interface (HECI)
+
+config SOC_INTEL_COMMON_BLOCK_HECI1_DISABLE_USING_SBI
+	bool
+	default y if HECI_DISABLE_USING_SMM
+	select SOC_INTEL_COMMON_BLOCK_P2SB
+	help
+	  Use this config to allow common CSE block to make HECI1 function disable
+	  in the SMM mode. From CNL PCH onwards,`HECI1` disabling can only be done
+	  using the non-posted sideband write after FSP-S sets the postboot_sai
+	  attribute.
+
+config SOC_INTEL_COMMON_BLOCK_HECI1_DISABLE_USING_PMC_IPC
+	bool
+	default n
+	select SOC_INTEL_COMMON_BLOCK_PMC
+	help
+	  Use this config to allow common CSE block to make HECI1 function disable
+	  using PMC IPC command `0xA9`. From TGL PCH onwards, disabling heci1
+	  device using PMC IPC doesn't required to run the operation in SMM.
+
+config SOC_INTEL_COMMON_BLOCK_HECI1_DISABLE_USING_PCR
+	bool
+	default n
+	select SOC_INTEL_COMMON_BLOCK_PCR
+	help
+	  Use this config for SoC platform prior to CNL PCH (with postboot_sai implemented)
+	  to make `HECI1` device disable using private configuration register (PCR) write.
+
+config SOC_INTEL_STORE_CSE_FW_VERSION
+	bool
+	default y
+	depends on SOC_INTEL_CSE_LITE_SKU
+	help
+	  This configuration option stores CSE RW FW version in CBMEM area.
+	  This information can be used to identify if the CSE firmware update is successful
+	  by comparing the currently running CSE RW firmware version against CSE version
+	  belongs to the CONFIG_SOC_INTEL_CSE_RW_VERSION (decided statically while
+	  building the AP FW image).
+
+	  The way to retrieve the CSE firmware version is by sending the HECI command to
+	  read the CSE Boot Partition (BP) info. The cost of sending HECI command to read
+	  the CSE FW version is between 7ms-20ms (depending on the SoC architecture) hence,
+	  ensure this feature is platform specific and only enabled for the platform
+	  that would like to store the CSE version into the CBMEM.
+
+config SOC_INTEL_CSE_FW_PARTITION_CMOS_OFFSET
+	int
+	default 68
+	depends on SOC_INTEL_CSE_LITE_SKU
+	help
+	  This configuration option stores the starting offset of cse fw partition versions in
+	  CMOS memory. The offset should be byte aligned and must leave enough memory to store
+	  required firmware partition versions.
+
+config SOC_INTEL_STORE_ISH_FW_VERSION
+	bool
+	default n
+	depends on DRIVERS_INTEL_ISH
+	help
+	  This configuration option stores ISH version in CBMEM area.
+	  This information can be used to identify the currently running ISH firmware
+	  version.
+
+	  ISH BUP is sitting inside the CSE firmware partition. The way to retrieve the
+	  ISH version is by sending the HECI command to read the CSE FPT. The cost of sending
+	  HECI command to read the CSE FPT is significant (~200ms) hence, the idea is to
+	  read the CSE RW version on every cold reset (to cover the CSE update scenarios)
+	  and store into CBMEM to avoid the cost of resending the HECI command in all
+	  consecutive warm boots.
+
+	  Later boot stages can just read the CBMEM ID to retrieve the ISH version.
+
+	  Additionally, ensure this feature is platform specific hence, only enabled
+	  for the platform that would like to store the ISH version into the CBMEM and
+	  parse to perform some additional work.
+
+config SOC_INTEL_CSE_SEND_EOP_EARLY
+	bool "CSE send EOP early"
+	depends on SOC_INTEL_COMMON_BLOCK_CSE && !SOC_INTEL_CSE_SEND_EOP_BY_PAYLOAD
+	help
+	  Use this config to send End Of Post (EOP) earlier through SoC code in order to
+	  reduce time required to send EOP and getting CSE response.
+	  In later stages, CSE might be busy and might require more time to process EOP command.
+	  SoC can use this Kconfig to send EOP earlier by itself.
+
+config SOC_INTEL_CSE_SEND_EOP_LATE
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK_CSE && !SOC_INTEL_CSE_SEND_EOP_BY_PAYLOAD
+	help
+	  Use this config to send End Of Post (EOP) late (even after CSE `final` operation)
+	  using boot state either `BS_PAYLOAD_BOOT` or `BS_PAYLOAD_LOAD` from common code
+	  in order to reduce time required to send EOP and getting CSE response.
+	  It has been observed that CSE might be busy and might require more time to
+	  process the EOP command.
+	  SoC can use this Kconfig to send EOP later by itself.
+	  Starting with Jasper Lake, coreboot sends EOP before loading payload hence, this
+	  config is applicable for those platforms.
+
+config SOC_INTEL_CSE_SEND_EOP_ASYNC
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK_CSE && !SOC_INTEL_CSE_SEND_EOP_BY_PAYLOAD
+	depends on !SOC_INTEL_CSE_SEND_EOP_LATE
+	depends on !SOC_INTEL_CSE_SEND_EOP_EARLY
+	help
+	  Use this config to handle End Of Post (EOP) completion
+	  asynchronously. The EOP command is sent first and the result
+	  is checked later leaving time to CSE to complete the
+	  operation while coreboot perform other activities.
+	  Performing EOP asynchronously reduces the time spent
+	  actively waiting for command completion which can have a
+	  significant impact on boot time.
+
+	  Using this asynchronous approach comes with the limitation
+	  that no HECI command should be sent between the time the EOP
+	  request is posted (at CSE .final device operation) and the
+	  time coreboot check for its completion (BS_PAYLOAD_LOAD).
+
+config SOC_INTEL_CSE_SEND_EOP_BY_PAYLOAD
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK_CSE
+	help
+	  Use this config to specify that the payload will send the End Of Post (EOP) instead
+	  of coreboot.
+
+	  In this case, the HECI interface needs to stay visible and the payload must support
+	  sending commands to CSE.
+
+config SOC_INTEL_CSE_LITE_SYNC_BY_PAYLOAD
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK_CSE
+	help
+	  Use this config to specify that the payload will update the CSE RW partition instead
+	  of coreboot.
+
+	  In this case, CSE shall not switch to RW partition and the payload must support
+	  CSE RW update.
+
+config SOC_INTEL_CSE_LITE_SKU
+	bool
+	default n
+	help
+	 Enables CSE Lite SKU
+
+config SOC_INTEL_CSE_LITE_PSR
+	bool
+	default n
+	depends on SOC_INTEL_CSE_LITE_SKU && !SOC_INTEL_CSE_LITE_SYNC_BY_PAYLOAD
+	select SOC_INTEL_CSE_LITE_SYNC_IN_RAMSTAGE
+	help
+	 Select this config if Platform Service Record(PSR) is supported by the platform. This
+	 config is applicable only for Lite SKU, where PSR data backup is required prior to a
+	 CSE firmware downgrade during which CSE data is cleared. PSR services in CSE FW is
+	 enabled only post DRAM init and the command to backup PSR data is also supported only
+	 post DRAM init. Hence platform that selects PSR would need to perform CSE firmware sync
+	 in ramstage.
+
+config SOC_INTEL_CSE_SERVER_SKU
+	bool
+	default n
+	help
+	  Enables CSE Server SKU
+
+config SOC_INTEL_CSE_RW_UPDATE
+	bool "Enable the CSE RW Update Feature"
+	default n
+	depends on SOC_INTEL_CSE_LITE_SKU || SOC_INTEL_CSE_LITE_SYNC_BY_PAYLOAD
+	help
+	 This config will enable CSE RW firmware update feature and also will be used ensure
+	 all the required configs are provided by mainboard.
+
+config SOC_INTEL_CSE_FMAP_NAME
+	string "Name of CSE Region in FMAP" if SOC_INTEL_CSE_RW_UPDATE
+	default "SI_ME"
+	help
+	 Name of CSE region in FMAP
+
+config SOC_INTEL_CSE_RW_A_FMAP_NAME
+	string "Location of CSE RW A in FMAP" if SOC_INTEL_CSE_RW_UPDATE
+	default "ME_RW_A"
+	help
+	 Name of CSE RW A region in FMAP
+
+config SOC_INTEL_CSE_RW_B_FMAP_NAME
+	string "Location of CSE RW B in FMAP" if SOC_INTEL_CSE_RW_UPDATE
+	default "ME_RW_B"
+	help
+	 Name of CSE RW B region in FMAP
+
+config SOC_INTEL_CSE_RW_CBFS_NAME
+	string "CBFS entry name for CSE RW blob" if SOC_INTEL_CSE_RW_UPDATE
+	default "me_rw"
+	help
+	 CBFS entry name for Intel CSE CBFS RW blob
+
+config SOC_INTEL_CSE_RW_HASH_CBFS_NAME
+	string "CBFS name for CSE RW hash file" if SOC_INTEL_CSE_RW_UPDATE
+	default "me_rw.hash"
+	help
+	 CBFS name for Intel CSE CBFS RW hash file
+
+config SOC_INTEL_CSE_RW_VERSION_CBFS_NAME
+	string "CBFS name for CSE RW version file" if SOC_INTEL_CSE_RW_UPDATE
+	default "me_rw.version"
+	help
+	 CBFS name for Intel CSE CBFS RW version file
+
+config SOC_INTEL_CSE_RW_FILE
+	string "Intel CSE CBFS RW path and filename" if SOC_INTEL_CSE_RW_UPDATE && !STITCH_ME_BIN
+	default ""
+	help
+	 Intel CSE CBFS RW blob path and file name
+
+config SOC_INTEL_CSE_RW_VERSION
+	string "Intel CSE RW firmware version (deprecated)" if SOC_INTEL_CSE_RW_UPDATE
+	default ""
+	help
+	 This config contains the Intel CSE RW version of the blob that is provided by
+	 SOC_INTEL_CSE_RW_FILE config and the version must be set in the format
+	 major.minor.hotfix.build (ex: 14.0.40.1209).
+
+	 This config may be deprecated in the future. Consider not providing the CSE RW
+	 firmware version here and let the CSE version be automatically queried from the CSE
+	 binary at build time (available with Meteor Lake and following platforms).
+
+config SOC_INTEL_CSE_SET_EOP
+	bool
+	default n
+	select PMC_IPC_ACPI_INTERFACE
+	help
+	  This config ensures coreboot will send the CSE the End-of-POST message
+	  just prior to loading the payload. This is a security feature so the
+	  CSE will no longer respond to Pre-Boot commands.
+
+config SOC_INTEL_CSE_SUB_PART_UPDATE
+	bool "Enable the CSE sub-partition update Feature"
+	default n
+	depends on SOC_INTEL_CSE_LITE_SKU
+	help
+	 This config will enable CSE sub-partition firmware update feature and also will be used ensure
+	 all the required configs are provided by mainboard.
+
+config SOC_INTEL_CSE_IOM_CBFS_NAME
+	string "CBFS name for CSE sub-partition IOM binary" if SOC_INTEL_CSE_SUB_PART_UPDATE
+	default "cse_iom"
+	help
+	 CBFS entry name for Intel CSE sub-partition IOM binary
+
+config SOC_INTEL_CSE_IOM_CBFS_FILE
+	string "Intel CBFS path and file name for CSE sub-partition IOM binary" if SOC_INTEL_CSE_SUB_PART_UPDATE
+	default ""
+	help
+	 CBFS path and file name for Intel CSE sub-partition IOM binary
+
+config SOC_INTEL_CSE_NPHY_CBFS_NAME
+	string "CBFS name for CSE sub-partition NPHY binary" if SOC_INTEL_CSE_SUB_PART_UPDATE
+	default "cse_nphy"
+	help
+	 CBFS entry name for Intel CSE sub-partition NPHY binary
+
+config SOC_INTEL_CSE_NPHY_CBFS_FILE
+	string "Intel CBFS path and file name for CSE sub-partition NPHY binary" if SOC_INTEL_CSE_SUB_PART_UPDATE
+	default ""
+	help
+	 CBFS path and file name for Intel CSE sub-partition NPHY binary
+
+config SOC_INTEL_CSE_LITE_COMPRESS_ME_RW
+	bool
+	default n
+	depends on SOC_INTEL_CSE_LITE_SKU
+	select CBFS_ALLOW_UNVERIFIED_DECOMPRESSION if CBFS_VERIFICATION && !VBOOT_CBFS_INTEGRATION
+	help
+	 Enable compression on Intel CSE CBFS RW blob
+
+config SOC_INTEL_CSE_PRE_CPU_RESET_TELEMETRY
+	def_bool n
+	depends on !SOC_INTEL_CSE_LITE_SYNC_BY_PAYLOAD
+	help
+	  Mainboard user to select this Kconfig in order to capture pre-cpu
+	  reset boot performance telemetry data.
+
+config SOC_INTEL_CSE_PRE_CPU_RESET_TELEMETRY_V1
+	bool
+	select SOC_INTEL_CSE_PRE_CPU_RESET_TELEMETRY
+	help
+	  This config will make mainboard use version 1 of the CSE timestamp
+	  definitions, it can be used for Alder Lake and Raptor Lake (all SKUs).
+
+config SOC_INTEL_CSE_PRE_CPU_RESET_TELEMETRY_V2
+	bool
+	select SOC_INTEL_CSE_PRE_CPU_RESET_TELEMETRY
+	help
+	  This config will make mainboard use version 2 of the CSE timestamp
+	  definitions, it can be used for Meteor Lake M/P.
+
+config SOC_INTEL_CSE_LITE_SYNC_IN_ROMSTAGE
+	bool
+	default !SOC_INTEL_CSE_LITE_SYNC_IN_RAMSTAGE
+	depends on SOC_INTEL_CSE_LITE_SKU && !SOC_INTEL_CSE_LITE_COMPRESS_ME_RW && !SOC_INTEL_CSE_LITE_SYNC_BY_PAYLOAD
+	help
+	 Use default flow of CSE FW Update in romstage when uncompressed ME_RW blobs are used.
+
+config SOC_INTEL_CSE_LITE_SYNC_IN_RAMSTAGE
+	bool
+	default n
+	depends on !SOC_INTEL_CSE_LITE_SYNC_BY_PAYLOAD
+	help
+	 Use this option if CSE RW update needs to be triggered during RAMSTAGE.
+
+config SOC_INTEL_CSE_HAVE_SPEC_SUPPORT
+	bool
+	depends on SOC_INTEL_COMMON_BLOCK_CSE
+	default n
+	help
+	 This option config will allow SoC platform to use applicable ME specification.
+	 The version based CSE measured ME specification data structures are defined at
+	 common code. Enabling this option will use those CSE defined ME specification
+	 for the SoC. User should select pertinent ME spec version along with this option.
+
+config SOC_INTEL_COMMON_BLOCK_ME_SPEC_12
+	bool
+	select SOC_INTEL_CSE_HAVE_SPEC_SUPPORT
+	help
+	  This config will enable 'ME specification version 12'. It will ensure ME specific
+	  declaration and uses of required data structures for Host firmware status registers.
+
+config SOC_INTEL_COMMON_BLOCK_ME_SPEC_13
+	bool
+	select SOC_INTEL_CSE_HAVE_SPEC_SUPPORT
+	help
+	  This config will enable 'ME specification version 13'. It will ensure ME specific
+	  declaration and uses of required data structures for Host firmware status registers.
+
+config SOC_INTEL_COMMON_BLOCK_ME_SPEC_15
+	bool
+	select SOC_INTEL_CSE_HAVE_SPEC_SUPPORT
+	help
+	  This config will enable 'ME specification version 15'. It will ensure ME specific
+	  declaration and uses of required data structures for Host firmware status registers.
+
+config SOC_INTEL_COMMON_BLOCK_ME_SPEC_16
+	bool
+	select SOC_INTEL_CSE_HAVE_SPEC_SUPPORT
+	help
+	  This config will enable 'ME specification version 16'. It will ensure ME specific
+	  declaration and uses of required data structures for Host firmware status registers.
+
+config SOC_INTEL_COMMON_BLOCK_ME_SPEC_18
+	bool
+	select SOC_INTEL_CSE_HAVE_SPEC_SUPPORT
+	help
+	  This config will enable 'ME specification version 18'. It will ensure ME specific
+	  declaration and uses of required data structures for Host firmware status registers.
+
+config SOC_INTEL_COMMON_BLOCK_ME_SPEC_21
+	bool
+	select SOC_INTEL_CSE_HAVE_SPEC_SUPPORT
+	help
+	  This config will enable 'ME specification version 21'. It will ensure ME specific
+	  declaration and uses of required data structures for Host firmware status registers.
+	  This version of ME is compatible with ME version 18 in terms of Host firmware
+	  status registers.
+
+if SOC_INTEL_CSE_HAVE_SPEC_SUPPORT
+
+config ME_SPEC
+	int
+	default 12 if SOC_INTEL_COMMON_BLOCK_ME_SPEC_12
+	default 13 if SOC_INTEL_COMMON_BLOCK_ME_SPEC_13
+	default 15 if SOC_INTEL_COMMON_BLOCK_ME_SPEC_15
+	default 16 if SOC_INTEL_COMMON_BLOCK_ME_SPEC_16
+	default 18 if SOC_INTEL_COMMON_BLOCK_ME_SPEC_18 || SOC_INTEL_COMMON_BLOCK_ME_SPEC_21
+	help
+	  This config holds the ME spec version if defined.
+
+endif # SOC_INTEL_CSE_HAVE_SPEC_SUPPORT
+
+if STITCH_ME_BIN
+
+config CSE_COMPONENTS_PATH
+	string "Path to directory containing all CSE input components to stitch"
+	default "3rdparty/blobs/mainboard/\$(CONFIG_MAINBOARD_DIR)/firmware"
+	help
+	  This is the file path containing all the input CSE component files.
+	  These will be used by cse_serger tool to stitch CSE image.
+
+config CSE_FPT_FILE
+	string "Name of CSE FPT file"
+	default "cse_fpt.bin"
+	help
+	  This file is the CSE input binary as released by Intel in a CSE kit.
+
+config CSE_DATA_FILE
+	string "Name of CSE data file"
+	default "cse_data.bin"
+	help
+	  This file is the CSE data binary typically generated by Intel FIT tool.
+
+config CSE_PMCP_FILE
+	string "Name of PMC file"
+	default "pmc.bin"
+	help
+	  This file is the PMC input binary as released by Intel in a CSE kit.
+
+config CSE_IOMP_FILE
+	string "Name of IOM file"
+	default "iom.bin"
+	help
+	  This file is the IOM input binary as released by Intel in a CSE kit.
+
+config CSE_TBTP_FILE
+	string "Name of TBT file"
+	default "tbt.bin"
+	help
+	  This file is the TBT input binary as released by Intel in a CSE kit.
+
+config CSE_NPHY_FILE
+	string "Name of NPHY file"
+	default "nphy.bin"
+	help
+	  This file is the NPHY input binary as released by Intel in a CSE kit.
+
+config CSE_PCHC_FILE
+	string "Name of PCHC file"
+	default "pchc.bin"
+	help
+	  This file is the PCHC input binary as released by Intel in a CSE kit.
+
+config CSE_IUNP_FILE
+	string "Name of IUNIT file"
+	default "iunit.bin"
+	help
+	  This file is the PCHC input binary as released by Intel in a CSE kit.
+
+config CSE_BPDT_VERSION
+	string
+	help
+	  This config indicates the BPDT version used by CSE for a given SoC.
+
+config CSE_OEMP_FILE
+	string "Name of OEM Key Manifest file"
+	default "oem_km.bin"
+	help
+	  OEM Key Manifest lists the public key hashes used for authenticating the
+	  OEM created binaries to be loaded. This binary is generated by signing with
+	  the key owned by trusted owner.
+
+endif
+
+config CSE_RESET_CLEAR_EC_AP_IDLE_FLAG
+	bool
+	default y if !SYSTEM_TYPE_LAPTOP
+	help
+	  Select this if the variant is a Chromebox/base. This allows AP to direct EC
+	  to clear AP_IDLE flag before triggering reset to make sure AP can boot up
+	  after reset.

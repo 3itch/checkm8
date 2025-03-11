@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_AMD_COMMON_BLOCK_SMBUS
+	bool
+	help
+	  Select this option to add FCH SMBus controller functions to the build.

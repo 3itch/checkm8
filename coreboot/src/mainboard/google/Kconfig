@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_GOOGLE
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/google/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/google/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "Google"
+
+endif # VENDOR_GOOGLE

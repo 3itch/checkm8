@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+# Emulation for QEMU 2.8 ARM Virtual Machine (alias of virt-2.8)
+# https://wiki.qemu.org/Documentation/Platforms/ARM
+
+if BOARD_EMULATION_QEMU_AARCH64
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select ARCH_BOOTBLOCK_ARMV8_64
+	select ARCH_VERSTAGE_ARMV8_64
+	select ARCH_ROMSTAGE_ARMV8_64
+	select ARCH_RAMSTAGE_ARMV8_64
+	select FLATTENED_DEVICE_TREE
+	select ARM64_USE_ARCH_TIMER
+	select BOARD_ROMSIZE_KB_16384
+	select BOOTBLOCK_CUSTOM
+	select BOOT_DEVICE_NOT_SPI_FLASH
+	select DRIVERS_UART_PL011
+	select HAVE_LINEAR_FRAMEBUFFER
+	select MAINBOARD_FORCE_NATIVE_VGA_INIT
+	select MAINBOARD_HAS_NATIVE_VGA_INIT
+	select MISSING_BOARD_RESET
+	select ARM64_USE_ARM_TRUSTED_FIRMWARE
+	select PCI
+
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0x4010000000
+
+config ECAM_MMCONF_BUS_NUMBER
+	default 256
+
+config PCI_IOBASE
+	default 0x3eff0000
+
+config MEMLAYOUT_LD_FILE
+	string
+	default "src/mainboard/emulation/qemu-aarch64/memlayout.ld"
+
+config MAINBOARD_DIR
+	default "emulation/qemu-aarch64"
+
+config MAINBOARD_PART_NUMBER
+	default "QEMU AArch64"
+
+config MAX_CPUS
+	int
+	default 2
+
+config MAINBOARD_VENDOR
+	string
+	default "QEMU"
+
+config DRAM_SIZE_MB
+	int
+	default 261120 # The maximum dram size is 255GiB.
+
+endif #  BOARD_EMULATION_QEMU_AARCH64

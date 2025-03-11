@@ -1,0 +1,44 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_CAVIUM_CN81XX
+	bool
+	default n
+	select ARCH_BOOTBLOCK_ARMV8_64
+	select ARCH_RAMSTAGE_ARMV8_64
+	select ARCH_ROMSTAGE_ARMV8_64
+	select ARCH_VERSTAGE_ARMV8_64
+	select DRIVERS_UART_PL011
+	select UART_OVERRIDE_REFCLK
+	select SOC_CAVIUM_COMMON
+	select CAVIUM_BDK_DDR_TUNE_HW_OFFSETS
+	select ECAM_MMCONF_SUPPORT
+	select PCI
+
+if SOC_CAVIUM_CN81XX
+
+config MEMLAYOUT_LD_FILE
+	string
+	default "src/soc/cavium/cn81xx/memlayout.ld"
+
+config VBOOT
+	select VBOOT_SEPARATE_VERSTAGE
+	select VBOOT_STARTS_IN_BOOTBLOCK
+
+config ARM64_BL31_EXTERNAL_FILE
+	string
+	default "3rdparty/blobs/soc/cavium/cn81xx/bl31.elf"
+
+config ARCH_ARMV8_EXTENSION
+	int
+	default 1
+
+config STACK_SIZE
+	default 0x2000
+
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0x848000000000
+
+config ECAM_MMCONF_BUS_NUMBER
+	default 32
+
+endif

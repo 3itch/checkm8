@@ -1,0 +1,161 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config MISSING_BOARD_RESET
+	bool
+	help
+	  Selected by boards that don't provide a do_board_reset()
+	  implementation. This activates a stub that logs the missing
+	  board reset and halts execution.
+
+config ROMSTAGE_ADA
+	bool
+	help
+	  Selected by features that use Ada code in romstage.
+
+config RAMSTAGE_ADA
+	bool
+	help
+	  Selected by features that use Ada code in ramstage.
+
+config RAMSTAGE_LIBHWBASE
+	bool
+	select RAMSTAGE_ADA
+	help
+	  Selected by features that require `libhwbase` in ramstage.
+
+config ROMSTAGE_LIBHWBASE
+	bool
+	select ROMSTAGE_ADA
+	help
+	  Selected by features that require `libhwbase` in romstage.
+
+config FLATTENED_DEVICE_TREE
+	bool
+	help
+	  Selected by features that require to parse and manipulate a flattened
+	  devicetree in ramstage.
+
+config HAVE_SPD_IN_CBFS
+	bool
+	help
+	  If enabled, add support for adding spd.hex files in cbfs as spd.bin
+	  and locating it runtime to load SPD.
+
+config DIMM_MAX
+	int
+	default 4
+	help
+	  Total number of memory DIMM slots available on motherboard.
+	  It is multiplication of number of channel to number of DIMMs per
+	  channel
+
+config MAX_SOCKET
+	int
+	default 1
+
+config DIMM_SPD_SIZE
+	int
+	default 256
+	help
+	  Total SPD size that will be used for DIMM.
+	  Ex: DDR3 256, DDR4 512.
+
+config SPD_READ_BY_WORD
+	bool
+
+config SPD_CACHE_IN_FMAP
+	bool
+	default n
+	help
+	  Enables capability to cache DIMM SPDs in a dedicated FMAP region
+	  to speed loading of SPD data. Currently requires board-level
+	  romstage implementation to read/write/utilize cached SPD data.
+	  When the default FMAP is used, will create a region named RW_SPD_CACHE
+	  to store the cached SPD data.
+
+config SPD_CACHE_FMAP_NAME
+	string
+	depends on SPD_CACHE_IN_FMAP
+	default "RW_SPD_CACHE"
+	help
+	  Name of the FMAP region created in the default FMAP to cache SPD data.
+
+if RAMSTAGE_LIBHWBASE && !ROMSTAGE_LIBHWBASE
+
+config HWBASE_DYNAMIC_MMIO
+	def_bool y
+
+endif
+
+if ROMSTAGE_LIBHWBASE
+
+config HWBASE_STATIC_MMIO
+	def_bool y
+
+endif
+
+if RAMSTAGE_LIBHWBASE || ROMSTAGE_LIBHWBASE
+
+config HWBASE_DEFAULT_MMCONF
+	hex
+	default ECAM_MMCONF_BASE_ADDRESS
+
+config HWBASE_DIRECT_PCIDEV
+	def_bool y
+
+endif
+
+config NO_FMAP_CACHE
+	bool
+	help
+	  If your platform really doesn't want to use an FMAP cache (e.g. due to
+	  space constraints), you can select this to disable warnings and save
+	  a bit more code.
+
+config ESPI_DEBUG
+	bool
+	help
+	  This option enables eSPI library helper functions for displaying debug
+	  information.
+
+config NO_CBFS_MCACHE
+	bool
+	help
+	  Disables the CBFS metadata cache. This means that your platform does
+	  not need to provide a CBFS_MCACHE section in memlayout and can save
+	  the associated CAR/SRAM size. In that case every single CBFS file
+	  lookup must re-read the same CBFS directory entries from flash to find
+	  the respective file.
+
+config CBFS_CACHE_ALIGN
+	int
+	default 8
+	help
+	  Sets the alignment of the buffers returned by the cbfs_cache.
+
+config CBFS_PRELOAD
+	bool
+	depends on COOP_MULTITASKING
+	help
+	  When enabled it will be possible to preload CBFS files into the
+	  cbfs_cache. This helps reduce boot time by loading the files
+	  in the background before they are actually required. This feature
+	  depends on the read-only boot_device having a DMA controller to
+	  perform the background transfer.
+
+config DECOMPRESS_OFAST
+	bool
+	depends on COMPILER_GCC
+	default y
+	help
+	  Compile the decompressing function in -Ofast instead of standard -Os
+
+config PROBE_RAM
+	def_bool y if VENDOR_EMULATION
+	help
+	  When enabled it will be possible to detect usable RAM using probe_ram
+	  function.
+
+config HAVE_CUSTOM_BMP_LOGO
+	def_bool n
+	depends on BMP_LOGO

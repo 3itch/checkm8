@@ -1,0 +1,128 @@
+/* A Bison parser, made by GNU Bison 3.8.2.  */
+
+/* Bison interface for Yacc-like parsers in C
+
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Inc.
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* As a special exception, you may create a larger work that contains
+   part or all of the Bison parser skeleton and distribute that work
+   under terms of your choice, so long as that work isn't itself a
+   parser generator using the skeleton or a modified version thereof
+   as a parser skeleton.  Alternatively, if you modify or redistribute
+   the parser skeleton itself, you may (at your option) remove this
+   special exception, which will cause the skeleton and the resulting
+   Bison output files to be licensed under the GNU General Public
+   License without this special exception.
+
+   This special exception was added by the Free Software Foundation in
+   version 2.2 of Bison.  */
+
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
+
+#ifndef YY_YY_SCONFIG_TAB_H_SHIPPED_INCLUDED
+# define YY_YY_SCONFIG_TAB_H_SHIPPED_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token kinds.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    CHIP = 258,                    /* CHIP  */
+    DEVICE = 259,                  /* DEVICE  */
+    REGISTER = 260,                /* REGISTER  */
+    ALIAS = 261,                   /* ALIAS  */
+    REFERENCE = 262,               /* REFERENCE  */
+    ASSOCIATION = 263,             /* ASSOCIATION  */
+    BOOL = 264,                    /* BOOL  */
+    STATUS = 265,                  /* STATUS  */
+    MANDATORY = 266,               /* MANDATORY  */
+    BUS = 267,                     /* BUS  */
+    RESOURCE = 268,                /* RESOURCE  */
+    END = 269,                     /* END  */
+    EQUALS = 270,                  /* EQUALS  */
+    HEX = 271,                     /* HEX  */
+    STRING = 272,                  /* STRING  */
+    PCI = 273,                     /* PCI  */
+    PNP = 274,                     /* PNP  */
+    I2C = 275,                     /* I2C  */
+    CPU_CLUSTER = 276,             /* CPU_CLUSTER  */
+    CPU = 277,                     /* CPU  */
+    DOMAIN = 278,                  /* DOMAIN  */
+    IRQ = 279,                     /* IRQ  */
+    DRQ = 280,                     /* DRQ  */
+    SLOT_DESC = 281,               /* SLOT_DESC  */
+    SMBIOS_DEV_INFO = 282,         /* SMBIOS_DEV_INFO  */
+    IO = 283,                      /* IO  */
+    NUMBER = 284,                  /* NUMBER  */
+    SUBSYSTEMID = 285,             /* SUBSYSTEMID  */
+    INHERIT = 286,                 /* INHERIT  */
+    PCIINT = 287,                  /* PCIINT  */
+    GENERIC = 288,                 /* GENERIC  */
+    SPI = 289,                     /* SPI  */
+    USB = 290,                     /* USB  */
+    MMIO = 291,                    /* MMIO  */
+    GPIO = 292,                    /* GPIO  */
+    MDIO = 293,                    /* MDIO  */
+    FW_CONFIG_TABLE = 294,         /* FW_CONFIG_TABLE  */
+    FW_CONFIG_FIELD = 295,         /* FW_CONFIG_FIELD  */
+    FW_CONFIG_OPTION = 296,        /* FW_CONFIG_OPTION  */
+    FW_CONFIG_PROBE = 297,         /* FW_CONFIG_PROBE  */
+    FW_CONFIG_UNPROVISIONED = 298, /* FW_CONFIG_UNPROVISIONED  */
+    PIPE = 299,                    /* PIPE  */
+    OPS = 300                      /* OPS  */
+  };
+  typedef enum yytokentype yytoken_kind_t;
+#endif
+
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+union YYSTYPE
+{
+
+	struct device *dev;
+	struct chip_instance *chip_instance;
+	char *string;
+	uint64_t number;
+
+
+};
+typedef union YYSTYPE YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
+#endif
+
+
+extern YYSTYPE yylval;
+
+
+int yyparse (void);
+
+
+#endif /* !YY_YY_SCONFIG_TAB_H_SHIPPED_INCLUDED  */

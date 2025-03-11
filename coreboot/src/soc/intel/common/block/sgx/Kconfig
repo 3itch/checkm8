@@ -1,0 +1,29 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_SGX
+	bool
+	select CPU_INTEL_COMMON
+	default n
+	help
+	  Intel Processor common SGX support
+
+if SOC_INTEL_COMMON_BLOCK_SGX
+
+config SOC_INTEL_COMMON_BLOCK_SGX_LOCK_MEMORY
+	bool
+	default n
+	help
+	 Lock memory before SGX activation. This is only needed if MCHECK does not do it.
+
+config SOC_INTEL_COMMON_BLOCK_SGX_ENABLE
+	bool "Enable Software Guard Extensions (SGX) if available"
+	default n
+	help
+	  Intel Software Guard Extensions (SGX) is a set of new CPU instructions that can be
+	  used by applications to set aside private regions (so-called Secure Enclaves) of
+	  code and data.
+
+	  SGX will only be enabled when supported by the CPU! Configure PRMRR size using
+	  SOC_INTEL_COMMON_BLOCK_PRMRR_SIZE config option.
+
+endif

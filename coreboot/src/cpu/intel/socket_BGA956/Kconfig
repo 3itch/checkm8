@@ -1,0 +1,28 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config CPU_INTEL_SOCKET_BGA956
+	bool
+	select CPU_INTEL_MODEL_1067X
+
+if CPU_INTEL_SOCKET_BGA956
+
+config DCACHE_RAM_BASE
+	hex
+	default 0xfefc0000
+
+config DCACHE_RAM_SIZE
+	hex
+	default 0x10000
+
+config PRERAM_CBFS_CACHE_SIZE
+	default 0x0
+
+config DCACHE_BSP_STACK_SIZE
+	hex
+	default 0x2000
+
+config MAX_CPUS
+	int
+	default 2
+
+endif

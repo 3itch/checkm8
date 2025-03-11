@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Smaug"
+
+config BOARD_GOOGLE_SMAUG
+	bool "->  Smaug (Google Pixel C)"

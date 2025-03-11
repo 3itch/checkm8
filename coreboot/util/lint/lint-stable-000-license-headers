@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# DESCR: Check that files have license headers
+
+# Top level
+util/lint/lint-000-license-headers "src tests payloads/coreinfo"

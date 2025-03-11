@@ -1,0 +1,181 @@
+chip soc/intel/skylake
+
+	# Enable deep Sx states
+	register "deep_s3_enable_ac" = "false"
+	register "deep_s3_enable_dc" = "false"
+
+	# FSP Configuration
+	register "ScsEmmcHs400Enabled" = "0"
+
+	# VR Settings Configuration for 5 Domains
+	#+----------------+-------+-------+-------------+-------------+-------+
+	#| Domain/Setting |  SA   |  IA   | Ring Sliced | GT Unsliced |  GT   |
+	#+----------------+-------+-------+-------------+-------------+-------+
+	#| Psi1Threshold  | 20A   | 20A   | 20A         | 20A         | 20A   |
+	#| Psi2Threshold  | 4A    | 5A    | 5A          | 5A          | 5A    |
+	#| Psi3Threshold  | 1A    | 1A    | 1A          | 1A          | 1A    |
+	#| Psi3Enable     | 1     | 1     | 1           | 1           | 1     |
+	#| Psi4Enable     | 1     | 1     | 1           | 1           | 1     |
+	#| ImonSlope      | 0     | 0     | 0           | 0           | 0     |
+	#| ImonOffset     | 0     | 0     | 0           | 0           | 0     |
+	#| IccMax         | Auto  | Auto  | Auto        | Auto        | Auto  |
+	#| VrVoltageLimit*| 0     | 0     | 0           | 0           | 0     |
+	#+----------------+-------+-------+-------------+-------------+-------+
+	#* VrVoltageLimit command not sent.
+
+	register "domain_vr_config[VR_SYSTEM_AGENT]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(4),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0,
+		.imon_offset = 0,
+		.icc_max = 0,
+		.voltage_limit = 0
+	}"
+
+	register "domain_vr_config[VR_IA_CORE]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0,
+		.imon_offset = 0,
+		.icc_max = 0,
+		.voltage_limit = 0
+	}"
+
+	register "domain_vr_config[VR_GT_UNSLICED]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0,
+		.imon_offset = 0,
+		.icc_max = 0,
+		.voltage_limit = 0
+	}"
+
+	register "domain_vr_config[VR_GT_SLICED]" = "{
+		.vr_config_enable = 1,
+		.psi1threshold = VR_CFG_AMP(20),
+		.psi2threshold = VR_CFG_AMP(5),
+		.psi3threshold = VR_CFG_AMP(1),
+		.psi3enable = 1,
+		.psi4enable = 1,
+		.imon_slope = 0,
+		.imon_offset = 0,
+		.icc_max = 0,
+		.voltage_limit = 0
+	}"
+
+	# Must leave UART0 enabled or SD/eMMC will not work as PCI
+	register "SerialIoDevMode" = "{
+		[PchSerialIoIndexI2C0]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C1]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C2]  = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C3]  = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C4]  = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C5]  = PchSerialIoDisabled,
+		[PchSerialIoIndexSpi0]  = PchSerialIoDisabled,
+		[PchSerialIoIndexSpi1]  = PchSerialIoDisabled,
+		[PchSerialIoIndexUart0] = PchSerialIoPci,
+		[PchSerialIoIndexUart1] = PchSerialIoDisabled,
+		[PchSerialIoIndexUart2] = PchSerialIoSkipInit,
+	}"
+
+	# PL2 override 25W
+	register "power_limits_config" = "{
+		.tdp_pl2_override = 25,
+	}"
+
+	device domain 0 on
+		device ref south_xhci on
+			register "SsicPortEnable" = "1" # Enable SSIC for WWAN
+
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_MAX(OC2),	/* Type-C Port */
+				[1] = USB2_PORT_MAX(OC5),	/* Front panel */
+				[2] = USB2_PORT_MAX(OC4),	/* Back panel */
+				[3] = USB2_PORT_MAX(OC4),	/* Back panel */
+				[4] = USB2_PORT_MAX(OC1),	/* Back panel-1 */
+				[5] = USB2_PORT_MAX(OC1),	/* Back panel */
+				[6] = USB2_PORT_MAX(OC_SKIP),	/* Back panel */
+				[7] = USB2_PORT_MAX(OC_SKIP),	/* Front panel */
+				[8] = USB2_PORT_MAX(OC_SKIP),	/* M.2 BT */
+				[9] = USB2_PORT_MAX(OC2),	/* Front panel */
+				[10] = USB2_PORT_MAX(OC_SKIP),	/* Back panel */
+				[11] = USB2_PORT_MAX(OC_SKIP),	/* Back panel-1 */
+				[12] = USB2_PORT_MAX(OC3),	/* Back panel */
+				[13] = USB2_PORT_MAX(OC_SKIP),	/* Back panel */
+			}"
+
+			register "usb3_ports" = "{
+				[0] = USB3_PORT_DEFAULT(OC_SKIP),	/* Type-C Port */
+				[1] = USB3_PORT_DEFAULT(OC1),		/* Back panel */
+				[2] = USB3_PORT_DEFAULT(OC1),		/* Back panel */
+				[3] = USB3_PORT_DEFAULT(OC0),		/* Back panel-2 */
+				[4] = USB3_PORT_DEFAULT(OC0),		/* Front Panel */
+				[5] = USB3_PORT_DEFAULT(OC_SKIP),	/* Front Panel */
+				[6] = USB3_PORT_DEFAULT(OC2),		/* Front Panel */
+				[7] = USB3_PORT_DEFAULT(OC2),		/* Front Panel */
+				[8] = USB3_PORT_DEFAULT(OC3),		/* Back panel */
+				[9] = USB3_PORT_DEFAULT(OC_SKIP),	/* LAN */
+			}"
+		end
+		device ref i2c2		off end
+		device ref i2c3		off end
+		device ref sata		on
+			register "SataSalpSupport" = "1"
+			register "SataPortsEnable" = "{
+				[0] = 1,
+				[1] = 1,
+				[2] = 1,
+				[3] = 1,
+				[4] = 1,
+				[5] = 1,
+				[6] = 1,
+				[7] = 1,
+			}"
+		end
+		device ref i2c4		off end
+		device ref pcie_rp1	off end
+		device ref pcie_rp3	on  end
+		device ref pcie_rp4	on
+			register "PcieRpEnable[3]" = "1"
+			register "PcieRpClkReqSupport[3]" = "1"
+			register "PcieRpClkReqNumber[3]" = "2"
+		end
+		device ref pcie_rp5	on
+			register "PcieRpEnable[4]" = "1"
+			register "PcieRpClkReqSupport[4]" = "1"
+			register "PcieRpClkReqNumber[4]" = "1"
+		end
+		device ref pcie_rp9	on
+			register "PcieRpEnable[8]" = "1"
+			register "PcieRpClkReqSupport[8]" = "1"
+			register "PcieRpClkReqNumber[8]" = "6"
+		end
+		device ref pcie_rp17	on
+			register "PcieRpEnable[16]" = "1"
+			register "PcieRpClkReqSupport[16]" = "1"
+			register "PcieRpClkReqNumber[16]" = "7"
+		end
+		device ref emmc		off end
+		device ref sdxc		off end
+		device ref lpc_espi	on
+			register "serirq_mode" = "SERIRQ_CONTINUOUS"
+
+			#chip drivers/pc80/tpm
+			#	device pnp 0c31.0 on end
+			#end
+		end
+		device ref gbe		on  end
+	end
+end

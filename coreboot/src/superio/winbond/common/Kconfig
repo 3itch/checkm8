@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+# Generic Winbond romstage driver - Just enough UART initialisation code for
+# romstage.
+config SUPERIO_WINBOND_COMMON_PRE_RAM
+	bool

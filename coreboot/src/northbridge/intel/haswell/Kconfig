@@ -1,0 +1,149 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config NORTHBRIDGE_INTEL_HASWELL
+	bool
+	select CPU_INTEL_HASWELL
+	select CACHE_MRC_SETTINGS
+	select INTEL_DDI
+	select INTEL_GMA_ACPI
+	select USE_DDR3
+
+if NORTHBRIDGE_INTEL_HASWELL
+
+config USE_NATIVE_RAMINIT
+	bool "[NOT WORKING] Use native raminit"
+	default n
+	select HAVE_DEBUG_RAM_SETUP
+	help
+	  Select if you want to use coreboot implementation of raminit rather than
+	  MRC.bin. Currently incomplete and does not boot.
+
+config HASWELL_VBOOT_IN_BOOTBLOCK
+	depends on VBOOT
+	bool "Start verstage in bootblock"
+	default y
+	select VBOOT_STARTS_IN_BOOTBLOCK
+	help
+	  Haswell can either start verstage in a separate stage
+	  right after the bootblock has run or it can start it
+	  after romstage for compatibility reasons.
+	  Haswell however uses a mrc.bin to initialize memory which
+	  needs to be located at a fixed offset. Therefore even with
+	  a separate verstage starting after the bootblock that same
+	  binary is used meaning a jump is made from RW to the RO region
+	  and back to the RW region after the binary is done.
+
+config USE_BROADWELL_MRC
+	bool "Use Broadwell MRC.bin"
+	depends on !USE_NATIVE_RAMINIT
+	help
+	  Haswell MRC.bin has several limitations: it does not support
+	  Broadwell CPUs nor 9-series PCHs, it does not initialise PEG
+	  ports properly and it can't use more than one SPD file entry
+	  at the same time (which would be useful for memory overclock
+	  when using different DIMMs, without patching SPD EEPROMs). A
+	  workaround for some of these limitations is to use Broadwell
+	  MRC.bin instead.
+
+config VBOOT
+	select VBOOT_MUST_REQUEST_DISPLAY
+	select VBOOT_STARTS_IN_ROMSTAGE if !HASWELL_VBOOT_IN_BOOTBLOCK
+
+config VGA_BIOS_ID
+	string
+	default "8086,0166"
+
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0xf0000000
+
+config ECAM_MMCONF_BUS_NUMBER
+	int
+	default 64
+
+# This number must be equal or lower than what's reported in ACPI PCI _CRS
+config DOMAIN_RESOURCE_32BIT_LIMIT
+	default ECAM_MMCONF_BASE_ADDRESS
+
+config DCACHE_RAM_BASE
+	hex
+	default 0xff7c0000
+
+config DCACHE_RAM_SIZE
+	hex
+	default 0x40000 if USE_NATIVE_RAMINIT
+	default 0x10000
+	help
+	  The size of the cache-as-ram region required during bootblock
+	  and/or romstage. Note DCACHE_RAM_SIZE and DCACHE_RAM_MRC_VAR_SIZE
+	  must add up to a power of 2.
+
+config DCACHE_RAM_MRC_VAR_SIZE
+	hex
+	default 0x0 if USE_NATIVE_RAMINIT
+	default 0x30000
+	help
+	  The amount of cache-as-ram region required by the reference code.
+
+config DCACHE_BSP_STACK_SIZE
+	hex
+	default 0x20000 if USE_NATIVE_RAMINIT
+	default 0x2000
+	help
+	  The amount of anticipated stack usage in CAR by bootblock and
+	  other stages.
+
+config HAVE_MRC
+	bool "Add a System Agent binary"
+	depends on !USE_NATIVE_RAMINIT
+	help
+	  Select this option to add a System Agent binary to
+	  the resulting coreboot image.
+
+	  Note: Without this binary coreboot will not work
+
+config MRC_FILE
+	string "Intel System Agent path and filename"
+	depends on HAVE_MRC
+	default "mrc.bin"
+	help
+	  The path and filename of the file to use as System Agent
+	  binary.
+
+config HASWELL_HIDE_PEG_FROM_MRC
+	bool "Hide PEG devices from MRC to work around hardcoded MRC behavior"
+	depends on !USE_NATIVE_RAMINIT
+	default y
+	help
+	  If set, hides all PEG devices from MRC. This allows the iGPU
+	  to be used even when a dedicated graphics card is present.
+	  However, it prevents MRC from programming PEG AFE registers,
+	  which can make PEG devices unstable. When unsure, choose N.
+
+# The UEFI System Agent binary needs to be at a fixed offset in the flash
+# and can therefore only reside in the COREBOOT fmap region
+config RO_REGION_ONLY
+	string
+	depends on VBOOT
+	default "mrc.bin"
+
+config INTEL_GMA_BCLV_OFFSET
+	default 0x48254
+
+config ENABLE_DDR_2X_REFRESH
+	bool "Enable DRAM Refresh 2x support"
+	default n
+	help
+	  When enabled, the memory controller will refresh the DRAM twice as often.
+	  This probably only happens when the DRAM gets hot, but what MRC exactly
+	  does when this setting is enabled has not been investigated.
+
+config FIXED_MCHBAR_MMIO_BASE
+	default 0xfed10000
+
+config FIXED_DMIBAR_MMIO_BASE
+	default 0xfed18000
+
+config FIXED_EPBAR_MMIO_BASE
+	default 0xfed19000
+
+endif

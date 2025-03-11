@@ -1,0 +1,24 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_EXAMPLE_MIN86
+	bool
+	select ARCH_X86
+	select NO_MONOTONIC_TIMER
+	select NO_ECAM_MMCONF_SUPPORT
+	select UNKNOWN_TSC_RATE
+	help
+	  This example SoC code along with the example/min86 mainboard
+	  should serve as a minimal example how a buildable x86 SoC code
+	  base can look like.
+
+	  This can serve, for instance, as a basis to add new SoCs to
+	  coreboot. Starting with a buildable commit should help with
+	  the review of the actual code, and also avoid any regressions
+	  when common coreboot code changes.
+
+if SOC_EXAMPLE_MIN86
+
+config DCACHE_BSP_STACK_SIZE		# required by arch/x86/car.ld
+	default 0x100
+
+endif

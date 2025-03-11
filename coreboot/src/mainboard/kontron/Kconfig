@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if VENDOR_KONTRON
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/kontron/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/kontron/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "Kontron"
+
+endif # VENDOR_KONTRON

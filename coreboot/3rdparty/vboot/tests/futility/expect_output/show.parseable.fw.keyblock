@@ -1,0 +1,9 @@
+keyblock::valid
+keyblock::size::2232
+keyblock::signature::ignored
+keyblock::signature::size::1024
+keyblock::signature::data_size::1144
+keyblock::flags::23::!DEV:DEV:!REC:!MINIOS
+keyblock::data_key::algorithm::7::RSA4096 SHA256
+keyblock::data_key::version::1
+keyblock::data_key::sha1_sum::e2c1c92d7d7aa7dfed5e8375edd30b7ae52b7450

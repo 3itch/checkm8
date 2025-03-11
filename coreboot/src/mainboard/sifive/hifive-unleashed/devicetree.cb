@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+chip soc/sifive/fu540
+	device cpu_cluster 0 on ops fu540_cpu_ops end
+end

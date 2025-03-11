@@ -1,0 +1,21 @@
+kernel::keyblock::valid
+kernel::keyblock::size::3256
+kernel::keyblock::signature::valid
+kernel::keyblock::signature::size::1024
+kernel::keyblock::signature::data_size::2168
+kernel::keyblock::flags::11::!DEV:DEV:REC
+kernel::keyblock::data_key::algorithm::11::RSA8192 SHA512
+kernel::keyblock::data_key::version::1
+kernel::keyblock::data_key::sha1_sum::e78ce746a037837155388a1096212ded04fb86eb
+kernel::preamble::valid
+kernel::preamble::signature::valid
+kernel::preamble::size::62280
+kernel::preamble::header_version::2.2
+kernel::preamble::kernel_version::1
+kernel::preamble::flags::0
+kernel::body::address::1048576
+kernel::body::size::4018176
+kernel::bootloader::address::5062656
+kernel::bootloader::size::4096
+kernel::body::signature::valid
+kernel::verified

@@ -1,0 +1,546 @@
+fw_config
+	field DB_USB 0 3
+		option USB_ABSENT 0
+		option USB4_GEN2 1
+		option USB3_ACTIVE 2
+		option USB4_GEN3 3
+		option USB3_PASSIVE 4
+		option USB3_NO_A 5
+		option USB3_NO_C 6
+	end
+	field THERMAL 4 7
+		option FAN_TABLE_0 0
+		option FAN_TABLE_1 1
+	end
+	field AUDIO 8 10
+		option NONE 0
+		option MAX98357_ALC5682I_I2S 1
+		option MAX98373_ALC5682I_I2S 2
+		option MAX98373_ALC5682_SNDW 3
+		option MAX98373_ALC5682I_I2S_UP4 4
+		option MAX98360_ALC5682I_I2S 5
+		option RT1011_ALC5682I_I2S 6
+	end
+	field TABLETMODE 11
+		option TABLETMODE_DISABLED 0
+		option TABLETMODE_ENABLED 1
+	end
+	field DB_LTE 12 13
+		option LTE_ABSENT 0
+		option LTE_PRESENT 1
+	end
+	field KB_BL 14
+		option KB_BL_ABSENT 0
+		option KB_BL_PRESENT 1
+	end
+	field NUMPAD 15
+		option NUMPAD_ABSENT 0
+		option NUMPAD_PRESENT 1
+	end
+	field DB_SD 16 19
+		option SD_ABSENT 0
+		option SD_GL9755S 1
+		option SD_RTS5261 2
+		option SD_RTS5227S 3
+		option SD_GL9750 4
+		option SD_OZ711LV2LN 5
+	end
+	field KB_LAYOUT 20 21
+		option KB_LAYOUT_DEFAULT 0
+		option KB_LAYOUT_1 1
+	end
+	field BOOT_DEVICE_EMMC 22
+		option BOOT_EMMC_DISABLED 0
+		option BOOT_EMMC_ENABLED 1
+	end
+	field BOOT_DEVICE_NVME 23
+		option BOOT_NVME_DISABLED 0
+		option BOOT_NVME_ENABLED 1
+	end
+	field BOOT_DEVICE_SATA 24
+		option BOOT_SATA_DISABLED 0
+		option BOOT_SATA_ENABLED 1
+	end
+	field TOUCHPAD 25
+		option REGULAR_TOUCHPAD 0
+		option NUMPAD_TOUCHPAD 1
+	end
+	field WIFI_SAR_ID 26 27
+		option WIFI_SAR_ID_0 0
+		option WIFI_SAR_ID_1 1
+		option WIFI_SAR_ID_2 2
+		option WIFI_SAR_ID_3 3
+	end
+	field OLED_SCREEN 28
+		option OLED_NOT_PRESENT 0
+		option OLED_PRESENT 1
+	end
+end
+
+chip soc/intel/tigerlake
+
+	# GPE configuration
+	# Note that GPE events called out in ASL code rely on this
+	# route. i.e. If this route changes then the affected GPE
+	# offset bits also need to be changed.
+	register "pmc_gpe0_dw0" = "GPP_C"
+	register "pmc_gpe0_dw1" = "GPP_D"
+	register "pmc_gpe0_dw2" = "GPP_E"
+
+	# FSP configuration
+	register "SaGv" = "SaGv_Enabled"
+
+	register "tcss_ports[0]" = "TCSS_PORT_DEFAULT(OC3)"
+	register "tcss_ports[1]" = "TCSS_PORT_DEFAULT(OC0)"
+
+	# Mark SRCCLKREQ pins as unused that are routed for a Non-Clkreq functionality
+	register "PcieClkSrcUsage[2]" = "PCIE_CLK_NOTUSED"
+	register "PcieClkSrcUsage[4]" = "PCIE_CLK_NOTUSED"
+	register "PcieClkSrcUsage[5]" = "PCIE_CLK_NOTUSED"
+	register "PcieClkSrcUsage[6]" = "PCIE_CLK_NOTUSED"
+
+	register "SerialIoI2cMode" = "{
+		[PchSerialIoIndexI2C0]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C1]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C2]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C3]  = PchSerialIoPci,
+		[PchSerialIoIndexI2C4]  = PchSerialIoDisabled,
+		[PchSerialIoIndexI2C5]  = PchSerialIoPci,
+	}"
+
+	register "SerialIoGSpiMode" = "{
+		[PchSerialIoIndexGSPI0] = PchSerialIoPci,
+		[PchSerialIoIndexGSPI1] = PchSerialIoPci,
+		[PchSerialIoIndexGSPI2] = PchSerialIoDisabled,
+		[PchSerialIoIndexGSPI3] = PchSerialIoDisabled,
+	}"
+
+	register "SerialIoGSpiCsMode" = "{
+		[PchSerialIoIndexGSPI0] = 1,
+		[PchSerialIoIndexGSPI1] = 1,
+		[PchSerialIoIndexGSPI2] = 0,
+		[PchSerialIoIndexGSPI3] = 0,
+	}"
+
+	register "SerialIoGSpiCsState" = "{
+		[PchSerialIoIndexGSPI0] = 1,
+		[PchSerialIoIndexGSPI1] = 1,
+		[PchSerialIoIndexGSPI2] = 0,
+		[PchSerialIoIndexGSPI3] = 0,
+	}"
+
+	register "SerialIoUartMode" = "{
+		[PchSerialIoIndexUART0] = PchSerialIoPci,
+		[PchSerialIoIndexUART1] = PchSerialIoDisabled,
+		[PchSerialIoIndexUART2] = PchSerialIoDisabled,
+	}"
+
+	# Set the minimum assertion width
+	# PchPmSlpS3MinAssert:
+	#	- 1: 60us
+	#	- 2: 1ms
+	#	- 3: 50ms
+	#	- 4: 2s
+	register "PchPmSlpS3MinAssert"  = "3"  # 50ms
+	# PchPmSlpS4MinAssert:
+	#	- 1 = 1s
+	#	- 2 = 2s
+	#	- 3 = 3s
+	#	- 4 = 4s
+	register "PchPmSlpS4MinAssert"  = "1"  # 1s
+	# PchPmSlpSusMinAssert:
+	#	- 1 = 0ms
+	#	- 2 = 500ms
+	#	- 3 = 1s
+	#	- 4 = 4s
+	register "PchPmSlpSusMinAssert" = "3"  # 1s
+	# PchPmSlpAMinAssert
+	#	- 1 = 0ms
+	#	- 2 = 4s
+	#	- 3 = 98ms
+	#	- 4 = 2s
+	register "PchPmSlpAMinAssert"   = "3"  # 98ms
+
+	# NOTE: Duration programmed in the below register should never be smaller than the
+	# stretch duration programmed in the following registers -
+	#	- GEN_PMCON_A.SLP_S3_MIN_ASST_WDTH (PchPmSlpS3MinAssert)
+	#	- GEN_PMCON_A.S4MAW (PchPmSlpS4MinAssert)
+	#	- PM_CFG.SLP_A_MIN_ASST_WDTH (PchPmSlpAMinAssert)
+	#	- PM_CFG.SLP_LAN_MIN_ASST_WDTH
+	register "PchPmPwrCycDur" = "1"       # 1s
+
+	# TCSS USB3
+	register "UsbTcPortEn" = "0x3"
+	register "TcssXhciEn" = "1"
+	register "TcssAuxOri" = "0"
+
+	# DP port
+	register "DdiPortAConfig" = "DDI_PORT_CFG_EDP"
+	register "DdiPortBConfig" = "DDI_PORT_CFG_NO_LFP"
+
+	register "DdiPortAHpd" = "1"
+	register "DdiPortBHpd" = "1"
+	register "DdiPortCHpd" = "0"
+	register "DdiPort1Hpd" = "1"
+	register "DdiPort2Hpd" = "1"
+	register "DdiPort3Hpd" = "0"
+	register "DdiPort4Hpd" = "0"
+
+	register "DdiPortADdc" = "0"
+	register "DdiPortBDdc" = "1"
+	register "DdiPortCDdc" = "0"
+	register "DdiPort1Ddc" = "0"
+	register "DdiPort2Ddc" = "0"
+	register "DdiPort3Ddc" = "0"
+	register "DdiPort4Ddc" = "0"
+
+	# Enable S0ix
+	register "s0ix_enable" = "true"
+
+	# Enable DPTF
+	register "dptf_enable" = "1"
+
+	# Enable External Bypass
+	register "external_bypass" = "1"
+
+	# Enable External Clk Gate
+	register "external_clk_gated" = "1"
+
+	# Enable External Phy Gate
+	register "external_phy_gated" = "1"
+
+	register "power_limits_config[POWER_LIMITS_U_2_CORE]" = "{
+		.tdp_pl1_override = 15,
+		.tdp_pl2_override = 38,
+		.tdp_pl4 = 71,
+	}"
+	register "power_limits_config[POWER_LIMITS_U_4_CORE]" = "{
+		.tdp_pl1_override = 15,
+		.tdp_pl2_override = 60,
+		.tdp_pl4 = 105,
+	}"
+	register "power_limits_config[POWER_LIMITS_Y_2_CORE]" = "{
+		.tdp_pl1_override = 9,
+		.tdp_pl2_override = 35,
+		.tdp_pl4 = 66,
+	}"
+	register "power_limits_config[POWER_LIMITS_Y_4_CORE]" = "{
+		.tdp_pl1_override = 9,
+		.tdp_pl2_override = 40,
+		.tdp_pl4 = 83,
+	}"
+
+	register "tcc_offset" = "10"     # TCC of 90
+
+	register "CnviBtCore" = "true"
+
+	register "CnviBtAudioOffload" = "true"
+
+	# Intel Common SoC Config
+	#+-------------------+---------------------------+
+	#| Field             |  Value                    |
+	#+-------------------+---------------------------+
+	#| GSPI0             | cr50 TPM. Early init is   |
+	#|                   | required to set up a BAR  |
+	#|                   | for TPM communication     |
+	#|                   | before memory is up       |
+	#| GSPI1             | Fingerprint MCU           |
+	#| I2C0              | Audio                     |
+	#| I2C1              | Touchscreen               |
+	#| I2C2              | WLAN, SAR0                |
+	#| I2C3              | Camera, SAR1              |
+	#| I2C5              | Trackpad                  |
+	#+-------------------+---------------------------+
+	register "common_soc_config" = "{
+		.gspi[0] = {
+			.speed_mhz = 1,
+			.early_init = 1,
+		},
+		.i2c[0] = {
+			.speed = I2C_SPEED_FAST,
+		},
+		.i2c[1] = {
+			.speed = I2C_SPEED_FAST,
+		},
+		.i2c[2] = {
+			.speed = I2C_SPEED_FAST,
+		},
+		.i2c[3] = {
+			.speed = I2C_SPEED_FAST,
+		},
+		.i2c[5] = {
+			.speed = I2C_SPEED_FAST,
+		},
+	}"
+
+	register "ext_fivr_settings" = "{
+		.configure_ext_fivr = 1,
+		.v1p05_enable_bitmap = FIVR_ENABLE_ALL_SX,
+		.vnn_enable_bitmap = FIVR_ENABLE_ALL_SX,
+		.v1p05_supported_voltage_bitmap = FIVR_VOLTAGE_NORMAL |
+						  FIVR_VOLTAGE_MIN_ACTIVE |
+						  FIVR_VOLTAGE_MIN_RETENTION,
+		.vnn_supported_voltage_bitmap = FIVR_VOLTAGE_NORMAL |
+						FIVR_VOLTAGE_MIN_ACTIVE |
+						FIVR_VOLTAGE_MIN_RETENTION,
+		.v1p05_icc_max_ma = 500,
+		.vnn_sx_voltage_mv = 1250,
+	}"
+
+	# Acoustic settings
+	register "AcousticNoiseMitigation" = "1"
+	register "SlowSlewRate" = "SLEW_FAST_8"
+	register "FastPkgCRampDisable" = "1"
+
+	device domain 0 on
+		device ref igpu on
+			register "gfx" = "GMA_DEFAULT_PANEL(0)"
+		end
+		device ref dptf on
+			# Default DPTF Policy for all Volteer boards if not overridden
+			chip drivers/intel/dptf
+				## Active Policy
+				register "policies.active" = "{
+					[0] = {.target = DPTF_CPU,
+					       .thresholds = {TEMP_PCT(85, 90),
+							      TEMP_PCT(80, 69),
+							      TEMP_PCT(75, 56),
+							      TEMP_PCT(70, 46),
+							      TEMP_PCT(65, 36),}},
+					[1] = {.target = DPTF_TEMP_SENSOR_0,
+					       .thresholds = {TEMP_PCT(50, 90),
+							      TEMP_PCT(47, 69),
+							      TEMP_PCT(45, 56),
+							      TEMP_PCT(42, 46),
+							      TEMP_PCT(39, 36),}},
+					[2] = {.target = DPTF_TEMP_SENSOR_1,
+					       .thresholds = {TEMP_PCT(50, 90),
+							      TEMP_PCT(47, 69),
+							      TEMP_PCT(45, 56),
+							      TEMP_PCT(42, 46),
+							      TEMP_PCT(39, 36),}},
+					[3] = {.target = DPTF_TEMP_SENSOR_2,
+					       .thresholds = {TEMP_PCT(50, 90),
+							      TEMP_PCT(47, 69),
+							      TEMP_PCT(45, 56),
+							      TEMP_PCT(42, 46),
+							      TEMP_PCT(39, 36),}},
+					[4] = {.target = DPTF_TEMP_SENSOR_3,
+					       .thresholds = {TEMP_PCT(50, 90),
+							      TEMP_PCT(47, 69),
+							      TEMP_PCT(45, 56),
+							      TEMP_PCT(42, 46),
+							      TEMP_PCT(39, 36),}}}"
+
+				## Passive Policy
+				register "policies.passive" = "{
+					[0] = DPTF_PASSIVE(CPU,	CPU,	       95, 5000),
+					[1] = DPTF_PASSIVE(CPU,	TEMP_SENSOR_1, 65, 6000),
+					[2] = DPTF_PASSIVE(CHARGER,	TEMP_SENSOR_0, 65, 6000),
+					[3] = DPTF_PASSIVE(CPU,	TEMP_SENSOR_2, 65, 6000),
+					[4] = DPTF_PASSIVE(CPU,	TEMP_SENSOR_3, 65, 6000)}"
+
+				## Critical Policy
+				register "policies.critical" = "{
+					[0] = DPTF_CRITICAL(CPU,	       105, SHUTDOWN),
+					[1] = DPTF_CRITICAL(TEMP_SENSOR_0,	75, SHUTDOWN),
+					[2] = DPTF_CRITICAL(TEMP_SENSOR_1,	75, SHUTDOWN),
+					[3] = DPTF_CRITICAL(TEMP_SENSOR_2,	75, SHUTDOWN),
+					[4] = DPTF_CRITICAL(TEMP_SENSOR_3,	75, SHUTDOWN)}"
+
+				## Power Limits Control
+				# 3-15W PL1 in 200mW increments, avg over 28-32s interval
+				# PL2 ranges from 15 to 60W, avg over 28-32s interval
+				register "controls.power_limits" = "{
+					.pl1 = {.min_power = 3000,
+						.max_power = 15000,
+						.time_window_min = 28 * MSECS_PER_SEC,
+						.time_window_max = 32 * MSECS_PER_SEC,
+						.granularity = 200,},
+					.pl2 = {.min_power = 60000,
+						.max_power = 60000,
+						.time_window_min = 28 * MSECS_PER_SEC,
+						.time_window_max = 32 * MSECS_PER_SEC,
+						.granularity = 1000,}}"
+
+				## Charger Performance Control (Control, mA)
+				register "controls.charger_perf" = "{
+					[0] = { 255, 1700 },
+					[1] = {  24, 1500 },
+					[2] = {  16, 1000 },
+					[3] = {   8,  500 }}"
+
+				## Fan Performance Control (Percent, Speed, Noise, Power)
+				register "controls.fan_perf" = "{
+					[0] = {  90, 6700, 220, 2200, },
+					[1] = {  80, 5800, 180, 1800, },
+					[2] = {  70, 5000, 145, 1450, },
+					[3] = {  60, 4900, 115, 1150, },
+					[4] = {  50, 3838,  90,  900, },
+					[5] = {  40, 2904,  55,  550, },
+					[6] = {  30, 2337,  30,  300, },
+					[7] = {  20, 1608,  15,  150, },
+					[8] = {  10,  800,  10,  100, },
+					[9] = {   0,    0,   0,   50, }}"
+
+				# Fan options
+				register "options.fan.fine_grained_control" = "true"
+				register "options.fan.step_size" = "2"
+
+				device generic 0 on end
+			end
+		end # DPTF				0x9A03
+		device ref gna on end
+		device ref north_xhci on end
+		device ref south_xhci on
+			register "usb2_ports[0]" = "USB2_PORT_MID(OC_SKIP)"	# Type-A Port A0
+			register "usb2_ports[1]" = "USB2_PORT_MID(OC_SKIP)"	# Type-A Port A1
+			register "usb2_ports[2]" = "USB2_PORT_MID(OC_SKIP)"	# M.2 WWAN
+			register "usb2_ports[3]" = "USB2_PORT_MID(OC_SKIP)"	# Type-A / Type-C Cl
+			register "usb2_ports[4]" = "USB2_PORT_MID(OC_SKIP)"	# M.2 Camera
+			register "usb2_ports[8]" = "USB2_PORT_MID(OC_SKIP)"	# Type-A / Type-C Co
+			register "usb2_ports[9]" = "USB2_PORT_MID(OC_SKIP)"	# M.2 Bluetooth
+
+			register "usb3_ports[0]" = "USB3_PORT_DEFAULT(OC1)"	# USB3/2 Type A port A0
+			register "usb3_ports[1]" = "USB3_PORT_DEFAULT(OC2)"	# USB3/2 Type A port A1
+			register "usb3_ports[2]" = "USB3_PORT_DEFAULT(OC_SKIP)"	# M.2 WWAN
+			register "usb3_ports[3]" = "USB3_PORT_DEFAULT(OC_SKIP)"	# M.2 Camera
+		end
+		device ref shared_ram on end
+		device ref cnvi_wifi on
+			chip drivers/wifi/generic
+				register "wake" = "GPE0_PME_B0"
+				device generic 0 on end
+			end
+		end
+		# MIPI camera devices are on I2C buses 2 and 3
+		device ref i2c2 on end
+		device ref i2c3 on end
+		device ref heci1 on end
+		device ref sata on
+			register "SataSalpSupport" = "1"
+			register "SataPortsEnable[1]" = "1"
+			register "SataPortsDevSlp[1]" = "1"
+			register "SataPortsEnableDitoConfig[1]" = "1"
+		end
+		device ref pcie_rp7 on
+			# WLAN PCIE 7 using clk 1
+			register "PcieRpLtrEnable[6]" = "1"
+			register "PcieClkSrcUsage[1]" = "6"
+			register "PcieClkSrcClkReq[1]" = "1"
+			register "PcieRpSlotImplemented[6]" = "1"
+		end
+		device ref pcie_rp8 on
+			# SD Card PCIE 8 using clk 3
+			register "PcieRpLtrEnable[7]" = "1"
+			register "PcieRpHotPlug[7]" = "1"
+			register "PcieClkSrcUsage[3]" = "7"
+			register "PcieClkSrcClkReq[3]" = "3"
+
+			probe DB_SD SD_GL9755S
+			probe DB_SD SD_RTS5261
+			probe DB_SD SD_RTS5227S
+			probe DB_SD SD_GL9750
+			probe DB_SD SD_OZ711LV2LN
+			chip soc/intel/common/block/pcie/rtd3
+				register "enable_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_HIGH(GPP_D16)"
+				register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_H3)"
+				register "srcclk_pin" = "3"
+				device generic 0 on
+					probe DB_SD SD_GL9755S
+					probe DB_SD SD_RTS5227S
+					probe DB_SD SD_GL9750
+					probe DB_SD SD_OZ711LV2LN
+				end
+			end
+			chip soc/intel/common/block/pcie/rtd3
+				register "reset_gpio" = "ACPI_GPIO_OUTPUT_ACTIVE_LOW(GPP_H3)"
+				register "srcclk_pin" = "3"
+				register "add_acpi_external_facing_port" = "1"
+				device generic 1 on
+					probe DB_SD SD_RTS5261
+				end
+			end
+		end
+		device ref pcie_rp9 on
+			# NVMe PCIE 9 using clk 0
+			register "PcieRpLtrEnable[8]" = "1"
+			register "PcieClkSrcUsage[0]" = "8"
+			register "PcieClkSrcClkReq[0]" = "0"
+			register "PcieRpSlotImplemented[8]" = "1"
+		end
+		device ref pcie_rp11 on
+			# Optane PCIE 11 using clk 0
+			register "PcieRpLtrEnable[10]" = "1"
+			register "HybridStorageMode" = "0"
+			register "PcieRpSlotImplemented[10]" = "1"
+		end
+		device ref uart0 on end
+		device ref gspi0 on
+			chip drivers/spi/acpi
+				register "hid" = "ACPI_DT_NAMESPACE_HID"
+				register "compat_string" = ""google,cr50""
+				register "irq" = "ACPI_IRQ_EDGE_LOW(GPP_C21_IRQ)"
+				device spi 0 alias spi_tpm on end
+			end
+		end
+		device ref gspi1 on
+			chip drivers/spi/acpi
+				register "name" = ""CRFP""
+				register "hid" = "ACPI_DT_NAMESPACE_HID"
+				register "uid" = "1"
+				register "compat_string" = ""google,cros-ec-spi""
+				register "irq_gpio" = "ACPI_GPIO_IRQ_LEVEL_LOW_WAKE(GPP_C20)"
+				device spi 0 on end
+			end # FPMCU
+		end
+		device ref pch_espi on
+			# EC host command ranges are in 0x800-0x8ff & 0x200-0x20f
+			register "gen1_dec" = "0x00fc0801"
+			register "gen2_dec" = "0x000c0201"
+			# EC memory map range is 0x900-0x9ff
+			register "gen3_dec" = "0x00fc0901"
+
+			chip ec/google/chromeec
+				device pnp 0c09.0 on end
+			end
+		end
+		device ref hda on
+			register "PchHdaDspEnable" = "1"
+
+			chip drivers/sof
+				register "spkr_tplg" = "max98373"
+				register "jack_tplg" = "rt5682"
+				register "mic_tplg" = "_2ch_pdm0"
+				device generic 0 on
+					probe AUDIO MAX98373_ALC5682I_I2S
+					probe AUDIO MAX98373_ALC5682_SNDW
+				end
+			end
+			chip drivers/sof
+				register "spkr_tplg" = "max98373_ssp2"
+				register "jack_tplg" = "rt5682"
+				register "mic_tplg" = "_2ch_pdm0"
+				device generic 0 on
+					probe AUDIO MAX98373_ALC5682I_I2S_UP4
+				end
+			end
+			chip drivers/sof
+				register "spkr_tplg" = "max98360a"
+				register "jack_tplg" = "rt5682"
+				register "mic_tplg" = "_2ch_pdm0"
+				device generic 0 on
+					probe AUDIO MAX98360_ALC5682I_I2S
+				end
+			end
+			chip drivers/sof
+				register "spkr_tplg" = "rt1011"
+				register "jack_tplg" = "rt5682"
+				register "mic_tplg" = "_2ch_pdm0"
+				device generic 0 on
+					probe AUDIO RT1011_ALC5682I_I2S
+				end
+			end
+		end
+	end
+end

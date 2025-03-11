@@ -1,0 +1,129 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config ACPI_AMD_HARDWARE_SLEEP_VALUES
+	def_bool n
+	help
+	  Provide common definitions for AMD hardware PM1_CNT register sleep
+	  values.
+
+config ACPI_CPU_STRING
+	string
+	default "CP%02X"
+	depends on HAVE_ACPI_TABLES
+	help
+	  Specifies the ACPI name format string used by the acpigen
+	  function to generate the processor scope. Default is CPxx.
+
+config ACPI_FNKEY_GEN_SCANCODE
+	int
+	default 0
+	help
+	  Specifies the scancode, if any, which is generated when the Fn key is
+	  pressed. A value of 0 is ignored, which is the default since most
+	  keyboards do not emit a scancode for the Fn key.
+
+config ACPI_HAVE_PCAT_8259
+	def_bool y if !ACPI_NO_PCAT_8259
+
+config ACPI_INTEL_HARDWARE_SLEEP_VALUES
+	def_bool n
+	help
+	  Provide common definitions for Intel hardware PM1_CNT register sleep
+	  values.
+
+config ACPI_SOC_NVS
+	bool
+	help
+	  Set to indicate <soc/nvs.h> exists for the platform with a definition
+	  for global_nvs.
+
+config ACPI_GNVS_USB_CHARGECTL
+	bool
+	depends on ACPI_SOC_NVS
+	help
+	  Set to indicate <soc/nvs.h> implements fields s3u0, s3u1, s5u0, s5u1
+	  to control USB port power rail for S3/S4/S5 sleep states.
+
+config ACPI_CUSTOM_MADT
+	bool
+	default n if ACPI_NO_CUSTOM_MADT
+	default y
+	help
+	  Selected by platforms that need to expose custom MADT entries.
+
+config ACPI_NO_CUSTOM_MADT
+	bool
+	default y if ACPI_COMMON_MADT_LAPIC && ACPI_COMMON_MADT_IOAPIC
+
+config ACPI_COMMON_MADT_LAPIC
+	bool
+
+config ACPI_COMMON_MADT_IOAPIC
+	bool
+
+config ACPI_COMMON_MADT_GICC_V3
+	bool
+	depends on ARCH_ARM64
+
+config ACPI_NO_PCAT_8259
+	bool
+	help
+	  Selected by platforms that don't expose a PC/AT 8259 PIC pair.
+
+config ACPI_EINJ
+	def_bool n
+	depends on HAVE_ACPI_TABLES
+	help
+	  This variable provides control for ACPI error injection table (EINJ)
+
+config HAVE_ACPI_TABLES
+	bool
+	help
+	  This variable specifies whether a given board has ACPI table support.
+	  It is usually set in mainboard/*/Kconfig.
+
+config ACPI_LPIT
+	bool
+	depends on HAVE_ACPI_TABLES
+	help
+	  Selected by platforms that support and fill Intel Low Power Idle Table.
+
+config ACPI_GTDT
+	bool
+	depends on HAVE_ACPI_TABLES
+	help
+	  Selected by platforms that implement ARM generic timers
+
+config ACPI_IORT
+	def_bool n
+	depends on ARCH_ARM64 && HAVE_ACPI_TABLES
+	help
+	  Selected by platforms that implement ARM IO Remap table.
+
+config MAX_ACPI_TABLE_SIZE_KB
+	int
+	default 144
+	help
+	  Set the maximum size of all ACPI tables in KiB.
+
+config ACPI_PPTT
+	bool
+	depends on HAVE_ACPI_TABLES
+	help
+	  Selected to build an ACPI Processor Properties Topology Table.
+
+config ACPI_PPTT_MAX_CACHES
+	int
+	depends on ACPI_PPTT
+	default 4
+	help
+	  This variable sets the maximum number of distinct caches per
+	  topology level. Increasing this option also increases stack usage.
+
+config ACPI_WDAT_WDT
+	bool
+	default n
+	depends on HAVE_ACPI_TABLES
+	help
+	  Selected by platforms that support and fill ACPI Watchdog Action Table
+	  (WDAT).

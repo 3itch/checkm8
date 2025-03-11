@@ -1,0 +1,71 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_LENOVO_T410
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select SYSTEM_TYPE_LAPTOP
+	select NORTHBRIDGE_INTEL_IRONLAKE
+	select SOUTHBRIDGE_INTEL_IBEXPEAK
+	select EC_LENOVO_PMH7
+	select EC_LENOVO_H8
+	select NO_UART_ON_SUPERIO
+	select HAVE_OPTION_TABLE
+	select HAVE_CMOS_DEFAULT
+	select BOARD_ROMSIZE_KB_8192
+	select HAVE_ACPI_TABLES
+	select INTEL_INT15
+	select HAVE_ACPI_RESUME
+	select DRIVERS_LENOVO_WACOM
+	select MEMORY_MAPPED_TPM
+	select MAINBOARD_HAS_TPM1
+	select DRIVERS_LENOVO_HYBRID_GRAPHICS
+	select INTEL_GMA_HAVE_VBT
+	select MAINBOARD_USES_IFD_GBE_REGION
+	select H8_HAS_BAT_THRESHOLDS_IMPL
+	select MAINBOARD_HAS_LIBGFXINIT
+	select DRIVERS_RICOH_RCE822
+	select DRIVER_LENOVO_SERIALS
+
+config VBOOT
+	select VBOOT_VBNV_FLASH
+	select GBB_FLAG_DISABLE_LID_SHUTDOWN
+	select GBB_FLAG_DISABLE_PD_SOFTWARE_SYNC
+	select GBB_FLAG_DISABLE_EC_SOFTWARE_SYNC
+	select GBB_FLAG_DISABLE_FWMP
+	select HAS_RECOVERY_MRC_CACHE
+
+config VBOOT_SLOTS_RW_A
+	default y
+
+config CBFS_SIZE
+	default 0x300000
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/vboot-rwa.fmd" if VBOOT
+
+config MAINBOARD_DIR
+	default "lenovo/t410"
+
+config MAINBOARD_PART_NUMBER
+	default "ThinkPad T410"
+
+config USBDEBUG_HCD_INDEX
+	int
+	default 2
+
+config MAX_CPUS
+	int
+	default 8
+
+config DRAM_RESET_GATE_GPIO
+	int
+	default 10
+
+config PS2K_EISAID
+	default "PNP0303"
+
+config PS2M_EISAID
+	default "LEN0015"
+
+endif

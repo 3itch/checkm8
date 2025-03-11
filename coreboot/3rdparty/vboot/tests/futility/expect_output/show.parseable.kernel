@@ -1,0 +1,20 @@
+kernel::keyblock::valid
+kernel::keyblock::size::1208
+kernel::keyblock::signature::ignored
+kernel::keyblock::signature::size::512
+kernel::keyblock::signature::data_size::632
+kernel::keyblock::flags::23::!DEV:DEV:!REC:!MINIOS
+kernel::keyblock::data_key::algorithm::4::RSA2048 SHA256
+kernel::keyblock::data_key::version::1
+kernel::keyblock::data_key::sha1_sum::d6170aa480136f1f29cf339a5ab1b960585fa444
+kernel::preamble::valid
+kernel::preamble::signature::valid
+kernel::preamble::size::64328
+kernel::preamble::header_version::2.2
+kernel::preamble::kernel_version::1
+kernel::preamble::flags::0
+kernel::body::address::1048576
+kernel::body::size::57344
+kernel::bootloader::address::1089536
+kernel::bootloader::size::16384
+kernel::body::signature::valid

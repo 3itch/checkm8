@@ -1,0 +1,8 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_AMD_COMMON_BLOCK_SMI
+	bool
+	select HAVE_CONFIGURABLE_APMC_SMI_PORT
+	help
+	  Select this option to add the common functions for setting up the SMI
+	  configuration to the build.

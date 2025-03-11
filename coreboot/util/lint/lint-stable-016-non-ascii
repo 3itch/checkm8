@@ -1,0 +1,39 @@
+#!/usr/bin/env sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# DESCR: Check for non-ASCII and unprintable characters
+
+LINTDIR="$(
+  cd -- "$(dirname "$0")" > /dev/null 2>&1 || return
+  pwd -P
+)"
+
+# shellcheck source=helper_functions.sh
+. "${LINTDIR}/helper_functions.sh"
+
+INCLUDED_FILES='\.[chsS]$\|\.asl$\|\.cb$\|\.inc$\|Kconfig\|\.ld$|\.txt\|\.hex'
+EXCLUDED_DIRS='^payloads/external/\|^src/vendorcode/\|^Documentation/'
+EXCLUDED_FILES='to-wiki/towiki\.sh$\|vga/vga_font\|video/font\|PDCurses.*x11'
+EXCLUDED_PHRASES='Copyright\|Ported to\|Intel®\|°C\|°F\|Athlon™\|Copyright.*©'
+
+# Exit if the code isn't in a git repo
+if [ "${IN_GIT_TREE}" -eq 0 ]; then
+	exit 0
+fi
+
+# 1. Get the list of files to parse and send them through grep
+# 2. Find any characters that aren't TAB, or space (0x20) to ~ (0x7F)
+#    LF (0x10) isn't included, as it ends the grep line
+# 3. Remove common phrases and names that have been found
+# 4. Run the result through grep again to highlight the issues that were
+#    found.  Without this step, the characters can be difficult to see.
+# shellcheck disable=SC2046
+${GREP_FILES} -lP "[^\t-~]" | \
+	grep "$INCLUDED_FILES" | \
+	grep -v "$EXCLUDED_DIRS" | \
+	grep -v "$EXCLUDED_FILES" | \
+	xargs -I % \
+		grep -n "[^	 -~]" % | \
+		grep -iv "$EXCLUDED_PHRASES" | \
+		grep --color='auto' "[^	 -~]"

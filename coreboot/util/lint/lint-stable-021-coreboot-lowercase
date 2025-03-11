@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+# DESCR: Verify that the word 'coreboot' is lowercase
+
+LINTDIR="$(
+  cd -- "$(dirname "$0")" > /dev/null 2>&1 || return
+  pwd -P
+)"
+
+# shellcheck source=helper_functions.sh
+. "${LINTDIR}/helper_functions.sh"
+
+EXCLUDE='^3rdparty/\|util/crossgcc/xgcc\|Binary file\|coreboot\|COREBOOT\|CorebootPayload\|CorebootModule\|minnowboard.org/Coreboot\|.*\.patch$\|CorebootBdsLib\|^payloads/external'
+
+# # Check last commit message if the code is in a git repo
+if [ "${IN_GIT_TREE}" -eq 1 ]; then
+	if [ -n "$(${GIT} log -n 1 | grep -i 'coreboot' | grep -v "$EXCLUDE" )" ]; then
+		echo "'coreboot' should be lowercase in commit message"
+	fi
+fi
+
+${GREP_FILES} -in "coreboot" | grep -v "$EXCLUDE";

@@ -1,0 +1,525 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config PLATFORM_USES_FSP2_0
+	bool
+	default n
+	help
+	  Include FSP 2.0 wrappers and functionality
+
+config PLATFORM_USES_FSP2_1
+	bool
+	default n
+	select PLATFORM_USES_FSP2_0
+	select FSP_USES_CB_STACK
+	help
+	  Include FSP 2.1 wrappers and functionality.
+	  Feature added into FSP 2.1 specification that impacts coreboot is:
+	  1. Remove FSP stack switch and use the same stack with boot firmware
+
+config PLATFORM_USES_FSP2_2
+	bool
+	default n
+	select PLATFORM_USES_FSP2_1
+	help
+	  Include FSP 2.2 wrappers and functionality.
+	  Features added into FSP 2.2 specification that impact coreboot are:
+	  1. Added multi-phase silicon initialization to increase the modularity of the
+	      FspSiliconInit() API
+	  2. FSP_INFO_HEADER changes to add FspMultiPhaseSiInitEntryOffset
+	  3. Added EnableMultiPhaseSiliconInit, bootloaders designed for FSP2.0/2.1 can disable
+	      the FspMultiPhaseSiInit() API and continue to use FspSiliconInit() without change.
+
+config PLATFORM_USES_FSP2_3
+	bool
+	default n
+	select PLATFORM_USES_FSP2_2
+	help
+	  Include FSP 2.3 wrappers and functionality.
+	  Features added into FSP 2.3 specification that impact coreboot are:
+	  1. Added ExtendedImageRevision field in FSP_INFO_HEADER
+	  2. Added FSP_NON_VOLATILE_STORAGE_HOB2
+
+config PLATFORM_USES_FSP2_4
+	bool
+	default n
+	select PLATFORM_USES_FSP2_3
+	help
+	  Include FSP 2.4 wrappers and functionality.
+	  Features added into FSP 2.4 specification that impact coreboot are:
+	  1. FSP-M multi phase init support
+	  2. FSPM_ARCH2_UPD and FSPS_ARCH2_UPD data structures must be
+	     used in place of FSPM_ARCH_UPD and FSPS_ARCH_UPD respectively
+	  3. 64-bits support
+
+if PLATFORM_USES_FSP2_0
+
+config PLATFORM_USES_FSP2_X86_32
+	bool
+	default n if PLATFORM_USES_FSP2_4
+	default y
+	help
+	  Specify if the FSP binaries are 32-bits (yes) or 64-bits
+	  (no). By default, 64-bit should be used starting with FSP
+	  specification 2.4
+
+config HAVE_INTEL_FSP_REPO
+	bool
+	help
+	  Select this, if the FSP binaries for the platform are public
+	  and available in 3rdparty/fsp/. When selecting this option, the
+	  platform must also set FSP_HEADER_PATH and FSP_FD_PATH correctly.
+
+config FSP_USE_REPO
+	bool "Use binaries of the Intel FSP repository on GitHub"
+	depends on HAVE_INTEL_FSP_REPO
+	select FSP_FULL_FD
+	default y
+	help
+	  Select this option to use the default FSP headers and binaries
+	  found in the IntelFsp GitHub repository at
+
+	    https://github.com/IntelFsp/FSP/
+
+	  If unsure, say Y.
+
+config FSP_HEADER_PATH
+	string "Location of FSP headers" if !FSP_USE_REPO
+	help
+	  Include directory with the FSP ABI header files.
+
+config ADD_FSP_BINARIES
+	bool "Add Intel FSP 2.0 binaries to CBFS" if !FSP_USE_REPO
+	default y if FSP_USE_REPO
+	help
+	  Add the FSP-M and FSP-S binaries to CBFS.
+
+config PLATFORM_USES_SECOND_FSP
+	bool
+	default n
+	help
+	  The platform uses two sets of FSP-M/FSP-S binaries and selects the
+	  appropriate one at runtime.  At least one platform requires different
+	  binaries depending on CPU stepping, so supporting any stepping
+	  requires embedding two FSPs.  The platform indicates which is the
+	  "first" and "second" FSP.
+
+config FSP_T_CBFS
+	string "Name of FSP-T in CBFS"
+	depends on FSP_CAR
+	default "fspt.bin"
+
+config FSP_T_LOCATION
+	hex
+	default 0xfffe0000
+	help
+	  The location for FSP-T.
+
+config FSP_S_CBFS
+	string "Name of FSP-S in CBFS"
+	default "fsps.bin"
+
+config FSP_M_CBFS
+	string "Name of FSP-M in CBFS"
+	default "fspm.bin"
+
+config FSP_FULL_FD
+	bool "Use a combined FSP FD file" if !FSP_USE_REPO
+	depends on ADD_FSP_BINARIES
+	help
+	  Use a combined FSP FD file instead of specifying individual, already split
+	  binaries and split the file at build-time.
+
+config FSP_FD_PATH
+	string "Location of FSP FD file" if FSP_FULL_FD && !FSP_USE_REPO
+	help
+	  Path to the FSP FD file that contains the individual FSP-T, FSP-M
+	  and FSP-S binaries. The file gets split at build-time.
+
+config FSP_T_FILE
+	string "Intel FSP-T (temp RAM init) binary path and filename" if !FSP_FULL_FD
+	depends on ADD_FSP_BINARIES
+	depends on FSP_CAR
+	default "\$(obj)/Fsp_T.fd" if FSP_FULL_FD
+	help
+	  The path and filename of the Intel FSP-T binary for this platform.
+
+config FSP_M_FILE
+	string "Intel FSP-M (memory init) binary path and filename" if !FSP_FULL_FD
+	depends on ADD_FSP_BINARIES
+	default "\$(obj)/Fsp_M.fd" if FSP_FULL_FD
+	help
+	  The path and filename of the Intel FSP-M binary for this platform.
+
+config FSP_S_FILE
+	string "Intel FSP-S (silicon init) binary path and filename" if !FSP_FULL_FD
+	depends on ADD_FSP_BINARIES
+	default "\$(obj)/Fsp_S.fd" if FSP_FULL_FD
+	help
+	  The path and filename of the Intel FSP-S binary for this platform.
+
+if PLATFORM_USES_SECOND_FSP
+
+config FSP_S_CBFS_2
+	string "Name of the second FSP-S in CBFS"
+	default "fsps_2.bin"
+
+config FSP_M_CBFS_2
+	string "Name of the second FSP-M in CBFS"
+	default "fspm_2.bin"
+
+config FSP_FD_PATH_2
+	string "Location of the second FSP FD file" if FSP_FULL_FD && !FSP_USE_REPO
+	help
+	  Path to the FSP FD file that contains the individual FSP-M and FSP-S
+	  binaries. The file gets split at build-time.
+
+config FSP_M_FILE_2
+	string "Intel FSP-M (memory init) second binary path and filename" if !FSP_FULL_FD
+	depends on ADD_FSP_BINARIES
+	default "\$(obj)/Fsp_2_M.fd" if FSP_FULL_FD
+	help
+	  The path and filename of the second Intel FSP-M binary for this
+	  platform.
+
+config FSP_S_FILE_2
+	string "Intel FSP-S (silicon init) second binary path and filename" if !FSP_FULL_FD
+	depends on ADD_FSP_BINARIES
+	default "\$(obj)/Fsp_2_S.fd" if FSP_FULL_FD
+	help
+	  The path and filename of the second Intel FSP-S binary for this
+	  platform.
+
+endif
+
+config FSP_CAR
+	bool
+	default n
+	select NO_CBFS_MCACHE if !NO_FSP_TEMP_RAM_EXIT
+	help
+	  Use FSP APIs to initialize & Tear Down the Cache-As-Ram
+
+config FSP_T_RESERVED_SIZE
+	hex
+	default 0x100 if FSP_CAR
+	default 0x0
+	help
+	  This is the size of the area reserved by FSP-T. This is not
+	  defined in the FSP specification but in the SOC integration
+	  guides.
+
+config NO_FSP_TEMP_RAM_EXIT
+	bool
+	depends on FSP_CAR
+	help
+	  Select this on a platform where you want to use FSP-T but use
+	  coreboot code to tear down CAR.
+
+config FSP_M_XIP
+	bool
+	default n
+	help
+	  Select this value when FSP-M is execute-in-place.
+
+config FSP_T_XIP
+	bool
+	default n
+	help
+	  Select this value when FSP-T is execute-in-place.
+
+config FSP_USES_CB_STACK
+	bool
+	default n
+	help
+	  Enable support for fsp to use same stack as coreboot.
+	  This option allows fsp to continue using coreboot stack
+	  without reinitializing stack pointer. This feature is
+	  supported Icelake onwards.
+
+config FSP_SPEC_VIOLATION_XEON_SP_HEAP_WORKAROUND
+	bool
+	help
+	 Starting with Intel CPX there is a bug in there reference code during
+	 the pipe init. This code synchronises the CAR between sockets in FSP-M.
+	 This code implicitly assumes that the FSP heap is right above the
+	 RC heap, where both of them are located at the bottom part of CAR.
+	 Select this to have an explicit handling of the FSP StackBase to work
+	 around this issue. This is needed on multi-socket Xeon-SP systems.
+	 This will place the FSP heap right above the FSP-M RC heap.
+
+config FSP_TEMP_RAM_SIZE
+	hex
+	help
+	  The amount of memory coreboot reserves for the FSP to use. In the
+	  case of FSP 2.1 and newer that share the stack with coreboot instead
+	  of having its own stack, this is the amount of anticipated heap usage
+	  in CAR by FSP to setup HOB and needs to be the recommended value from
+	  the Platform FSP integration guide. In the case of the FSP having its
+	  own stack that will be placed in DRAM and not in CAR, this is the
+	  amount of memory the FSP needs for its stack and heap.
+
+config FSP_PLATFORM_MEMORY_SETTINGS_VERSIONS
+	bool
+	help
+	  This is selected by SoC or mainboard to supply their own
+	  concept of a version for the memory settings respectively.
+	  This allows deployed systems to bump their version number
+	  with the same FSP which will trigger a retrain of the memory.
+
+config HAVE_FSP_LOGO_SUPPORT
+	bool
+	default n
+
+config BMP_LOGO
+	bool "Enable logo"
+	default n
+	depends on HAVE_FSP_LOGO_SUPPORT
+	help
+	  Uses the FSP to display the boot logo. This method supports a
+	  BMP file only. The uncompressed size can be up to 1 MB. The logo can
+	  be compressed based on either `BMP_LOGO_COMPRESS_*` configs (default LZMA).
+
+config HAVE_BMP_LOGO_COMPRESS_LZMA
+	bool
+	depends on BMP_LOGO
+	default y
+
+choice
+	prompt "BMP Logo compression"
+	depends on BMP_LOGO
+	default BMP_LOGO_COMPRESS_LZMA if HAVE_BMP_LOGO_COMPRESS_LZMA
+	default BMP_LOGO_COMPRESS_LZ4
+
+config BMP_LOGO_COMPRESS_LZMA
+	bool "Use LZMA compression for BMP logo"
+	help
+	  This option enables the use of LZMA compression for the BMP logo.
+	  LZMA is a lossless compression algorithm that can significantly reduce
+	  the size of the logo, without sacrificing quality.
+
+	  If this option is not enabled, the BMP logo will be uncompressed.
+
+config BMP_LOGO_COMPRESS_LZ4
+	bool "Compress BMP logo using LZ4"
+	help
+	  This option enables compression of the BMP logo using the LZ4 algorithm.
+	  Although the size reduction is not as efficient as LZMA compression, however,
+	  it can also make the boot process slightly faster compared to the LZMA.
+
+endchoice
+
+config FSP2_0_LOGO_FILE_NAME
+	string "Logo file"
+	depends on BMP_LOGO
+	default "3rdparty/blobs/mainboard/\$(MAINBOARDDIR)/logo.bmp"
+
+config FSP_COMPRESS_FSP_S_LZMA
+	bool
+
+config FSP_COMPRESS_FSP_S_LZ4
+	bool
+
+config FSP_COMPRESS_FSP_M_LZMA
+	bool
+	depends on !FSP_M_XIP
+
+config FSP_COMPRESS_FSP_M_LZ4
+	bool
+	depends on !FSP_M_XIP
+
+config FSP_ALIGNMENT_FSP_S
+	int
+	help
+	  Sets the CBFS alignment for FSP-S
+
+config FSP_ALIGNMENT_FSP_M
+	int
+	help
+	  Sets the CBFS alignment for FSP-M
+
+config FSP_M_ADDR
+	hex
+	help
+	  The address FSP-M will be relocated to during build time
+
+config FSP_STATUS_GLOBAL_RESET
+	hex
+	depends on SOC_INTEL_COMMON_FSP_RESET
+	range 0x4000000000000003 0x4000000000000008 if !PLATFORM_USES_FSP2_X86_32
+	range 0x40000003 0x40000008
+	default 0x4000000000000003 if !PLATFORM_USES_FSP2_X86_32
+	default 0x40000003
+	help
+	  If global reset is supported by SoC then select the correct status value for global
+	  reset type.
+
+	  This option specifies the global reset status code used by the
+	  platform, as defined in the FSP specification.
+
+	  The FSP specification allows for a range of values to indicate a
+	  global reset request, typically between
+	  FSP_STATUS_GLOBAL_RESET_REQUIRED_3 and
+	  FSP_STATUS_GLOBAL_RESET_REQUIRED_8.
+
+	  This option defaults to the most commonly used global reset
+	  status code in FSP implementations:
+	  - 0x40000003 for 32-bit FSP interfaces
+	  - 0x4000000000000003 for 64-bit FSP interfaces
+
+	  If your FSP implementation uses a different global reset status
+	  code, override this default value accordingly.
+
+config SOC_INTEL_COMMON_FSP_RESET
+	bool
+	help
+	  Common code block to handle platform reset request raised by FSP. The FSP
+	  will use the FSP EAS v2.0 section 12.2.2 (OEM Status Code) to indicate that
+	  a reset is required.
+
+config FSPS_HAS_ARCH_UPD
+	bool
+	help
+	  SoC users must select this Kconfig if the `FSPS_UPD` header has architecture
+	  UPD structure as `FSPS_ARCH_UPD`. Typically, platform with FSP 2.2 specification
+	  onwards has support for `FSPS_ARCH_UPD` section as part of `FSPS_UPD` structure.
+	  But there are some exceptions as in TGL, JSL, XEON_SP FSP header doesn't have
+	  support for FSPS_ARCH_UPD.
+
+config FSPS_USE_MULTI_PHASE_INIT
+	bool
+	help
+	  SoC users to select this Kconfig to set EnableMultiPhaseSiliconInit to enable and
+	  execute FspMultiPhaseSiInit() API.
+
+config USE_FSP_NOTIFY_PHASE_POST_PCI_ENUM
+	bool
+	help
+	  The FSP API is used to notify the FSP about different phases in the boot process.
+	  The current FSP specification supports three notify phases:
+	  - Post PCI enumeration
+	  - Ready to Boot
+	  - End of Firmware
+	  This option allows FSP to execute Notify Phase API (Post PCI enumeration).
+	  SoC users can override this config to use coreboot native implementations
+	  to perform the required lock down and chipset register configuration prior
+	  to executing any 3rd-party code during PCI enumeration (i.e. Option ROM).
+
+	  coreboot native implementation to skip FSP Notify Phase (Post PCI enumeration)
+	  is still WIP.
+
+config USE_FSP_NOTIFY_PHASE_READY_TO_BOOT
+	bool
+	help
+	  The FSP API is used to notify the FSP about different phases in the boot process.
+	  The current FSP specification supports three notify phases:
+	  - Post PCI enumeration
+	  - Ready to Boot
+	  - End of Firmware
+	  This option allows FSP to execute Notify Phase API (Ready to Boot).
+	  SoC users can override this config to use coreboot native implementations
+	  to perform the required lock down and chipset register configuration prior
+	  boot to payload.
+
+config USE_FSP_NOTIFY_PHASE_END_OF_FIRMWARE
+	bool
+	help
+	  The FSP API is used to notify the FSP about different phases in the boot process.
+	  The current FSP specification supports three notify phases:
+	  - Post PCI enumeration
+	  - Ready to Boot
+	  - End of Firmware
+	  This option allows FSP to execute Notify Phase API (End of Firmware).
+	  SoC users can override this config to use coreboot native implementations
+	  to perform the required lock down and chipset register configuration prior
+	  boot to payload.
+
+config FSP_USES_CB_DEBUG_EVENT_HANDLER
+	bool
+	default n
+	help
+	  This option allows to create `Debug Event Handler` to print FSP debug messages
+	  to output device using coreboot native implementation.
+
+config DISPLAY_FSP_TIMESTAMPS
+	bool "Display FSP Timestamps"
+	default n
+	help
+	  Select this config to retrieve FSP timestamps from Firmware Performance Data Table
+	  (FPDT) and display from ramstage after FSP-S is executed.
+
+	  To be able to use this, FSP has to be compiled with `PcdFspPerformanceEnable` set to
+	  `TRUE`.
+
+config FSP_UGOP_EARLY_SIGN_OF_LIFE
+	bool
+	default n
+	select VBT_CBFS_COMPRESSION_DEFAULT_LZ4
+	help
+	  Enable the FSP-M Sign-of-Life feature to display a text message
+	  on screen during memory training and CSME update. This utilizes Intel's underlying uGOP
+	  technology to enable early sign of life (eSOL) as part of FSP-M.
+
+config FSP_ENABLE_SERIAL_DEBUG
+	bool "Output FSP debug messages on serial console"
+	default y
+	depends on FSP_USES_CB_DEBUG_EVENT_HANDLER
+	help
+	  Output FSP debug messages on serial console.
+
+	  The config option is selected based on your FSP configuration i.e., debug or
+	  release. Enable this option from site-local to print FSP serial messages using
+	  coreboot native debug driver when coreboot has integrated the debug FSP
+	  binaries. coreboot disables serial messages when this config is not enabled.
+
+config FSP_NVS_DATA_POST_SILICON_INIT
+	bool
+	default n
+	help
+	  Select this config to enable the workaround for Intel SoC platforms that
+	  do not adhere to the FSP 2.x specification requirement, where the FSP
+	  Silicon Init API produces Non-Volatile Storage (NVS) data instead of the
+	  FSP-Memory Init API.
+
+	  According to the FSP 2.x specification (section 11.3), the FSP populates the
+	  NVS data using the FSP_NON_VOLATILE_STORAGE_HOB and expects the boot firmware
+	  to parse the FSP_NON_VOLATILE_STORAGE_HOB after the FspMemoryInit() API in API
+	  mode.
+
+	  However, not all Intel SoC platforms that support the FSP 2.x specification
+	  adhere to this requirement. For example, the FSP binary for XEON SP platform
+	  produces NVS data (aka FSP_NON_VOLATILE_STORAGE_HOB) after the FspSiliconInit()
+	  API. Therefore, attempting to locate NVS data after the FspMemoryInit() API on
+	  these platforms would result in an error. Use this config to find the NVS data
+	  and store it in Non-Volatile Storage after the FspSiliconInit() API.
+
+config FSP_MULTIPHASE_SI_INIT_RETURN_BROKEN
+	bool
+	default n
+	depends on PLATFORM_USES_FSP2_2
+	help
+	  Select this config for Intel SoC platform where FSP MultiPhaseSiInit API is unable
+	  to return ERROR status properly.
+
+	  The config option will be selected based on the target SoC platform and if the
+	  problem existed inside the FSP MultiPhaseSiInit. At present the problem has only
+	  reported with Alder Lake and Raptor Lake FSP where MultiPhaseSiInit API is unable
+	  to return any ERROR status.
+
+config FSP_PUBLISH_MBP_HOB
+	bool
+	default n if CHROMEOS
+	default y
+	help
+	  This is to control creation of ME_BIOS_PAYLOAD_HOB (MBP HOB) by FSP.
+	  Disabling it for the platforms, which do not use MBP HOB, can improve the boot time.
+
+	  ChromeOS devices typically do not require the MBP information, hence it is disabled
+	  by default on ChromeOS.
+
+config BUILDING_WITH_DEBUG_FSP
+	bool "Use Debug FSP for Build"
+	default n
+	help
+	  Enable this option if you are using a debug build of the FSP (Firmware Support Package)
+	  in your project.
+
+endif

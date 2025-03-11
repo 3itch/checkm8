@@ -1,0 +1,76 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_INTEL_COMMON_BLOCK_GPIO
+	bool
+	select HAVE_DEBUG_GPIO
+	select HAVE_GPIO_SNAPSHOT_VERIFY_SUPPORT
+	help
+	  Intel Processor common GPIO support
+
+if SOC_INTEL_COMMON_BLOCK_GPIO
+
+# Use to program Interrupt Polarity Control (IPCx) register
+# Each bit represents IRQx Active High Polarity Disable configuration:
+# when set to 1, the interrupt polarity associated with IRQx is inverted
+# to appear as Active Low to IOAPIC and vice versa
+config SOC_INTEL_COMMON_BLOCK_GPIO_ITSS_POL_CFG
+	bool
+	default n
+
+# Used to configure Pad Tolerance as 1.8V or 3.3V
+config SOC_INTEL_COMMON_BLOCK_GPIO_PADCFG_PADTOL
+	bool
+	default n
+
+# Used to configure IOSSTATE and IOSTERM
+config SOC_INTEL_COMMON_BLOCK_GPIO_IOSTANDBY
+	bool
+	default n
+
+# Indicate if multiple ACPI devices are used for each gpio community.
+config SOC_INTEL_COMMON_BLOCK_GPIO_MULTI_ACPI_DEVICES
+	bool
+	default n
+
+# Indicate if SoC supports dual-routing of GPIOs (to different paths like SCI,
+# NMI, SMI, IOAPIC). This is required to support IRQ and wake on the same pad.
+config SOC_INTEL_COMMON_BLOCK_GPIO_DUAL_ROUTE_SUPPORT
+	bool
+	default n
+
+config SOC_INTEL_COMMON_BLOCK_GPIO_LOCK_USING_SBI
+	bool
+	default n
+	help
+	  Till ADL PCH,`Pad Configuration Lock` can only be set or cleared
+	  using non-posted sideband write.
+
+config SOC_INTEL_COMMON_BLOCK_GPIO_LOCK_USING_PCR
+	bool
+	default n
+	depends on !SOC_INTEL_COMMON_BLOCK_GPIO_LOCK_USING_SBI
+	help
+	  SoC user to select this config if `Pad Configuration Lock` can only be set or
+	  cleared using private configuration register (PCR) write.
+	  Starting with MTL SoC, the recommendation is to use PCR for locking down the
+	  GPIO configuration.
+
+# Indicate if SoC supports 4 bits Pad Mode with PAD_CFG_DW0 registers
+config SOC_INTEL_COMMON_BLOCK_GPIO_PMODE_4BITS
+	bool
+	default n
+	help
+	 SoC user to select this config if Pad Mode (PMODE) width of PAD_CFG_DW0 regiser
+	 is 4 bits to support Native Function 1 to 15.
+
+config SOC_INTEL_COMMON_BLOCK_GPIO_16BIT_CPU_PORTID
+	bool
+	default n
+	help
+	  Enable support for 16-bit CPU Port IDs.
+	  Intel SoCs (starting with Panther Lake) have extended the CPU Port ID field
+	  to 16 bits.
+	  Enable this option if your platform requires the GPIO driver to
+	  accommodate this larger Port ID value.
+
+endif

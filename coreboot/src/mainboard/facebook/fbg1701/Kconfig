@@ -1,0 +1,99 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_FACEBOOK_FBG1701
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOARD_ROMSIZE_KB_8192
+	select DISABLE_ACPI_HIBERNATE
+	select HAVE_ACPI_TABLES
+	select HAVE_IFD_BIN
+	select HAVE_ME_BIN
+	select HAVE_OPTION_TABLE
+	select MEMORY_MAPPED_TPM
+	select MAINBOARD_HAS_TPM2
+	select SOC_INTEL_BRASWELL
+	select SOC_INTEL_COMMON_BLOCK_HDA_VERB
+	select PCIEXP_L1_SUB_STATE
+	select DISABLE_HPET
+	select INTEL_GMA_HAVE_VBT
+	select HAVE_SPD_IN_CBFS
+
+config USE_VENDORCODE_ELTAN
+	default y
+
+if VBOOT
+
+config VBOOT_VBNV_FLASH
+	default y
+
+config VBOOT_SLOTS_RW_A
+	default y
+
+config VBOOT_NO_BOARD_SUPPORT
+	default y
+
+config VBOOT_ENABLE_CBFS_FALLBACK
+	default y
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/vboot-rw.fmd"
+
+config RW_REGION_ONLY
+	default "%/payload logo.bmp %/ramstage vbt.bin %/dsdt.aml config %/postcar"
+
+config RO_REGION_ONLY
+	default "spd.bin fsp.bin cpu_microcode_blob.bin"
+
+endif # VBOOT
+
+config MAINBOARD_DIR
+	default "facebook/fbg1701"
+
+config MAINBOARD_PART_NUMBER
+	default "FBG-1701"
+
+config CBFS_SIZE
+	default 0x00600000
+
+config MRC_SETTINGS_CACHE_SIZE
+	hex
+	default 0x08000
+
+config FSP_LOC
+	hex
+	default 0xfff9c000
+
+config VENDORCODE_ELTAN_OEM_MANIFEST_LOC
+	depends on VENDORCODE_ELTAN_VBOOT
+	hex
+	default 0xFFFE9000
+
+config SPI_FLASH_INCLUDE_ALL_DRIVERS
+	bool
+	default n
+
+config SPI_FLASH_WINBOND
+	bool
+	default y
+
+config VENDORCODE_ELTAN_VBOOT_SIGNED_MANIFEST
+	depends on VENDORCODE_ELTAN_VBOOT
+	bool
+	default y
+
+config VENDORCODE_ELTAN_VBOOT_MANIFEST
+	depends on USE_VENDORCODE_ELTAN
+	string
+	default "mainboard/facebook/fbg1701/manifest.h"
+
+config VENDORCODE_ELTAN_VBOOT_KEY_LOCATION
+	depends on VENDORCODE_ELTAN_VBOOT
+	hex
+	default 0xFFFEA000
+
+config DRIVERS_INTEL_WIFI
+	bool
+	default n
+
+endif # BOARD_FACEBOOK_FBG1701

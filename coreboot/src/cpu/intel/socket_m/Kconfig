@@ -1,0 +1,25 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config CPU_INTEL_SOCKET_M
+	bool
+	select CPU_INTEL_MODEL_6EX
+	select CPU_INTEL_MODEL_6FX
+
+if CPU_INTEL_SOCKET_M
+
+config DCACHE_RAM_BASE
+	hex
+	default 0xfefc0000
+
+config DCACHE_RAM_SIZE
+	hex
+	default 0x8000
+
+config PRERAM_CBFS_CACHE_SIZE
+	default 0x0
+
+config DCACHE_BSP_STACK_SIZE
+	hex
+	default 0x2000
+
+endif

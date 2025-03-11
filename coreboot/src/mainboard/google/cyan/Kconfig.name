@@ -1,0 +1,36 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Cyan"
+
+config BOARD_GOOGLE_BANON
+	bool "->  Banon (Acer Chromebook 15 (CB3-532))"
+
+config BOARD_GOOGLE_CELES
+	bool "->  Celes (Samsung Chromebook 3)"
+
+config BOARD_GOOGLE_CYAN
+	bool "->  Cyan (Acer Chromebook R11 (C738T))"
+
+config BOARD_GOOGLE_EDGAR
+	bool "->  Edgar (Acer Chromebook 14 (CB3-431))"
+
+config BOARD_GOOGLE_KEFKA
+	bool "->  Kefka (Dell Chromebook 11 3180/3189)"
+
+config BOARD_GOOGLE_REKS
+	bool "->  Reks (Lenovo N22/N42 Chromebook)"
+
+config BOARD_GOOGLE_RELM
+	bool "->  Relm"
+
+config BOARD_GOOGLE_SETZER
+	bool "->  Setzer (HP Chromebook 11 G5)"
+
+config BOARD_GOOGLE_TERRA
+	bool "->  Terra (ASUS Chromebook C202SA/C300SA/C301SA)"
+
+config BOARD_GOOGLE_ULTIMA
+	bool "->  Ultima (Lenovo Yoga 11e G3)"
+
+config BOARD_GOOGLE_WIZPIG
+	bool "->  Wizpig"

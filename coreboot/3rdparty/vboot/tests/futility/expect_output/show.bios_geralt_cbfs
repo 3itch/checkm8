@@ -1,0 +1,71 @@
+BIOS:                    tests/futility/data/bios_geralt_cbfs.bin
+GBB header:              GBB
+  Version:               1.2
+  Flags:                 0x00000039
+  Regions:                 offset       size
+    hwid                 0x00000080   0x00000100
+    bmpvf                0x00001180   0x00000000
+    rootkey              0x00000180   0x00001000
+    recovery_key         0x00001180   0x00001000
+  Size:                  0x00002180 / 0x00002f00
+GBB content:
+  HWID:                  GERALT TEST 0843
+     digest:             14cfa3d880e40e5f706a87a46a19a6ab68877ac39ef30ad14a0bcd7209b31106   valid
+  Root Key:
+    Vboot API:           1.0
+    Algorithm:           11 RSA8192 SHA512
+    Key Version:         1
+    Key sha1sum:         b11d74edd286c144e1135b49e7f0bc20cf041f10
+  Recovery Key:
+    Vboot API:           1.0
+    Algorithm:           11 RSA8192 SHA512
+    Key Version:         1
+    Key sha1sum:         c14bd720b70d97394257e3e826bd8f43de48d4ed
+Firmware body:           FW_MAIN_A
+  Offset:                0x00402000
+  Size:                  0x00174f00
+Firmware body:           FW_MAIN_B
+  Offset:                0x00582000
+  Size:                  0x00174f00
+Keyblock:                VBLOCK_A
+  Size:                  0x8b8
+  Signature:             valid
+    Size:                0x400
+    Data size:           0x478
+  Flags:                 23  !DEV DEV !REC !MINIOS
+  Data key algorithm:    7 RSA4096 SHA256
+  Data key version:      1
+  Data key sha1sum:      e2c1c92d7d7aa7dfed5e8375edd30b7ae52b7450
+Firmware Preamble:
+  Size:                  1688
+  Header version:        2.1
+  Firmware version:      1
+  Kernel key algorithm:  7 RSA4096 SHA256
+  Kernel key version:    1
+  Kernel key sha1sum:    5d2b220899c4403d564092ada3f12d3cc4483223
+  Firmware body size:    0
+  Preamble flags:        0
+  Body metadata hash:    SHA256 81c301db828912ad0eab0866293ece02d58d402d67062af8abc74e64342821ee
+  Body metadata hash valid!
+Body verification succeeded.
+Keyblock:                VBLOCK_B
+  Size:                  0x8b8
+  Signature:             valid
+    Size:                0x400
+    Data size:           0x478
+  Flags:                 23  !DEV DEV !REC !MINIOS
+  Data key algorithm:    7 RSA4096 SHA256
+  Data key version:      1
+  Data key sha1sum:      e2c1c92d7d7aa7dfed5e8375edd30b7ae52b7450
+Firmware Preamble:
+  Size:                  1688
+  Header version:        2.1
+  Firmware version:      1
+  Kernel key algorithm:  7 RSA4096 SHA256
+  Kernel key version:    1
+  Kernel key sha1sum:    5d2b220899c4403d564092ada3f12d3cc4483223
+  Firmware body size:    0
+  Preamble flags:        0
+  Body metadata hash:    SHA256 2a7c59681a4a8ec9ac952163f346ea65082d3086d1e74e731ce60822e777b755
+  Body metadata hash valid!
+Body verification succeeded.

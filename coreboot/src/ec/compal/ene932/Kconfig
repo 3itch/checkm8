@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config EC_COMPAL_ENE932
+	bool
+	help
+	  Interface to COMPAL ENE932 Embedded Controller.

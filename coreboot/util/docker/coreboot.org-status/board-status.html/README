@@ -1,0 +1,35 @@
+Tool to publish board-status data to the website
+================================================
+
+This tool parses the board-status repository (and the coreboot repository as
+companion) to build a meaningful representation of the test coverage stored
+in board-status.
+
+The server runs these regularly to update
+https://coreboot.org/status/board-status.html
+
+How to use
+----------
+When modifying the tool, or when publishing the results elsewhere, you
+might want to run it yourself. You'll need the board-status and the coreboot
+repository checked out.
+
+To build the tool, run the following commands
+
+    $ go mod download
+    $ go build
+
+To run it, use
+
+    $ ./board-status.html \
+      -board-status-dir .../board-status.git \
+      -coreboot-dir .../coreboot.git > out.html
+
+There will be a few errors about missing revisions, those come from status
+reports based on unpublished commits.
+
+LIMITATIONS
+-----------
+The tool doesn't support board variants or "clone of" specifiers in
+board-info.txt. The output is also a bit unwieldy, leading to many megabytes
+of HTML in a single file.

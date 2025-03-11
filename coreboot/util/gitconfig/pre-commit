@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+##
+## SPDX-License-Identifier: GPL-2.0-only
+
+set -e # -o errexit
+set -u # -o nounset
+
+%MAKE% check-style lint-stable
+
+PATCHDIFF=$(git diff --cached --src-prefix=a/ --dst-prefix=b/)
+if printf "%s\n" "$PATCHDIFF" | grep -q "@@"; then
+	echo
+	echo "Running checkpatch"
+	printf "%s\n" "$PATCHDIFF" | util/lint/lint-007-checkpatch diff \
+		|| (echo "Please consider fixing these issues." ;sleep 5) ; true
+fi

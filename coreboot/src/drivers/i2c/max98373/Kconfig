@@ -1,0 +1,6 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config DRIVERS_I2C_MAX98373
+	bool
+	default n
+	depends on HAVE_ACPI_TABLES

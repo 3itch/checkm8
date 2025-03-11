@@ -1,0 +1,20 @@
+fw_pre::keyblock::valid
+fw_pre::keyblock::size::2232
+fw_pre::keyblock::signature::invalid
+fw_pre::keyblock::signature::size::1024
+fw_pre::keyblock::signature::data_size::1144
+fw_pre::keyblock::flags::7::!DEV:DEV:!REC
+fw_pre::keyblock::data_key::algorithm::8::RSA4096 SHA512
+fw_pre::keyblock::data_key::version::1
+fw_pre::keyblock::data_key::sha1_sum::f917ad29e36aa8a286f978c1aa0550ea31c6a561
+fw_pre::preamble::valid
+fw_pre::preamble::signature::valid
+fw_pre::preamble::size::2164
+fw_pre::preamble::header_version::2.1
+fw_pre::preamble::firmware_version::2
+fw_pre::preamble::kernel_subkey::algorithm::7::RSA4096 SHA256
+fw_pre::preamble::kernel_subkey::version::2
+fw_pre::preamble::kernel_subkey::sha1_sum::cc05423373b76acbec23ec45dfa3696a2ea6dc0f
+fw_pre::preamble::flags::0
+fw_pre::body::size::146456
+fw_pre::body::signature::valid

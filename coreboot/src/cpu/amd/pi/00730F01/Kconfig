@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config CPU_AMD_PI_00730F01
+	bool
+	select X86_AMD_FIXED_MTRRS
+	select SUPPORT_CPU_UCODE_IN_CBFS
+	select MICROCODE_BLOB_UNDISCLOSED
+
+if CPU_AMD_PI_00730F01
+
+config ACPI_CPU_STRING
+	string
+	default "P%03X"
+
+endif # CPU_AMD_PI_00730F01

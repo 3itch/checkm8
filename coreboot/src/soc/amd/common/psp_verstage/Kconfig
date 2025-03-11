@@ -1,0 +1,54 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config PSP_VERSTAGE_CCP_DMA
+	bool
+	default n
+	help
+	  Configure PSP Verstage to use Crypto Co-processor (CCP) DMA while
+	  accessing the boot device. Select it on platforms which supports
+	  using CCP DMA to access the boot device.
+
+config PSP_S0I3_RESUME_VERSTAGE
+	bool "S0i3 resume verstage"
+	depends on VBOOT_STARTS_BEFORE_BOOTBLOCK
+	default n
+	help
+	  Select this item to enable running verstage during S0i3 resume.
+
+config PSP_INIT_TPM_ON_S0I3_RESUME
+	bool
+	depends on TPM2 && PSP_S0I3_RESUME_VERSTAGE
+	default PSP_S0I3_RESUME_VERSTAGE
+	help
+	  If the TPM is reset while in S0i3, it must be reinitialized
+	  during s0i3 resume. This must be performed in PSP verstage since
+	  coreboot is otherwise not involved with s0i3 resume.
+
+config PSP_SUPPORTS_EFS2_RELATIVE_ADDR
+	bool
+	default n
+	help
+	  On SoCs where PSP uses A/B recovery layout, PSP support relative addressing
+	  from the start of the SPI ROM. Enable this config on SoCs where PSP supports
+	  relative addressing so that PSP verstage can pass the offset.
+
+config SEPARATE_SIGNED_PSPFW
+	def_bool n
+	help
+	  Put signed AMD/PSP firmwares outside FW_MAIN_[AB] so vboot doesn't verify them,
+	  and rely on PSP's verification.
+
+config PSP_VERSTAGE_STACK_IS_MAPPED
+	bool
+	default y if SOC_AMD_PICASSO
+	default n
+	help
+	  This configuration indicates whether the PSP Verstage stack is mapped to a virtual
+	  address space. This has been the case so far only in Picasso SoC.
+
+config PSP_VERSTAGE_MAP_ENTIRE_SPIROM
+	bool
+	default n
+	help
+	  This configuration indicates whether PSP Verstage needs to map the entire SPI ROM.
+	  This is required only in Cezanne SoC at the moment.

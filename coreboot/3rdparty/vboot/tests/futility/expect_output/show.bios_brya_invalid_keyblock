@@ -1,0 +1,67 @@
+BIOS:                    tests/futility/data/bios_brya_mp_invalid_vblock_b.bin
+GBB header:              GBB
+  Version:               1.2
+  Flags:                 0x00000039
+  Regions:                 offset       size
+    hwid                 0x00000080   0x00000100
+    bmpvf                0x00001180   0x00000000
+    rootkey              0x00000180   0x00001000
+    recovery_key         0x00001180   0x00001000
+  Size:                  0x00002180 / 0x00070000
+GBB content:
+  HWID:                  BANSHEE TEST 1126
+     digest:             0ba1c94b15e23ec7139b3abd6854fedcb1e379df8b673a10ea04e61947a23a49   valid
+  Root Key:
+    Vboot API:           1.0
+    Algorithm:           8 RSA4096 SHA512
+    Key Version:         1
+    Key sha1sum:         30cc57d4d2402113ae0ba3884278c0d929731c71
+  Recovery Key:
+    Vboot API:           1.0
+    Algorithm:           8 RSA4096 SHA512
+    Key Version:         1
+    Key sha1sum:         e3c39daf95da1940936aa29eef2d101eb09905c0
+Firmware body:           FW_MAIN_A
+  Offset:                0x00510000
+  Size:                  0x004fffc0
+Firmware body:           FW_MAIN_B
+  Offset:                0x01010000
+  Size:                  0x004fffc0
+Keyblock:                VBLOCK_A
+  Size:                  0x6b8
+  Signature:             valid
+    Size:                0x200
+    Data size:           0x478
+  Flags:                 23  !DEV DEV !REC !MINIOS
+  Data key algorithm:    7 RSA4096 SHA256
+  Data key version:      1
+  Data key sha1sum:      581477dd7408c8f179f22ff67e2e1d8e5ed40674
+Firmware Preamble:
+  Size:                  2164
+  Header version:        2.1
+  Firmware version:      1
+  Kernel key algorithm:  8 RSA4096 SHA512
+  Kernel key version:    1
+  Kernel key sha1sum:    b047ada00a098f208eaba08a9d2fbf21fe6f023b
+  Firmware body size:    1931904
+  Preamble flags:        0
+Body verification succeeded.
+Keyblock:                VBLOCK_B
+  Size:                  0x4b8
+  Signature:             invalid
+    Size:                0
+    Data size:           0
+  Flags:                 23  !DEV DEV !REC !MINIOS
+  Data key algorithm:    7 RSA4096 SHA256
+  Data key version:      1
+  Data key sha1sum:      e2c1c92d7d7aa7dfed5e8375edd30b7ae52b7450
+Firmware Preamble:
+  Size:                  2164
+  Header version:        2.1
+  Firmware version:      1
+  Kernel key algorithm:  7 RSA4096 SHA256
+  Kernel key version:    1
+  Kernel key sha1sum:    5d2b220899c4403d564092ada3f12d3cc4483223
+  Firmware body size:    1931904
+  Preamble flags:        0
+Body verification succeeded.

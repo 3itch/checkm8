@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+# Generic NSC romstage driver - Just enough UART initialisation code for
+# pre-ram.
+config SUPERIO_NSC_COMMON_PRE_RAM
+	bool

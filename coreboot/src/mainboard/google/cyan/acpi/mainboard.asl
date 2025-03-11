@@ -1,0 +1,23 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#include <variant/onboard.h>
+
+Scope (\_SB.GPNC)
+{
+	Method (_AEI, 0, Serialized)
+	{
+		Name (RBUF, ResourceTemplate ()
+		{
+			GpioInt (Edge, ActiveLow, ExclusiveAndWake, PullDefault,,
+				"\\_SB.GPNC") { BOARD_SCI_GPIO_INDEX }
+		})
+		Return (RBUF)
+	}
+
+	Method (_E0F, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
+	{
+	}
+}
+
+/* Variant-specific I2C devices */
+#include <variant/acpi/mainboard.asl>

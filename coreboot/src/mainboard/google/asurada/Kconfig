@@ -1,0 +1,63 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config BOARD_GOOGLE_ASURADA_COMMON
+	def_bool BOARD_GOOGLE_ASURADA || \
+		 BOARD_GOOGLE_HAYATO || \
+		 BOARD_GOOGLE_SPHERION
+
+if BOARD_GOOGLE_ASURADA_COMMON
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select RTC
+	select SOC_MEDIATEK_MT8192
+	select BOARD_ROMSIZE_KB_8192
+	select MAINBOARD_HAS_CHROMEOS
+	select CHROMEOS_USE_EC_WATCHDOG_FLAG if CHROMEOS
+	select COMMON_CBFS_SPI_WRAPPER
+	select SPI_FLASH
+	select SPI_FLASH_INCLUDE_ALL_DRIVERS
+	select EC_GOOGLE_CHROMEEC
+	select EC_GOOGLE_CHROMEEC_BOARDID
+	select EC_GOOGLE_CHROMEEC_SPI
+	select SPI_TPM if VBOOT
+	select TPM_GOOGLE_CR50 if VBOOT
+	select MAINBOARD_HAS_TPM2 if VBOOT
+	select MAINBOARD_HAS_NATIVE_VGA_INIT
+	select MAINBOARD_FORCE_NATIVE_VGA_INIT
+	select HAVE_LINEAR_FRAMEBUFFER
+	select DRIVER_ANALOGIX_ANX7625
+	select COMMONLIB_STORAGE
+	select COMMONLIB_STORAGE_MMC
+
+config VBOOT
+	select EC_GOOGLE_CHROMEEC_SWITCHES
+	select VBOOT_VBNV_FLASH
+
+config MAINBOARD_DIR
+	default "google/asurada"
+
+config MAINBOARD_PART_NUMBER
+	default "Asurada" if BOARD_GOOGLE_ASURADA
+	default "Hayato" if BOARD_GOOGLE_HAYATO
+	default "Spherion" if BOARD_GOOGLE_SPHERION
+
+config DRIVER_TPM_SPI_BUS
+	hex
+	default 0x5
+
+# On MT8192 the SPI flash is actually using a SPI-NOR controller with its own bus.
+# The number here should be a virtual value as (SPI_BUS_NUMBER + 1).
+config BOOT_DEVICE_SPI_FLASH_BUS
+	int
+	default 9
+
+config EC_GOOGLE_CHROMEEC_SPI_BUS
+	hex
+	default 0x1
+
+config CONSOLE_CBMEM_BUFFER_SIZE
+	hex
+	default 0x80000
+
+endif

@@ -1,0 +1,147 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config ARCH_RISCV_RV64
+	bool
+	select ARCH_RISCV
+
+config ARCH_RISCV_RV32
+	bool
+	select ARCH_RISCV
+
+config ARCH_RISCV
+	bool
+
+if ARCH_RISCV
+
+config RISCV_ARCH
+	string
+
+config RISCV_ABI
+	string
+
+config RISCV_CODEMODEL
+	string
+
+config ARCH_RISCV_M_DISABLED
+	bool
+
+config ARCH_RISCV_M
+	# Whether a SOC implements M mode.
+	# M mode is the most privileged mode, it is
+	# the equivalent in some ways of x86 SMM mode
+	# save that in M mode it is impossible to turn
+	# on paging.
+	# While the spec requires it, there is at least
+	# one implementation that will not have it due
+	# to security concerns.
+	bool
+	default y if ARCH_RISCV && !ARCH_RISCV_M_DISABLED
+	default n
+
+config ARCH_RISCV_S
+	# S (supervisor) mode is for kernels. It is optional.
+	bool
+	default n
+
+config RISCV_HAS_OPENSBI
+	def_bool n
+
+config RISCV_OPENSBI
+	bool "Use OpenSBI to hand over control to payload"
+	depends on ARCH_RISCV_M && ARCH_RISCV_S
+	depends on RISCV_HAS_OPENSBI
+	default n
+	help
+	  Load OpenSBI after payload has been loaded and use it to
+	  provide the SBI and to handover control to payload.
+
+if RISCV_OPENSBI
+
+config OPENSBI_BLOB
+	bool "Include OpenSBI ELF binary blob"
+	depends on RISCV_OPENSBI
+	help
+	  If enabled it allows to specify a file path to an already compiled OpenSBI binary.
+	  If disabled the OpenSBI binary will be compiled from upstream OpenSBI repository.
+	  This option is discouraged as compatibility with out-of-tree blobs may break anytime.
+
+config OPENSBI_BLOB_PATH
+	string "Path to external opensbi.elf"
+	depends on OPENSBI_BLOB
+	help
+	  Absolute (or relative to coreboot directory) path to the OpenSBI ELF file.
+
+config OPENSBI_PLATFORM
+	string
+	help
+	  The OpenSBI platform to build for.
+
+config OPENSBI_TEXT_START
+	hex
+	help
+	  The linking address used to build opensbi.
+
+config OPENSBI_FW_DYNAMIC_BOOT_HART
+	int
+	default RISCV_WORKING_HARTID
+	help
+	  This specifies the hart that OpenSBI will use to boot the payload. If set to
+	  value -1, OpenSBI will use a 'lottery' scheme to figure it out itself.
+	  This hart must be able to execute in the Supervisor priviledged mode, since
+	  that is the mode usually used for the payload. If the hart does not support
+	  Supervisor mode OpenSBI will again look for a hart that does support it.
+
+endif # RISCV_OPENSBI
+
+config ARCH_RISCV_U
+	# U (user) mode is for programs.
+	bool
+	default n
+
+config ARCH_RISCV_PMP
+	bool
+	default n
+
+config ARCH_BOOTBLOCK_RISCV
+	bool
+	default n
+
+config ARCH_VERSTAGE_RISCV
+	bool
+	default n
+
+config ARCH_ROMSTAGE_RISCV
+	bool
+	default n
+
+config ARCH_RAMSTAGE_RISCV
+	bool
+	default n
+
+config RISCV_USE_ARCH_TIMER
+	bool
+	default n
+
+config RISCV_WORKING_HARTID
+	int
+
+# Newer SoC have the menvconfig register.
+# Very few SOC do not have this.
+# Older SoC, such as the SiFive FU[57]40, that
+# do not have this register, should set this
+# to n.
+config RISCV_SOC_HAS_MENVCFG
+	bool
+	default y
+
+config RISCV_GET_HART_COUNT_AT_RUNTIME
+	bool
+	default n
+	help
+	  Usually RISC-V SOCs have a specific amount of harts (CONFIG_MAX_CPUS).
+	  It is however possible that the amount of harts can only be known at runtime.
+	  This is for example the case for socketed and for emulation systems.
+	  SOC/Mainboards select this option in case the number of harts is not known at
+	  build time. In this case the SOC must have a scheme in place to discover all harts.
+
+endif # if ARCH_RISCV

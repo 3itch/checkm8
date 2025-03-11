@@ -1,0 +1,12 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+comment "Fizz"
+
+config BOARD_GOOGLE_FIZZ
+	bool "->  Fizz"
+
+config BOARD_GOOGLE_KARMA
+	bool "->  Karma"
+
+config BOARD_GOOGLE_ENDEAVOUR
+	bool "->  Endeavour"

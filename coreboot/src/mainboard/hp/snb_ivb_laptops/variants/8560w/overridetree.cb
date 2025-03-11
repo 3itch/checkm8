@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+chip northbridge/intel/sandybridge
+	register "spd_addresses" = "{0x50, 0x51, 0x52, 0x53}"
+	device domain 0 on
+		subsystemid 0x103c 0x1631 inherit
+		device ref peg10 on end
+		device ref igd off end
+
+		chip southbridge/intel/bd82x6x # Intel Series 6 Cougar Point PCH
+			register "docking_supported" = "false"
+			register "gpi6_routing" = "2"
+			register "pcie_hotplug_map" = "{ 0, 1, 1, 0, 0, 0, 0, 0 }"
+			# HDD(0), ODD(1), eSATA(4)
+			register "sata_port_map" = "0x3b"
+
+			register "usb_port_config" = "{
+				{ 1, 1, 0 }, /* USB0 */
+				{ 1, 1, 0 }, /* USB1 */
+				{ 1, 1, 1 }, /* eSATA */
+				{ 1, 1, 1 }, /* camera */
+				{ 0, 0, 2 },
+				{ 1, 0, 2 }, /* bluetooth */
+				{ 0, 0, 3 },
+				{ 1, 0, 3 },
+				{ 0, 1, 4 },
+				{ 1, 1, 4 }, /* WWAN */
+				{ 1, 0, 5 },
+				{ 1, 0, 5 }, /* dock */
+				{ 1, 0, 6 },
+				{ 1, 0, 6 },
+			}"
+
+			device ref pcie_rp1 on  end # WWAN
+			device ref pcie_rp2 on  end # ExpressCard
+			device ref pcie_rp3 on  end # SD/MMC
+			device ref pcie_rp4 on  end # WLAN
+			device ref pcie_rp5 off end
+			device ref pcie_rp6 off end
+			device ref pcie_rp7 off end
+			device ref pcie_rp8 on  end # NEC USB 3.0 Host Controller
+			device ref lpc on
+				register "gen1_dec" = "0x007c0201"
+				register "gen2_dec" = "0x000c0101"
+				register "gen3_dec" = "0x00fcfe01"
+				register "gen4_dec" = "0x000402e9"
+				chip ec/hp/kbc1126
+					register "ec_data_port" = "0x60"
+					register "ec_cmd_port"  = "0x64"
+					register "ec_ctrl_reg"  = "0xca"
+					register "ec_fan_ctrl_value" = "0x6b"
+					device pnp ff.1 off end
+				end
+				chip superio/smsc/lpc47n217
+					device pnp 4e.3 on	# Parallel
+						io  0x60 = 0x378
+						irq 0x70 = 7
+					end
+					device pnp 4e.4 on	# COM1
+						io  0x60 = 0x3f8
+						irq 0x70 = 4
+					end
+					device pnp 4e.5 off end	# COM2
+				end
+			end
+		end
+	end
+end

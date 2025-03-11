@@ -1,0 +1,206 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config COMMON_CBFS_SPI_WRAPPER
+	bool
+	default n
+	depends on !ARCH_X86
+	depends on BOOT_DEVICE_SPI_FLASH
+	select BOOT_DEVICE_SUPPORTS_WRITES
+	help
+	 Use common wrapper to interface CBFS to SPI bootrom.
+
+config SPI_FLASH
+	bool
+	default y if BOOT_DEVICE_SPI_FLASH && BOOT_DEVICE_SUPPORTS_WRITES
+	default n
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash.
+
+config SPI_SDCARD
+	bool
+	default n
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI sdcard.
+
+if SPI_FLASH
+
+# Keep at 0 because lots of boards assume this default.
+config BOOT_DEVICE_SPI_FLASH_BUS
+	int
+	default 0
+	help
+	  Which SPI bus the boot device is connected to.
+
+config BOOT_DEVICE_SPI_FLASH_RW_NOMMAP
+	bool
+	default y if !COMMON_CBFS_SPI_WRAPPER
+	default n
+	depends on BOOT_DEVICE_SPI_FLASH
+	help
+	  Provide common implementation of the RW boot device that
+	  doesn't provide mmap() operations.
+
+config BOOT_DEVICE_SPI_FLASH_NO_EARLY_WRITES
+	bool
+	default n
+	depends on BOOT_DEVICE_SPI_FLASH_RW_NOMMAP
+	help
+	  For platforms who do not allow writes to SPI flash in early
+	  stages like romstage.  Not selecting this config will result
+	  in the auto-selection of
+	  BOOT_DEVICE_SPI_FLASH_RW_NOMMAP_EARLY if
+	  BOOT_DEVICE_SPI_FLASH_RW_NOMMAP is selected by the platform.
+
+config BOOT_DEVICE_SPI_FLASH_RW_NOMMAP_EARLY
+	bool
+	default y if BOOT_DEVICE_SPI_FLASH_RW_NOMMAP && !BOOT_DEVICE_SPI_FLASH_NO_EARLY_WRITES
+	default n
+	depends on BOOT_DEVICE_SPI_FLASH_RW_NOMMAP
+	help
+	  Include the common implementation in all stages, including the
+	  early ones.
+
+config SPI_FLASH_DONT_INCLUDE_ALL_DRIVERS
+	bool
+	default y if COMMON_CBFS_SPI_WRAPPER
+	default n
+
+config SPI_FLASH_INCLUDE_ALL_DRIVERS
+	bool
+	default n if SPI_FLASH_DONT_INCLUDE_ALL_DRIVERS
+	default y
+
+config SPI_FLASH_SMM
+	bool
+	depends on HAVE_SMI_HANDLER
+	help
+	  Select this option if you want SPI flash support in SMM.
+
+config SPI_FLASH_NO_FAST_READ
+	bool "Disable Fast Read command"
+	default n
+	help
+	  Select this option if your setup requires to avoid "fast read"s
+	  from the SPI flash parts.
+
+config SPI_FLASH_ADESTO
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by Adesto Technologies.
+
+config SPI_FLASH_AMIC
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by AMIC.
+
+config SPI_FLASH_ATMEL
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by Atmel.
+
+config SPI_FLASH_EON
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by EON.
+
+config SPI_FLASH_GIGADEVICE
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by Gigadevice.
+
+config SPI_FLASH_MACRONIX
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by Macronix.
+
+config SPI_FLASH_SPANSION
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by Spansion.
+
+config SPI_FLASH_SST
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by SST.
+
+config SPI_FLASH_STMICRO
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by ST Micro,
+	  Numonyx or Micron.
+
+config SPI_FLASH_WINBOND
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by Winbond.
+
+config SPI_FLASH_ISSI
+	bool
+	default y if SPI_FLASH_INCLUDE_ALL_DRIVERS
+	help
+	  Select this option if your chipset driver needs to store certain
+	  data in the SPI flash and your SPI flash is made by ISSI.
+
+config SPI_FLASH_HAS_VOLATILE_GROUP
+	bool
+	default n
+	help
+	  Allows chipset to group write/erase operations under a single volatile
+	  group.
+
+config SPI_FLASH_EXIT_4_BYTE_ADDR_MODE
+	bool
+	default n
+	help
+	  This will send an Exit 4-Byte Address Mode (E9h) command before the first
+	  access to the SPI flash. On some platforms with SPI flashes larger than 32MB,
+	  the SPI flash may power up in 4-byte addressing mode and this command needs
+	  to be sent before coreboot's 3-byte address commands can be interpreted correctly.
+	  On flashes that don't support 4-byte addressing mode or where it is already
+	  disabled, this command should be a no-op.
+
+config SPI_FLASH_FORCE_4_BYTE_ADDR_MODE
+	bool
+	default n
+	help
+	  This will force coreboot to send addresses as 4-bytes instead of 3-bytes.
+	  On some platforms with SPI flashes larger than 16MB, the SPI flash may need
+	  to remain in 4-byte addressing mode.
+
+config SPI_FLASH_SFDP
+	bool
+	help
+	  Include serial flash discoverable parameters (SFDP) support.
+
+config SPI_FLASH_RPMC
+	bool
+	select SPI_FLASH_SFDP
+	help
+	  Include replay-protected monotonic counter (RPMC) support.
+
+endif # SPI_FLASH
+
+config HAVE_EM100PRO_SPI_CONSOLE_SUPPORT
+	def_bool n

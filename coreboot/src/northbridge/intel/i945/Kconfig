@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config NORTHBRIDGE_INTEL_I945
+	bool
+	select HAVE_DEBUG_RAM_SETUP
+	select VGA
+	select INTEL_GMA_ACPI
+	select INTEL_GMA_SSC_ALTERNATE_REF
+	select INTEL_EDID
+	select HAVE_VGA_TEXT_FRAMEBUFFER if MAINBOARD_DO_NATIVE_VGA_INIT
+	select USE_DDR2
+	select NEED_SMALL_2MB_PAGE_TABLES
+
+if NORTHBRIDGE_INTEL_I945
+
+config VBOOT
+	select VBOOT_STARTS_IN_BOOTBLOCK
+config NORTHBRIDGE_INTEL_SUBTYPE_I945GC
+	def_bool n
+config NORTHBRIDGE_INTEL_SUBTYPE_I945GM
+	def_bool n
+
+config VGA_BIOS_ID
+	string
+	default "8086,27a2" if NORTHBRIDGE_INTEL_SUBTYPE_I945GM
+	default "8086,2772" if NORTHBRIDGE_INTEL_SUBTYPE_I945GC
+
+config I945_LVDS
+	def_bool n
+	select MAINBOARD_HAS_NATIVE_VGA_INIT
+	select HAVE_LINEAR_FRAMEBUFFER if MAINBOARD_DO_NATIVE_VGA_INIT
+	help
+	  Selected by mainboards that use native graphics initialization
+	  for the LVDS port. A linear framebuffer is only supported for
+	  LVDS.
+
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0xf0000000
+
+config ECAM_MMCONF_BUS_NUMBER
+	int
+	default 64
+
+# This number must be equal or lower than what's reported in ACPI PCI _CRS
+config DOMAIN_RESOURCE_32BIT_LIMIT
+	default 0xfec00000
+
+config OVERRIDE_CLOCK_DISABLE
+	bool
+	default n
+	help
+	  Usually system firmware turns off system memory clock
+	  signals to unused SO-DIMM slots to reduce EMI and power
+	  consumption.
+	  However, some boards do not like unused clock signals to
+	  be disabled.
+
+config MAXIMUM_SUPPORTED_FREQUENCY
+	int
+	default 0
+	help
+	  If non-zero, this designates the maximum DDR frequency
+	  the board supports, despite what the chipset should be
+	  capable of.
+
+config CHECK_SLFRCS_ON_RESUME
+	def_bool n
+	help
+	  On some boards it may be necessary to hard reset early
+	  during resume from S3 if the SLFRCS register indicates that
+	  a memory channel is not guaranteed to be in self-refresh.
+	  On other boards the check always creates a false positive,
+	  effectively making it impossible to resume.
+
+config SMM_RESERVED_SIZE
+	hex
+	default 0x100000
+
+config MAX_CPUS
+	int
+	default 4
+
+config FIXED_MCHBAR_MMIO_BASE
+	default 0xfed14000
+
+config FIXED_DMIBAR_MMIO_BASE
+	default 0xfed18000
+
+config FIXED_EPBAR_MMIO_BASE
+	default 0xfed19000
+
+endif

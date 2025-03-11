@@ -1,0 +1,47 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_AMD_COMMON_BLOCK_ACPI
+	bool
+	depends on SOC_AMD_COMMON_BLOCK_ACPIMMIO
+	select ACPI_AMD_HARDWARE_SLEEP_VALUES
+	select ACPI_COMMON_MADT_IOAPIC
+	select ACPI_COMMON_MADT_LAPIC
+	select ACPI_CUSTOM_MADT
+	help
+	  Select this option to use the AcpiMmio ACPI registers.
+
+config SOC_AMD_COMMON_BLOCK_ACPI_ALIB
+	bool
+
+config SOC_AMD_COMMON_BLOCK_ACPI_DPTC
+	bool
+	depends on SOC_AMD_COMMON_BLOCK_ACPI_ALIB
+	help
+	  Selected by mainboards that implement support for ALIB
+	  to enable DPTC.
+
+config SOC_AMD_COMMON_BLOCK_ACPI_CPPC
+	bool
+
+config SOC_AMD_COMMON_BLOCK_ACPI_CPU_POWER_STATE
+	bool
+
+config SOC_AMD_COMMON_BLOCK_ACPI_GPIO
+	bool
+
+config SOC_AMD_COMMON_BLOCK_ACPI_IVRS
+	bool
+
+config SOC_AMD_COMMON_BLOCK_ACPI_MADT
+	bool
+	help
+	  Select this to add the common AMD acpi_fill_madt implementation to
+	  the build which adds the MADT entries for all non-FCH IOAPICs.
+
+config ACPI_SSDT_PSD_INDEPENDENT
+	bool "Allow core p-state independent transitions"
+	default y
+	help
+	  AMD recommends the ACPI _PSD object to be configured to cause
+	  cores to transition between p-states independently. A vendor may
+	  choose to generate _PSD object to allow cores to transition together.

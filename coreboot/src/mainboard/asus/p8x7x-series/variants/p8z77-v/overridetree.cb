@@ -1,0 +1,88 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+chip northbridge/intel/sandybridge
+	device domain 0 on
+		subsystemid 0x1043 0x84ca inherit
+		device ref peg11 on  end # PCIEX_16_2
+		chip southbridge/intel/bd82x6x
+			register "usb_port_config" = "{
+				{ 1, 2, 0 },
+				{ 1, 2, 0 },
+				{ 1, 2, 1 },
+				{ 1, 9, 1 },
+				{ 1, 9, 2 },
+				{ 1, 2, 2 },
+				{ 1, 2, 3 },
+				{ 1, 2, 3 },
+				{ 1, 2, 4 },
+				{ 1, 9, 4 },
+				{ 1, 2, 6 },
+				{ 1, 2, 5 },
+				{ 1, 2, 5 },
+				{ 1, 2, 6 }
+			}"
+			register "gen1_dec" = "0x000c0291"
+
+			device ref gbe on  end
+			device ref pcie_rp1 on  end	# PCIEX_16_3 (electrical x1 or x4)
+			device ref pcie_rp2 on  end	# PCIEX_1_1
+			device ref pcie_rp4 on  end	# ASM1061 SATA or PCIEX_1_2
+			device ref pcie_rp5 on  end	# ASM1083 PCI Bridge
+			device ref pcie_rp7 on  end	# Wi-Fi Go!
+			device ref pcie_rp8 on  end	# ASM1042 USB3
+
+			device ref lpc on
+				chip superio/nuvoton/nct6779d
+					device pnp 2e.1 off end		# Parallel
+					device pnp 2e.2 on		# UART A
+						io  0x60 = 0x3f8
+						irq 0x70 = 4
+					end
+					device pnp 2e.3 off end		# UART B, IR
+					device pnp 2e.5 on		# PS2 KBC
+						io  0x60 = 0x0060	# KBC1 base
+						io  0x62 = 0x0064	# KBC2 base
+						irq 0x70 = 1		# Keyboard IRQ
+						irq 0x72 = 12		# Mouse IRQ
+
+						# KBC 12Mhz/A20 speed/sw KBRST
+						drq 0xf0 = 0x82
+					end
+					device pnp 2e.6 off  end	# CIR
+					device pnp 2e.7 off  end	# GPIOs 6-8
+					device pnp 2e.8 off  end	# WDT1 GPIO 0-1
+					device pnp 2e.108 on end	# GPIO0-1
+					device pnp 2e.109 on end	# GPIO1
+					device pnp 2e.209 on 		# GPIO2
+						drq 0xe0 = 0xdf
+					end
+					device pnp 2e.309 on end	# GPIO3
+					device pnp 2e.509 on  		# GPIO5
+						drq 0xf4 = 0xfc
+					end
+					device pnp 2e.a on		# ACPI
+						drq 0xe3 = 0x04		# Thermal shutdown event issued
+						drq 0xe7 = 0x11		# Enable 3VSBS to power RAM on S3
+						drq 0xf2 = 0x5d		# Enable PME
+					end
+					device pnp 2e.b   on		# H/W Monitor, FP LED
+						io  0x60 = 0x290
+						io  0x62 = 0
+						irq 0x70 = 0
+					end
+					device pnp 2e.d off end		# WDT1
+					device pnp 2e.e off end		# CIR wake-up
+					device pnp 2e.f on  		# Push-pull/Open-drain
+						drq 0xe4 = 0xfc		# GP5 PP
+						drq 0xe6 = 0x7f		# GP7 PP
+					end
+					device pnp 2e.14 off end	# Port 80 UART
+					device pnp 2e.16 off end	# Deep sleep
+				end
+				chip drivers/pc80/tpm
+					device pnp c31.0 on end		# TPM
+				end
+			end
+		end
+	end
+end

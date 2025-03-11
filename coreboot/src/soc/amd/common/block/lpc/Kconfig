@@ -1,0 +1,67 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config SOC_AMD_COMMON_BLOCK_LPC
+	bool
+	help
+	  Select this option to use the traditional LPC-ISA bridge at D14F3.
+
+config PROVIDES_ROM_SHARING
+	bool
+	help
+	  Select this option if the LPC bridge supports ROM sharing.
+
+config SOC_AMD_COMMON_BLOCK_LPC_SPI_DMA
+	bool
+	select X86_CUSTOM_BOOTMEDIA
+	select SOC_AMD_COMMON_BLOCK_SPI_4DW_BURST
+	depends on !SOC_AMD_PICASSO && !SOC_AMD_STONEYRIDGE
+	help
+	  Select this option to enable SPI DMA support.
+
+# The LPC SPI DMA controller requires the source and destination to be 64 byte
+# aligned.
+config CBFS_CACHE_ALIGN
+	int
+	default 64 if SOC_AMD_COMMON_BLOCK_LPC_SPI_DMA
+
+config FSP_ALIGNMENT_FSP_S
+	int
+	default 64 if SOC_AMD_COMMON_BLOCK_LPC_SPI_DMA
+
+config FSP_ALIGNMENT_FSP_M
+	int
+	default 64 if SOC_AMD_COMMON_BLOCK_LPC_SPI_DMA
+
+config SOC_AMD_COMMON_BLOCK_HAS_ESPI
+	bool
+	help
+	  Select this option if platform supports eSPI using D14F3 configuration
+	  registers.
+
+config SOC_AMD_COMMON_BLOCK_ESPI_EXTENDED_DECODE_RANGES
+	bool
+	depends on SOC_AMD_COMMON_BLOCK_HAS_ESPI
+	help
+	  Select this if the platform supports 16 instead of 4 eSPI IO decode
+	  ranges and 5 instead of 4 eSPI MMIO decode ranges.
+
+config SOC_AMD_COMMON_BLOCK_HAS_ESPI_ALERT_ENABLE
+	bool
+	depends on SOC_AMD_COMMON_BLOCK_HAS_ESPI
+	help
+	  Selected by the SoC if it supports the ALERT_ENABLE bit.
+
+config SOC_AMD_COMMON_BLOCK_USE_ESPI
+	bool
+	depends on SOC_AMD_COMMON_BLOCK_HAS_ESPI
+	help
+	  Select this option if mainboard uses eSPI instead of LPC (if supported
+	  by platform).
+
+config SOC_AMD_COMMON_BLOCK_ESPI_RETAIN_PORT80_EN
+	bool
+	depends on SOC_AMD_COMMON_BLOCK_USE_ESPI
+	help
+	  SMU will lock up at times if the port80h enable bit is cleared. Select
+	  this option to retain the port80 enable bit while clearing other enable
+	  bits in the ESPI Decode register.

@@ -1,0 +1,9 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+config CHROMEOS_CAMERA
+	bool
+	default n
+	help
+	  Camera with identifiers following ChromeOS Camera Info. The info is
+	  usually available on MIPI camera EEPROM for identifying correct
+	  drivers and config.

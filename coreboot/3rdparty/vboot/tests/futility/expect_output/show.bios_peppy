@@ -1,0 +1,67 @@
+BIOS:                    tests/futility/data/bios_peppy_mp.bin
+GBB header:              GBB
+  Version:               1.1
+  Flags:                 0x00000039
+  Regions:                 offset       size
+    hwid                 0x00000080   0x00000100
+    bmpvf                0x00001180   0x000ece80
+    rootkey              0x00000180   0x00001000
+    recovery_key         0x000ee000   0x00001000
+  Size:                  0x000ef000 / 0x000ef000
+GBB content:
+  HWID:                  X86 PEPPY TEST 4211
+     digest:             <none>
+  Root Key:
+    Vboot API:           1.0
+    Algorithm:           11 RSA8192 SHA512
+    Key Version:         1
+    Key sha1sum:         fc68bcb88bf9af1907289a9f377d658b3b9fe5b0
+  Recovery Key:
+    Vboot API:           1.0
+    Algorithm:           11 RSA8192 SHA512
+    Key Version:         1
+    Key sha1sum:         bf39d0d3e30cbf6a121416d04df4603ad5310779
+Firmware body:           FW_MAIN_A
+  Offset:                0x00210000
+  Size:                  0x000c0000
+Firmware body:           FW_MAIN_B
+  Offset:                0x00300000
+  Size:                  0x000c0000
+Keyblock:                VBLOCK_A
+  Size:                  0x8b8
+  Signature:             valid
+    Size:                0x400
+    Data size:           0x478
+  Flags:                 7  !DEV DEV !REC
+  Data key algorithm:    8 RSA4096 SHA512
+  Data key version:      1
+  Data key sha1sum:      f917ad29e36aa8a286f978c1aa0550ea31c6a561
+Firmware Preamble:
+  Size:                  2164
+  Header version:        2.1
+  Firmware version:      2
+  Kernel key algorithm:  7 RSA4096 SHA256
+  Kernel key version:    2
+  Kernel key sha1sum:    cc05423373b76acbec23ec45dfa3696a2ea6dc0f
+  Firmware body size:    146456
+  Preamble flags:        0
+Body verification succeeded.
+Keyblock:                VBLOCK_B
+  Size:                  0x8b8
+  Signature:             valid
+    Size:                0x400
+    Data size:           0x478
+  Flags:                 7  !DEV DEV !REC
+  Data key algorithm:    8 RSA4096 SHA512
+  Data key version:      1
+  Data key sha1sum:      f917ad29e36aa8a286f978c1aa0550ea31c6a561
+Firmware Preamble:
+  Size:                  2164
+  Header version:        2.1
+  Firmware version:      2
+  Kernel key algorithm:  7 RSA4096 SHA256
+  Kernel key version:    2
+  Kernel key sha1sum:    cc05423373b76acbec23ec45dfa3696a2ea6dc0f
+  Firmware body size:    146456
+  Preamble flags:        0
+Body verification succeeded.
