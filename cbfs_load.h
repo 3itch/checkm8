@@ -5,38 +5,38 @@
 #ifndef CBFS_LOAD_H
 #define CBFS_LOAD_H
 
-#endif
-
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
 #include "com.h"
 
 #define CBFS_MASTER_HEAD_MAGIC     0x4F524243        // orbc
-#define CBFS_FILE_MAGIC            0x4C494E48        // link
+#define CBFS_FILE_MAGIC            0x4C494E4B        // link
+
+extern void *CBFS_BASE_ADDR;
 
 struct cbfs_master_header {
-  uint32_t magic;
-  uint32_t version;
-  uint32_t rom_size;
-  uint32_t boot_block_size;
-  uint32_t align;
-  uint32_t offset;
-  uint32_t architecture;
+  uint32_t  magic;
+  uint32_t  version;
+  uint32_t  rom_size;
+  uint32_t  boot_block_size;
+  uint32_t  align;
+  uint32_t  offset;
+  uint32_t  architecture;
 };
 
 struct cbfs_file {
-  uint32_t magic;
-  uint32_t len;
-  uint32_t type;
-  uint32_t checksum;
-  uint32_t offset;
+  uint32_t  magic;
+  uint32_t  len;
+  uint32_t  type;
+  uint32_t  checksum;
+  uint32_t  offset;
 };
 
 struct cbfs_file_attribute {
-  uint32_t tag;
-  uint32_t len;
-  uint32_t data[];
+  uint32_t  tag;
+  uint32_t  len;
+  uint8_t   data[];
 };
 
 #define CBFS_ATTRIBUTE_TAG_NAME 0x4E414D45        // name
@@ -56,15 +56,15 @@ static int _strcmp(const char *s1, const char *s2) {
 
 struct cbfs_file *cbfs_find_file(const char *name) {
   struct cbfs_master_header *master_hdr = (struct cbfs_master_header *)CBFS_BASE_ADDR;
-  (uintptr_t)align_up((uintptr_t)CBFS_BASE_ADDR, 8);
+  master_hdr = (struct cbfs_master_header *)align_up((uintptr_t)CBFS_BASE_ADDR, 8);
 
   if (master_hdr->magic != CBFS_MASTER_HEAD_MAGIC) {
     serial_print("cbfs_find_file:  bad magic number\n");
     return NULL;
   }
 
-  void *current = (void *)((uintptr_t)CBFS_BASE_ADDR + master_hdr->offset);
-  void *end     = (void *)((uintptr_t)CBFS_BASE_ADDR + master_hdr->rom_size);
+  void *current = (void *)( (uintptr_t)CBFS_BASE_ADDR +   master_hdr->offset );
+  void *end     = (void *)( (uintptr_t)CBFS_BASE_ADDR + master_hdr->rom_size );
 
   while ( current < end ) {
     struct cbfs_file *file = ( struct cbfs_file * )current;
@@ -80,20 +80,20 @@ struct cbfs_file *cbfs_find_file(const char *name) {
           fname = ( const char * ) attr->data;
           break;
         }
-        attr_start = (void *)((uintptr_t)attr_start + align_up(attr->len, 8);
+        attr_start = (void *)((uintptr_t)attr_start + align_up(attr->len, 8));
       }
 
-      if ( fname && strcmp(fname, name) == 0 ) {
+      if ( fname && _strcmp(fname, name) == 0 ) {
         serial_print("cbfs_find_file:  found file ");
         serial_print(name);
-        serial_print(" 0 ");
+        serial_print(" @ ");
         serial_print_hex((uint32_t)file);
         serial_print("\n");
         return file;
       }
     }
 
-    current = (void *)((uintptr_t)file + align_up(file->offset + file->len, master_hdr->align));
+    current = (void *)( (uintptr_t)file + align_up( file->offset + file->len, master_hdr->align ) );
   }
 
   serial_print("checkmate:  file ");
@@ -113,7 +113,7 @@ void *cbfs_load(const char *name, size_t *size) {
   void *load_addr = (void *)TBOOT_LOAD_ADDR;
   memcpy(load_addr, file_data, file->len);
 
-  iif ( size ) {
+  if ( size ) {
     *size = file->len;
   }
 
@@ -127,3 +127,5 @@ void *cbfs_load(const char *name, size_t *size) {
 
   return load_addr;
 }
+
+#endif //CBFS_LOAD_H

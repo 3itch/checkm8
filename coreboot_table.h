@@ -9,8 +9,6 @@
 #ifndef COREBOOT_TABLE_H
 #define COREBOOT_TABLE_H
 
-#endif //COREBOOT_TABLE_H
-
 #define COREBOOT_TB_MAGIC  0x43425254        //  cbrt
 #define COREBOOT_TB_CBFS         0x14        //  cbfs entry tag
 
@@ -55,3 +53,5 @@ void *find_cbfs_base_addr() {
   serial_print("coreboot_table:  couldn't find coreboot table\n");
   return NULL;
 }
+
+#endif //COREBOOT_TABLE_H

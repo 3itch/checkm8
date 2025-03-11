@@ -29,9 +29,9 @@
 void *CBFS_BASE_ADDR = NULL;
 
 void patch(const void* tboot_base) {
-  void* verify_integrity_addr = (void*)((uint32_t)tboot_base + VERIFY_INTEGRITY_OFFSET);
+  void* verify_integrity_addr = (void*)( (uint32_t)tboot_base + VERIFY_INTEGRITY_OFFSET );
   serial_print("checkmate:  patching verify_integrity @ ");
-  serial_print_hex((uint32_t)verify_integrity_addr);
+  serial_print_hex( (uint32_t)verify_integrity_addr );
   serial_print("\n");
 
                   /*******************/
@@ -64,7 +64,6 @@ void *memcpy(void *dest, const void *src, size_t n) {
 void *bruteforce_cbfs_base_addr(uintptr_t start, uintptr_t end, uint32_t step) {
   serial_print("checkmate:  brute-forcing CBFS base addr from @ ");
   serial_print_hex((uint32_t)start);
-  serial_print("\n");
   serial_print(" to ");
   serial_print_hex((uint32_t)end);
   serial_print("\n");
@@ -73,7 +72,7 @@ void *bruteforce_cbfs_base_addr(uintptr_t start, uintptr_t end, uint32_t step) {
     volatile uint32_t *ptr = ( volatile uint32_t * )addr;
 
     if ( *ptr == CBFS_MASTER_HEADER_MAGIC ) {
-      serial_print("checkmate:  patching CBFS @ ");
+      serial_print("checkmate:  found CBFS @ ");
       serial_print_hex((uint32_t)addr);
       serial_print("\n");
 
@@ -89,18 +88,11 @@ void *bruteforce_cbfs_base_addr(uintptr_t start, uintptr_t end, uint32_t step) {
 void* tboot_load() {
   size_t tboot_size;
   void* tboot_base = cbfs_load("tboot.gz", &tboot_size);
-  if ( !tboot_addr ) {
+  if (!tboot_base) {
     serial_print("checkmate:  failed to load tboot.gz\n");
     return NULL;
   }
   return tboot_base;
-
-  size_t i;
-  uint8_t* dest = (uint8_t*)TBOOT_LOAD_ADDR;
-  for (i = 0; i < tboot_size; i++) {
-    dest[i] = ((uint8_t*)tboot_addr)[i];
-  }
-  return (void*)TBOOT_LOAD_ADDR;
 }
 
 void shim_main() {
@@ -114,18 +106,22 @@ void shim_main() {
 
   CBFS_BASE_ADDR = bruteforce_cbfs_base_addr(search_start, search_end, search_step);
   if ( !CBFS_BASE_ADDR ) {
-    serial_print("checkmate:  failed to find CBFS base addr\n");
+    serial_print("checkmate:      failed to find CBFS base addr\n");
     return;
   }
 
   void* tboot_base = tboot_load();
-  serial_print("checkmate:    tboot loaded @ ");
+  if (!tboot_base) {
+    serial_print("checkmate:      failed to load tboot\n");
+    return;
+  }
+  serial_print("checkmate:  tboot loaded @ ");
   serial_print_hex((uint32_t)tboot_base);
   serial_print("\n");
 
   patch(tboot_base);
 
-  serial_print("checkmate: jumping to tboot entry\n");
+  serial_print("checkmate:  jumping to tboot entry\n");
   void (*tboot_entry)(void) = (void (*)(void))tboot_base;
   tboot_entry();
 }
