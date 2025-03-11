@@ -10,8 +10,9 @@
 #include <string.h>
 #include "com.h"
 
-#define CBFS_MASTER_HEAD_MAGIC     0x4F524243        // orbc
-#define CBFS_FILE_MAGIC            0x4C494E4B        // link
+#define TBOOT_LOAD_ADDR             0x1000000        //   adjust MLE base depending on spec if this doesn't work
+#define CBFS_MASTER_HEAD_MAGIC     0x4F524243        //   orbc
+#define CBFS_FILE_MAGIC            0x4C494E4B        //   link
 
 extern void *CBFS_BASE_ADDR;
 

