@@ -18,29 +18,13 @@
 
 #include <stdint.h>
 #include <stddef.h>
+//#include <libpayload.h>
+//#include <cbfs.h>
+#include "com.h"
+#include "cbfs_load.h"
 
 #define TBOOT_LOAD_ADDR         0x1000000     //    adjust MLE base depending on spec if this doesn't work
 #define VERIFY_INTEGRITY_OFFSET 0x80af10
-
-void serial_putc(char c) {
-  volatile uint8_t* serial_port = (volatile uint8_t*)0x3f8;
-  while ( !(*serial_port & 0x20) );
-  *serial_port = c;
-}
-
-void serial_print(const char* str) {
-  while (*str) {
-    serial_putc(*str++);
-  }
-}
-
-void serial_print_hex(uint32_t val) {
-  const char hex[] = "0123456789ABCDEF";
-  serial_print("0x");
-  for (int i = 28; i >= 0; i -= 4) {
-    serial_putc(hex[(val >> i) & 0xf]);
-  }
-}
 
 void patch(const void* tboot_base) {
   void* verify_integrity_addr = (void*)((uint32_t)tboot_base + VERIFY_INTEGRITY_OFFSET);
@@ -59,14 +43,27 @@ void patch(const void* tboot_base) {
   serial_print("checkmate:    patched!\n");
 }
 
-extern void* __cbfs_load(const char* name, size_t* size);
+void *memcpy(void *dest, const void *src, size_t n) {
+  uint8_t *d = (uint8_t*)dest;
+  const uint8_t *s = (const uint8_t*)src;
+
+  size_t i;
+  for ( i = 0; i < n; i++ ) {
+    d[i] = s[i];
+  }
+
+  return dest;
+}
+
+//extern void* __cbfs_load(const char* name, size_t* size);
 void* tboot_load() {
   size_t tboot_size;
-  void* tboot_addr = __cbfs_load("tboot.gz", &tboot_size);
+  void* tboot_base = cbfs_load("tboot.gz", &size);
   if ( !tboot_addr ) {
     serial_print("checkmate:  failed to load tboot.gz\n");
-    while ( 1 );
+    return NULL;
   }
+  return tboot_base;
 
   size_t i;
   uint8_t* dest = (uint8_t*)TBOOT_LOAD_ADDR;
