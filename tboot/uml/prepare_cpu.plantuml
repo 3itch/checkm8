@@ -1,0 +1,9 @@
+@startuml prepare CPU
+start
+:verify if CPU in protected mode;
+:check & enable cache;
+:check & enable native FPU error reporting;
+:check & exit virtual-8086 mode;
+:check if no machine check in progress;
+stop
+@enduml

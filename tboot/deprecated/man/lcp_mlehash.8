@@ -1,0 +1,41 @@
+.\"
+.TH LCP_MLEHASH 8 "2011-12-31" "tboot" "User Manuals"
+.SH NAME
+lcp_mlehash \- generate a SHA-1 hash of a TXT MLE binary file suitable for use in a TXT launch control policy
+.SH SYNOPSIS
+.B lcp_mlehash
+.RB [\| \-v \|]
+.RB [\| \-c
+.IR cmdline \|]
+.RB [\| \-h \|]
+.I mle-file
+.SH DESCRIPTION
+.B lcp_mlehash
+is used to generate a SHA-1 hash of the portion of an executable file that contains
+the Intel® TXT measured launched environment (MLE).  In the MLE binary file, the 
+portion of the file to be used as the MLE is specified in the MLE header structure.  
+If verbose mode is not used, the output is suitable for use as the mle-file to the
+.B lcp_crtpol
+and
+.B lcp_crtpolelt
+commands.
+.SH OPTIONS
+.TP
+.I mle-file
+File name of the MLE binary.  If it is a gzip file then it will be un-ziped before hashing.
+.TP
+.B \-v
+Verbose mode, display progress indications.
+.TP
+.BI \-c\  cmdline
+Specify quote-delimited command line. It is important to specify the command line that is used when launching the MLE or the hash will not match what is calculated by SINIT.
+.TP
+.B \-h
+Print out the help message.
+.SH EXAMPLES
+\fBlcp_mlehash \-c \fI"logging=memory,serial,vga" \fI/boot/tboot.gz \fB> \fImle-hash
+.SH "SEE ALSO"
+.BR lcp_readpol (8),
+.BR lcp_writepol (8),
+.BR lcp_crtpol (8),
+.BR lcp_crtpolelt (8).

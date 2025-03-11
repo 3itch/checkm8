@@ -1,0 +1,15 @@
+.\"
+.TH TXT-PARSE_ERR 8 "2020-05-10" "tboot" "User Manuals"
+.SH NAME
+txt-parse_err \- parse TXT.ERRORCODE value
+.SH SYNOPSIS
+.B txt-parse_err
+.RB [\|
+.IR error_value\  \|]
+.SH DESCRIPTION
+.B txt-parse_err
+can be used to parse a TXT.ERRORCODE value. If no value is given as a parameter parse_err will attempt to read the error code from memory (via /dev/mem).
+.SH OPTIONS
+.TP
+.BI error_value
+Error value to parse

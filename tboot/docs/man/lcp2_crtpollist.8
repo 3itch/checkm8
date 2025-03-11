@@ -1,0 +1,101 @@
+.\"
+.TH LCP2_CRTPOLLIST 8 "2020-05-10" "tboot" "User Manuals"
+.SH NAME
+lcp2_crtpollist \- create an Intel(R) TXT policy list
+.SH SYNOPSIS
+.B lcp2_crtpollist
+.I COMMAND
+.RI [ OPTION ]
+.SH DESCRIPTION
+.B lcp2_crtpollist
+is used to create an Intel(R) TXT policy list.
+.SH OPTIONS
+.TP
+.B --create
+Create a TXT policy list. The following options are available:
+.RS
+.TP \w'\fB--listver\ \fIver\fP'u+1n
+\fB--listver\ \fIver\fP
+policy list version. Supported values are: 0x100 (legacy LCP_POLICY_LIST), 
+0x200, 0x201 (legacy LCP_POLICY_LIST2) and 0x300 (current LCP_POLICY_LIST2_1). 
+.TP \w'\fB--out\ \fIfile\fP'u+1n
+\fB--out\ \fIfile\fP
+output file for policy list
+.TP
+\fR[\fIfile\fR]...\fP
+policy element files (created with the lcp2_crpolelt command).
+.RE
+.TP
+.B --sign
+Sign a TXT policy list.
+.RS
+.TP \w'\fB--sigalg\ \fI<rsa|rsapss|ecdsa|sm2>\fP'u+1n
+\fB--sigalg\ \fI<rsa|rsapss|ecdsa|sm2>\fP
+Signature algorithm. Lists version 0x100 only support rsa (rsa pkcs 1.5). Lists 
+version 0x200 and 0x201 support rsa (rsa pkcs 1.5) and ecdsa. Lists version 0x300 
+support rsapss and ecdsa.
+.TP \w'\fB--hashalg\ \fI<sha1|sha256|sha384|sha512|sm2>\fP'u+1n
+\fB--hashalg\ \fI<sha1|sha256|sha384|sha512|sm2>\fP
+Hash algorithm used for signing a list. Lists version 0x100 only support SHA1.
+.TP
+\fB--pub\ \fIfile\fP
+Public key to use, must be in PEM format.
+.TP
+\fB[--priv\ \fIfile\fP]
+Private key to use, must be in PEM format. This option is required unless you use the \fB--nosig\fP option
+.TP
+\fR[\fB--rev \fIcounter\fR]\fP
+Revocation counter value
+.TP
+\fR[\fB--nosig\fR]\fP
+Don't add a SigBlock. This option is ignored if list is version 0x300.
+.TP
+\fB--out\ \fIfile\fP
+Policy list file (input and output)
+.RE
+.TP
+.B --addsig
+Add a signature. This option is ignored if list is version 0x300.
+.RS
+.TP \w'\fB--sig\ \fIfile\fP'u+1n
+\fB--sig\ \fIfile\fP
+File containing signature (big-endian)
+.TP
+\fB--out\ \fIfile\fP
+Policy list file
+.RE
+.TP
+\fB--show \fIfile\fP
+Show contents of a policy file
+.TP
+\fB--verify \fIfile\fP
+Verify policy version 0x300 file.
+.TP
+\fB--version\fP
+Show tool version.
+.TP
+.B --help
+Print out the tool's help message.
+.TP
+.B --verbose
+Enable verbose output; can be specified with any command.
+.SH EXAMPLES
+.P
+Create unsigned policy list with MLE element:
+.EX
+lcp2_crtpollist --create --out list.lst mle.elt
+.EE
+.P
+Sign policy:
+.EX
+lcp2_crtpollist --sign --sigalg rsa --pub pubkey.pem --priv privkey.pem --out list.lst
+.EE
+.SH "SEE ALSO"
+.BR "Full documentation of MLE, Intel(R) TXT and LCP is available in Intel(R) TXT Measured 
+Launch Environment Deleveloper's Guide, available at: 
+http://www.intel.com/content/www/us/en/software-developers/intel-txt-software-development-guide.html
+
+.BR lcp2_crtpol (8),
+.BR lcp2_crtpolelt (8),
+.BR lcp2_mlehash (8),
+.BR openssl(1).

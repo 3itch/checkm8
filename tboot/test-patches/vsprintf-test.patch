@@ -1,0 +1,79 @@
+--- tboot/common/vsprintf.c	2010-06-22 15:41:16.000000000 -0700
++++ tboot/common/test_vsprintf.c	2010-06-22 15:42:26.000000000 -0700
+@@ -33,12 +33,13 @@
+  *
+  */
+ 
+-#include <types.h>
++/* unit test code, should test it on i386 arch */
++#include <stdint.h>
+ #include <stdbool.h>
+ #include <string.h>
+-#include <misc.h>
+-#include <div64.h>
+-#include <compiler.h>
++#include <stdarg.h>
++#include <stdio.h>
++#include "../include/div64.h"
+ 
+ /*
+  * write the character into the buffer
+@@ -421,6 +422,58 @@ int snprintf(char *buf, size_t size, con
+     return count;
+ }
+ 
++void myprintf(const char *fmt, ...)
++{
++    char buf[256];
++    int n;
++    va_list ap;
++    int i;
++
++    memset(buf, '\0', sizeof(buf));
++    va_start(ap, fmt);
++    n = vscnprintf(buf, sizeof(buf), fmt, ap);
++    va_end(ap);
++
++    /* print */
++    for ( i = 0; i < n; i++ )
++        printf("%c", buf[i]);
++}
++
++int main(void)
++{
++    int nums[] = {-20000, -1, 0, 200, 0xFFFE, 0xFFFFFFFE};
++    int i, j;
++
++    for ( j = 0; j < sizeof(nums); j++ ) {
++        i = nums[j];
++
++        printf("%c,%s,%d,%o,%x,%X,%u,%p\n", 'a', "abc", i, i, i, i, i, &i);
++        myprintf("%c,%s,%d,%o,%x,%X,%u,%p\n", 'a', "abc", i, i, i, i, i, &i);
++        printf("%-+ 10.4d,%-+ 10.3u\n", i, i);
++        myprintf("%-+ 10.4d,%-+ 10.3u\n", i, i);
++        printf("%-+ 10d,%-+ 10u\n", i, i);
++        myprintf("%-+ 10d,%-+ 10u\n", i, i);
++        printf("%-+.3d,%-+.3u\n", i, i);
++        myprintf("%-+.3d,%-+.3u\n", i, i);
++        printf("%.3-+d,%.3-+u\n", i, i);
++        myprintf("%.3-+d,%.3-+u\n", i, i);
++        printf("%d.3-+,%d.3-+u\n", i, i);
++        myprintf("%d.3-+,%d.3-+u\n", i, i);
++        printf("%+0d,%+0d\n", -i, i);
++        myprintf("%+0d,%+0d\n", -i, i);
++        printf("%#o,%#x,%#X\n", i, i, i);
++        myprintf("%#o,%#x,%#X\n", i, i, i);
++        printf("%lld,%Ld,%Lld,%llld\n", i, i, i, i);
++        myprintf("%lld,%Ld,%Lld,%llld\n", i, i, i, i);
++        printf("%d,%d\n", i);
++        myprintf("%d,%d\n", i);
++        printf("%%%%%%%%%%\n");
++        myprintf("%%%%%%%%%%\n");
++    }
++
++    return 0;
++}
++
+ /*
+  * Local variables:
+  * mode: C

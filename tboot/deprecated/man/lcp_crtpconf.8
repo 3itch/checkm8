@@ -1,0 +1,30 @@
+.\"
+.TH LCP_CRTPCONF 8 "2011-12-31" "tboot" "User Manuals"
+.SH NAME
+lcp_crtpconf \- create a platform configuration measurement for v1 policies
+.SH SYNOPSIS
+.B lcp_crtpconf
+.B \-p
+.IR PCR-index1,PCR-index2,...,PCR-indexN
+.RB [\| \-f
+.IR file-name \|]
+.RB [\| \-h \|]
+.SH DESCRIPTION
+.B lcp_crtpconf
+is used to create a platform configuration measurement. The produced platform
+configuration measurement will be appended to the input file in binary mode.
+.SH OPTIONS
+.TP
+.BI \-p\  PCR-index1,PCR-index2,...,PCR-indexN
+Index values can be 0-23.
+.TP
+.BI \-f\   file-name
+File name to which the measurement is appended. 
+.TP
+.B \-h
+Print out the help message
+.SH EXAMPLES
+\fBlcp_crtpconf \-p \fI0,1,2,3 \fB \-f \fIpconf-file
+.SH "SEE ALSO"
+.BR lcp_writepol (8),
+.BR lcp_crtpol (8).

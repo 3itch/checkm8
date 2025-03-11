@@ -1,0 +1,75 @@
+.\"
+.TH LCP_CRTPOL2 8 "2011-12-31" "tboot" "User Manuals"
+.SH NAME
+lcp_crtpol2 \- create an Intel(R) TXT policy (and policy data file)
+.SH SYNOPSIS
+.B lcp_crtpol2
+.I COMMAND
+.RI [ OPTION ]
+.SH DESCRIPTION
+.B lcp_crtpol2
+is used to create an Intel(R) TXT policy (and policy data file) for platforms
+produced after 2008.
+.SH OPTIONS
+.TP
+.B \-\-create
+Create an TXT policy. The following options are available:
+.RS
+.TP \w'\fR[\fB\-\-rev\ \fIctr1\fR[,\fIctrN\fR]'u+1n
+\fB\-\-type\ \fIany\||\|list\fR
+type
+.TP
+\fB\-\-pol\ \fIfile\fR
+policy file
+.TP
+\fR[\fB\-\-ver\ \fIversion\fR]
+version
+.TP
+\fR[\fB\-\-minver\ \fIver\fR]
+SINITMinVersion
+.TP
+\fR[\fB\-\-rev\ \fIctr1\fR,\fIctrN\fR]
+revocation values (comma separated, no spaces)
+.TP
+\fR[\fB\-\-ctrl\ \fIpol-ctrl\fR]
+policy control
+.TP
+\fR[\fB\-\-data\ \fIfile\fR]
+policy data file
+.TP
+\fR[\fIfile\fR]...
+policy list files
+.RE
+.TP
+.B \-\-show
+Show the content of policy file or policy data file. Available options are:
+.RS
+.TP \w'\fR[\fB\-\-rev\ \fIctr1\fR[,\fIcrtN\fR]'u+1n
+\fR[\fB\-\-brief\fR]
+brief format output
+.TP
+\fR[\fIpolicy-file\fR]
+policy file
+.TP
+\fR[\fIpolicy-data-file\fR]
+policy data file
+.RE
+.TP
+.B \-\-help
+Print out the help message.
+.TP
+.B \-\-verbose
+Enable verbose output; can be specified with any command.
+.SH EXAMPLES
+Assuming a policy list file
+.I list-unsig.lst
+has been created by the command
+.B lcp_crtpolist(8).
+The following example will create a policy and policy data file.
+.PP
+\fBlcp_crtpol2\ \-\-create\ \-\-type \fIlist \fB\-\-pol \fIlist.pol \fB\-\-data \fIlist.data\ list-unsig.lst
+.SH "SEE ALSO"
+.BR lcp_crtpol (8),
+.BR lcp_mlehash (8),
+.BR lcp_crtpolelt (8),
+.BR lcp_crtpollist (8).

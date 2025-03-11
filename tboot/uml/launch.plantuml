@@ -1,0 +1,53 @@
+@startuml Launch
+start
+:parse command line;
+if (load SINIT) then (false)
+    -[#red]->
+    stop
+endif
+if (detect TPM) then (false)
+    -[#red]->
+    stop
+endif
+:check SE_SVN;
+:read VLP;
+if (platform TXT capable?) then (no)
+    -[#red]->
+    stop
+endif
+if (post-SINIT launch?) then (yes)
+    :handle post-launch;
+    if (S3 wakeup) then (yes)
+        :verify integrity;
+        :relinquish locality 2;
+        :jump to kernel\nresume vecor;
+        stop
+    else (no)
+        :protect memory;
+        :verify modules against VLP;
+        if (TPM1.2?) then (yes)
+            :verify NV against VLP;
+        else (no)
+        endif
+        :init MLE/kernel shared page;
+        :relinquish locality 2;
+        :launch kernel;
+        stop
+    endif
+else (no)
+    :prepare CPU;
+    :relinquish locality 0;
+    if (S3 wakeup) then (no)
+            :build MLE pagetable;
+        :configure VTd;
+        :set loader to MLE struct;
+        :set loader to SINIT struct;
+    else (yes)
+    endif
+    :init event log;
+    :save & set MTRRs;
+    :call GETSEC[SENTER];
+    stop
+endif
+
+@enduml

@@ -1,0 +1,6 @@
+This folder includes code that is not longer supported and will not be build or
+installed when executing 'make' in root directory. It is archived here for
+legacy purposes.
+
+lcptools: TPM1.2 tool for generating LCP policy and provisioning TPM, depends
+          on outdated TrouSerS library

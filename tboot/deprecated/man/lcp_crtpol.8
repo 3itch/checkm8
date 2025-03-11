@@ -1,0 +1,86 @@
+.\"
+.TH LCP_CRTPOL 8 "2011-12-31" "tboot" "User Manuals"
+.SH NAME
+lcp_crtpol \- create a TXT v1 Launch Control Policy
+.SH SYNOPSIS
+.B lcp_crtpol
+.B \-t
+.I policy-type
+.RB [\| \-a
+.IR hashalg \|]
+.RB [\| \-v
+.IR version \|]
+.RB [\| \-sr
+.IR SINIT-revocation-counter \|]
+.RB [\| \-s
+.IR srtm-file \|]
+.RB [\| \-m
+.IR mle-file \|]
+.RB [\| \-o
+.IR policy-file \|]
+.RB [\| \-b
+.IR policy-data-file \|]
+.RB [\| \-pcf
+.IR policy-control-field \|]
+.RB [\| \-h \|]
+.SH DESCRIPTION
+.B lcp_crtpol
+is used to create a TXT v1 LCP policy (and optionally policy data), which can later be written to the TPM. The policy created are for platforms produced before 2009 (Weybridge, Montevina, McCreary).
+.SH OPTIONS
+.TP
+.BI \-t\  policy-type
+Policy type can be UINT8 or string. 5 strings are supported for the reserved LCP
+policy types. Strings and default policy type values for each string are: 
+.RS
+.TP
+0 or "hashonly"
+.TP
+1 or "unsigned"
+.TP
+2 or "signed"
+.TP
+3 or "any"
+.TP
+4 or "forceowner"
+.RE
+.TP
+.BI \-a\  hashalg
+Hash algorithm. Currently we only support SHA-1 algorithm: 0 OR 'sha1'.
+.TP
+.BI \-v\  version
+Version number. Currently it can be set to 0 or 1 if specified. The default value is 0.
+.TP
+.BI \-sr\  SINIT-revocation-counter
+The default sinit revocation counter is 0.
+.TP
+.BI \-s\  srtm-file
+File name of platform configuration data, as produced by
+.BR lcp_crtpconf.
+.TP
+.BI \-m\  mle-file
+File name of file containing the MLE hash values. This is a text file that contains one SHA-1 hash per line. The value of the hash must be hexadecimal values, specified either a single un-deliminated set or as space-delimited two-character (i.e. one byte) values.  This can be produced by the
+.BR lcp_mlehash
+command.
+.TP
+.BI \-o\  policy-file
+File name to store the output policy.
+.TP
+.BI \-b\  policy-data-file
+File name to store the LCP Policy data.
+.TP
+.BI \-pcf\  policy-control-field
+The default policy control field value is 0.
+.TP
+.B \-h
+Print out the help message
+.SH EXAMPLES
+\fBlcp_crtpol \-t \fI0 \fB \-m \fImle-file \fB \-o \fIpolicy-hashonly-file
+.PP
+\fBlcp_crtpol \-t \fI1 \fB \-m \fImle-file \fB \-s \fIpconf-file \fB \-b \fI policy-data-file
+.PP
+\fBlcp_crtpol \-t \fIunsigned \fB \-a \fIsha1 \fB \-m \fImle-file \fB \-s \fIpconf-file \fB \-o \fIpolicy-unsigned-file \fB \-b \fIpolicy-data-file
+.SH "SEE ALSO"
+.BR lcp_readpol (8),
+.BR lcp_writepol (8),
+.BR lcp_mlehash (8),
+.BR lcp_crtpconf (8).

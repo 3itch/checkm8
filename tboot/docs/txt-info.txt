@@ -1,0 +1,16 @@
+Intel's technology for safer computing, Intel(R) Trusted Execution Technology
+(Intel(R) TXT), defines platform-level enhancements that provide the building
+blocks for creating trusted platforms.
+
+Intel(R) TXT was formerly known by the code name LaGrande Technology (LT).
+
+Intel(R) TXT in Brief:
+----------------------
+o  Provides dynamic root of trust for measurement (DRTM)
+o  Data protection in case of improper shutdown
+o  Verification and enforcement of launched environment
+
+
+For more information, see http://www.intel.com/technology/security/.  This
+site also has a link to the Intel(R) TXT MLE Developers Manual, which has
+been updated for the new released platforms.

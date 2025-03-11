@@ -1,0 +1,219 @@
+diff -r 4ea7c584151a tboot/common/e820.c
+--- a/tboot/common/e820.c	Tue Jan 13 11:29:14 2009 -0800
++++ b/tboot/common/e820.c	Tue Jan 20 22:25:23 2009 -0800
+@@ -623,6 +623,202 @@ bool get_ram_ranges(multiboot_info_t *mb
+     return true;
+ }
+ 
++#define RUN_CASE(caseid)                                                \
++{                                                                       \
++    if ( caseid() )                                                     \
++        printk("VALIDATE_E820_UNIT_TEST: " #caseid " passed\n");        \
++    else                                                                \
++        printk("VALIDATE_E820_UNIT_TEST: " #caseid " failed\n");        \
++}
++
++#define E820_ENTRY(s, e, t)                                 \
++    {                                                       \
++        sizeof(memory_map_t)-sizeof(uint32_t),              \
++        ((uint64_t)(s) & 0xffffffULL),                      \
++        ((uint64_t)(s) >> 32),                              \
++        (((uint64_t)(e) - (uint64_t)(s)) & 0xffffffffULL),  \
++        (((uint64_t)(e) - (uint64_t)(s)) >> 32),            \
++        (t)                                                 \
++    }
++
++static memory_map_t test_map[32] = {
++    E820_ENTRY(0x00000, 0x04000, E820_RAM),
++    E820_ENTRY(0x08000, 0x0c000, E820_RAM),
++    E820_ENTRY(0x10000, 0x14000, E820_RAM),
++    E820_ENTRY(0x18000, 0x1c000, E820_RAM),
++    E820_ENTRY(0x20000, 0x24000, E820_RAM),
++    E820_ENTRY(0x28000, 0x2c000, E820_RAM),
++    E820_ENTRY(0x30000, 0x34000, E820_RAM),
++    E820_ENTRY(0x38000, 0x3c000, E820_RAM),
++    E820_ENTRY(0x40000, 0x44000, E820_RAM),
++    E820_ENTRY(0x48000, 0x4c000, E820_RAM),
++    E820_ENTRY(0x50000, 0x54000, E820_RAM),
++    E820_ENTRY(0x58000, 0x5c000, E820_RAM),
++    E820_ENTRY(0x60000, 0x64000, E820_RAM),
++    E820_ENTRY(0x68000, 0x6c000, E820_RAM),
++    E820_ENTRY(0x70080, 0x74080, E820_RAM),
++    E820_ENTRY(0x78000, 0x7c000, E820_RAM),
++    E820_ENTRY(0x100000000ULL, 0x120000000ULL, E820_RAM),
++};
++static int nr_test_map = 17;
++
++#define UNIT_PROTECT_REG(s, e)                                           \
++    printk("protecting 0x%Lx - 0x%Lx\n", (uint64_t)(s), (uint64_t)(e));  \
++    if ( !protect_region(test_map, &nr_test_map, (s), ((e) - (s)),       \
++                         E820_RESERVED) ) {                              \
++        printk("\tFAILED\n");                                            \
++        return false;                                                    \
++    }
++
++static bool verify_entry(int idx, uint64_t start, uint64_t end, uint32_t type)
++{
++    memory_map_t *entry = &test_map[idx];
++    uint64_t base = e820_base_64(entry);
++    uint64_t length = e820_length_64(entry);
++
++    if ( start == base && (end - start) == length && type == entry->type )
++        return true;
++    else
++        return false;
++}
++
++#define UNIT_VERIFY(idx, s, e, t)                           \
++    if ( !verify_entry(idx, s, e, t) ) {                    \
++        printk("verification of index %u failed\n", idx);   \
++        return false;                                       \
++    }
++
++
++static bool UNIT_PROT_01(void)
++{
++    /* reserve within gap space (e1---e1  r1---r1  e2---e2) */
++    UNIT_PROTECT_REG(0x05000, 0x06000);
++    UNIT_VERIFY(0, 0x0, 0x04000, E820_RAM);
++    UNIT_VERIFY(1, 0x05000, 0x06000, E820_RESERVED);
++    return true;
++}
++
++static bool UNIT_PROT_02(void)
++{
++    /* reserve partially overlapping beginning 1 (r1---e1+++r1---e1) */
++    UNIT_PROTECT_REG(0x07000, 0x0a000);
++    UNIT_VERIFY(2, 0x07000, 0x0a000, E820_RESERVED);
++    UNIT_VERIFY(3, 0x0a000, 0x0c000, E820_RAM);
++    return true;
++}
++
++static bool UNIT_PROT_03(void)
++{
++    /* reserve partially overlapping beginning 2 (r1---e1+++e1--e2+++r1--e2) */
++    UNIT_PROTECT_REG(0x0e000, 0x1a000);
++    UNIT_VERIFY(4, 0x0e000, 0x1a000, E820_RESERVED);
++    UNIT_VERIFY(5, 0x1a000, 0x1c000, E820_RAM);
++    return true;
++}
++
++static bool UNIT_PROT_04(void)
++{
++    /* reserve partially overlapping end 1 (e1---r1+++e1---r1) */
++    UNIT_PROTECT_REG(0x22000, 0x26000);
++    UNIT_VERIFY(6, 0x20000, 0x22000, E820_RAM);
++    UNIT_VERIFY(7, 0x22000, 0x26000, E820_RESERVED);
++    return true;
++}
++
++static bool UNIT_PROT_05(void)
++{
++    /* reserve partially overlapping end 2 (e1---r1+++e1---e2+++e2---r1) */
++    UNIT_PROTECT_REG(0x2a000, 0x36000);
++    UNIT_VERIFY(8, 0x28000, 0x2a000, E820_RAM);
++    UNIT_VERIFY(9, 0x2a000, 0x36000, E820_RESERVED);
++    return true;
++}
++
++static bool UNIT_PROT_06(void)
++{
++    /* reserve partially overlapping 2 (e1---r1+++e1---e2+++r1---e1) */
++    UNIT_PROTECT_REG(0x3a000, 0x42000);
++    UNIT_VERIFY(10, 0x38000, 0x3a000, E820_RAM);
++    UNIT_VERIFY(11, 0x3a000, 0x42000, E820_RESERVED);
++    UNIT_VERIFY(12, 0x42000, 0x44000, E820_RAM);
++    return true;
++}
++
++static bool UNIT_PROT_07(void)
++{
++    /* reserve fully containing 1 (r1---e1+++e1---r1) */
++    UNIT_PROTECT_REG(0x46000, 0x4e000);
++    UNIT_VERIFY(13, 0x46000, 0x4e000, E820_RESERVED);
++    return true;
++}
++
++static bool UNIT_PROT_08(void)
++{
++    /* reserve fully containing 2 (r1---e1+++e1-e2+++e2---r1) */
++    UNIT_PROTECT_REG(0x4e000, 0x5d000);
++    UNIT_VERIFY(14, 0x4e000, 0x5d000, E820_RESERVED);
++    return true;
++}
++
++static bool UNIT_PROT_09(void)
++{
++    /* reserve fully contained (e1---r1+++r1---e1) */
++    UNIT_PROTECT_REG(0x62000, 0x63000);
++    UNIT_VERIFY(15, 0x60000, 0x62000, E820_RAM);
++    UNIT_VERIFY(16, 0x62000, 0x63000, E820_RESERVED);
++    UNIT_VERIFY(17, 0x63000, 0x64000, E820_RAM);
++    return true;
++}
++
++static bool UNIT_PROT_10(void)
++{
++    /* reserve identical (e1r1+++e1r1) */
++    UNIT_PROTECT_REG(0x68000, 0x6c000);
++    UNIT_VERIFY(18, 0x68000, 0x6c000, E820_RESERVED);
++    return true;
++}
++
++static bool UNIT_PROT_11(void)
++{
++    /* reserve sub-page in sub-page range */
++    UNIT_PROTECT_REG(0x70040, 0x74040);
++    UNIT_VERIFY(19, 0x70040, 0x74040, E820_RESERVED);
++    UNIT_VERIFY(20, 0x74040, 0x74080, E820_RAM);
++    UNIT_VERIFY(21, 0x78000, 0x7c000, E820_RAM);
++    return true;
++}
++
++static bool UNIT_PROT_12(void)
++{
++    /* reserve in high memory (e1---r1+++r1---e1) */
++    UNIT_PROTECT_REG(0x100004000ULL, 0x100006000ULL);
++    UNIT_VERIFY(22, 0x100000000ULL, 0x100004000ULL, E820_RAM);
++    UNIT_VERIFY(23, 0x100004000ULL, 0x100006000ULL, E820_RESERVED);
++    UNIT_VERIFY(24, 0x100006000ULL, 0x120000000ULL, E820_RAM);
++    return true;
++}
++
++void unit_test_validate_e820(void)
++{
++    printk("test map before:\n");
++    print_map(test_map, nr_test_map);
++
++    RUN_CASE(UNIT_PROT_01);
++    RUN_CASE(UNIT_PROT_02);
++    RUN_CASE(UNIT_PROT_03);
++    RUN_CASE(UNIT_PROT_04);
++    RUN_CASE(UNIT_PROT_05);
++    RUN_CASE(UNIT_PROT_06);
++    RUN_CASE(UNIT_PROT_07);
++    RUN_CASE(UNIT_PROT_08);
++    RUN_CASE(UNIT_PROT_09);
++    RUN_CASE(UNIT_PROT_10);
++    RUN_CASE(UNIT_PROT_11);
++    RUN_CASE(UNIT_PROT_12);
++
++    printk("all e820 unit tests passed:\n");
++    print_map(test_map, nr_test_map);
++}
+ 
+ /*
+  * Local variables:
+diff -r 4ea7c584151a tboot/common/tboot.c
+--- a/tboot/common/tboot.c	Tue Jan 13 11:29:14 2009 -0800
++++ b/tboot/common/tboot.c	Tue Jan 20 22:25:23 2009 -0800
+@@ -267,6 +267,9 @@ void begin_launch(multiboot_info_t *mbi)
+     printk("command line: %s\n", g_cmdline);
+     if ( s3_flag )
+         printk("resume from S3\n");
++
++    extern void unit_test_validate_e820(void);
++    unit_test_validate_e820();
+ 
+     /* we should only be executing on the BSP */
+     rdmsrl(MSR_IA32_APICBASE, apicbase);

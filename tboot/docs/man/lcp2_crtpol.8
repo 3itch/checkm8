@@ -1,0 +1,116 @@
+.\"
+.TH LCP2_CRTPOL 8 "2020-05-10" "tboot" "User Manuals"
+.SH NAME
+lcp2_crtpol \- create an Intel TXT Launch Control Policy
+.SH SYNOPSIS
+.B lcp2_crtpol
+.B <--create|--show|--help>
+.RB [ --brief ]
+.RB [ --verbose ]
+.B --alg
+.I alg
+.B --type
+.I <any|list>
+.RI [ LIST FILES ]
+.RB [ --minver
+.IR <ver> ]
+.RB [ --rev
+.IR <counter1> [ ,counterN ]]
+.RB [ --ctrl
+.IR <pol_ctrl> ]
+.B --pol
+.I <POLICY\ FILE>
+.RB [ --data
+.IR <POLICY\ DATA\ FILE> ]
+.RB [ --mask
+.IR mask ]
+.RB [ --auxalg
+.IR alg ]
+.B --sign
+.I alg
+.RB [ --polver
+.IR version ]
+.SH DESCRIPTION
+.B lcp2_crtpol
+is used to create a TXT LCP policy (and optionally policy data), which can later 
+be written to the TPM. This tool allows creating policies for TPM 1.2 and TPM 2.0. 
+Policy format is specified by the --polver option.
+.SH COMMANDS
+.TP
+.B --create
+Create a policy.
+.TP
+.B --show
+Show contents of a policy file, policy data file or both. If you specify one 
+file it must be either a policy file or a policy data file. 
+If you specify two files, one must be a policy file and the other a policy data file.
+.TP
+.B --help
+Show help text.
+.TP
+.B --version
+Show tool version.
+.SH OPTIONS
+.TP
+.B --brief
+Use brief format for output.
+.TP
+.B --verbose
+Use verbose format for output.
+.TP
+.BI --alg\  alg
+Specify algorithm for the LCP. Supported values are sha1, sha256 or sm3.
+.TP
+.BI --type\  <any|list>
+Specify type of the policy. If --type is list, specify a comma-separated list 
+of up to 8 policy list files (created with the lcp2_crtpollist command).
+.TP
+.BI --minver\  version
+Specify minimum allowed SINIT module version number (SINITMinVersion).
+.TP
+.BI --max_sinit_min\  version
+Specify maximum allowed value of the minimal SINIT module version number (MaxSinitMinVersion).
+.TP
+.BI --rev\  <counter1>[,counterN]
+Specify a comma-separated list of revocation counters.
+.TP
+.BI --ctrl\  <pol\ ctrl>
+Specify PolicyControl value. The default is 0 (LCP_DEFAULT_POLICY_CONTROL).
+.TP
+.BI --pol\  <POLICY\ FILE>
+Specify output file for the policy.
+.TP
+.BI --data\  <POLICY\ DATA\ FILE>
+Specify output file for the policy data.
+.TP
+.BI --mask\  mask
+Specify the policy hash algorithm mask. Supported values are sha1, sha256, sha384, sha512 or sm3. 
+This option can be used multiple times to specify several allowed algorithms. Policy 
+versions 2.0-2.4 only support SHA1.
+.TP
+.BI --auxalg\  alg
+Specify the AUX hash algorithm. Supported values are sha1, sha256, sha384, sha512 or sm3. 
+You can also specify a raw value in hex (the value must start with "0x"). This option 
+is only valid for policy versions 3.0 or 3.1.
+.TP
+.BI --sign\ alg
+Specify the allowed LCP signature algorithm mask. Supported values are: 
+rsa-2048-sha1, rsa-2048-sha256, rsa-3072-sha256, rsa-3072-sha384, ecdsa-p256, 
+ecdsa-p384 sm3. This option can be used multiple times to specify several allowed 
+algorithms.
+.TP
+.BI --polver\  version
+Specify LCP policy version. Supported values are 2.0-2.4 (for TPM 1.2) and 3.0-3.2 
+(for TPM 2.0). If not specified, this option defaults to 3.0.
+.SH EXAMPLES
+.EX
+lcp2_crtpol --create --type list --pol list.pol --alg sha256 --data list.data --sign 0x8 list.lst
+.EE
+.SH "SEE ALSO"
+.BR "Full documentation of MLE, Intel(R) TXT and LCP is available in Intel(R) TXT Measured 
+Launch Environment Deleveloper's Guide, available at: 
+http://www.intel.com/content/www/us/en/software-developers/intel-txt-software-development-guide.html
+
+.BR lcp2_crtpollist (8),
+.BR lcp2_crtpolelt (8),
+.BR lcp2_mlehash (8),

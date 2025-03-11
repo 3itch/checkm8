@@ -1,0 +1,28 @@
+@startuml load SINIT
+start
+
+if (already loaded?) then (yes)
+    stop
+endif
+
+if (SINIT in MBI? && match platform?) then (yes)
+    :load SINIT from MBI;
+endif
+
+if (SINIT in BIOS? && match platform?) then (yes)
+    if (BIOS SINIT newer than MBI?) then (yes)
+        :use BIOS SINIT;
+        stop
+    endif
+endif
+
+if (SINIT was loaded?) then (yes)
+    :copy MBI SINIT to SINIT region;
+    :use MBI SINIT;
+    stop
+else (no)
+    :no SINIT;
+    stop
+endif
+
+@enduml

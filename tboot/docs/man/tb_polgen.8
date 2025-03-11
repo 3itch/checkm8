@@ -1,0 +1,99 @@
+.\"
+.TH TB_POLGEN 8 "2011-12-31" "tboot" "User Manuals"
+.SH NAME
+tb_polgen \- manage tboot verified launch policy
+.SH SYNOPSIS
+.B tb_polgen
+.I COMMAND
+.RI [ OPTION ]
+.SH DESCRIPTION
+.B tb_polgen
+is used to manage tboot verified launch policy.
+.SH COMMANDS
+.TP
+.B \-\-create
+Create an empty tboot verified launch policy file.
+.RS
+.TP
+\fB\-\-type \fInonfatal \fR|\fI continue \fR|\fI halt\fR
+Nonfatal means ignoring all non-fatal errors and continuing. Continue means ignoring verification errors and halting otherwise. Halt means halting on any errors.
+.TP
+\fR[\fB\-\-ctrl \fIpolicy-control-value\fR]
+The default value 1 is to extend policy into PCR 17.
+.TP
+\fR[\fB\-\-alg \fIsha1 \fR|\fI sha256 \fR|\fI sha384 \fR|\fI sha512\fR]
+Policy hashing algorithm.
+.TP
+\fIpolicy-file\fR
+.RE
+.TP
+.B \-\-add
+Add a module hash entry into a policy file.
+.RS
+.TP
+\fB\-\-num \fImodule-number \fR|\fI any\fR
+The module-number is the 0-based module number corresponding to modules loaded by the bootloader.
+.TP
+\fB\-\-pcr \fITPM-PCR-number \fR|\fI none\fR
+The TPM-PCR-number is the PCR to extend the module's measurement into.
+.TP
+\fB\-\-hash \fIany \fR|\fI image\fR
+.TP
+\fR[\fB\-\-cmdline \fIcommand-line\fR]
+The command line is from grub.conf, and it should not include the module name (e.g. "/xen.gz"). 
+.TP
+\fR[\fB\-\-image \fIimage-file-name\fR]
+.TP
+\fIpolicy-file\fR
+.RE
+.TP
+.B \-\-del
+Delete a module hash entry from a policy file.
+.RS
+.TP
+\fB\-\-num \fImodule-number \fR|\fI any\fR
+The module-number is the 0-based module number corresponding to modules loaded by the bootloader.
+.TP
+\fR[\fB\-\-pos \fIhash-number\fR]
+The hash-number is the 0-based index of the hash, within the list of hashes for the specified module.
+.TP
+\fIpolicy-file\fR
+.RE
+.TP
+.B \-\-unwrap
+Extract the tboot verified launch policy from a TXT LCP element file.
+.RS
+.TP
+\fB\-\-elt \fIelt-file\fR
+.TP
+\fIpolicy-file\fR
+.RE
+.TP
+\fB\-\-show \fIpolicy-file\fR
+Show the policy information in a policy file.
+.TP
+.B \-\-help
+Print out the help message.
+.TP
+.B \-\-verbose
+Enable verbose output; can be specified with any command.
+.SH EXAMPLES
+\fBtb_polgen \-\-create \-\-type \fInonfatal vl.pol\fR
+.PP
+\fBtb_polgen \-\-add \-\-num \fI0 \fB\-\-pcr \fInone \fB\-\-hash \fIimage \fB\-\-cmdline \fI"cmdline" \fB\-\-image \fI/boot/xen.gz vl.pol\fR
+.PP
+\fBtb_polgen \-\-add \-\-num \fI1 \fB\-\-pcr \fI19 \fB\-\-hash \fIimage \fB\-\-cmdline \fI"cmdline" \fB\-\-image \fI/boot/vmlinuz-2.6.18.8-xen vl.pol\fR
+.PP
+\fBtb_polgen \-\-add \-\-num \fI2 \fB\-\-pcr \fI19 \fB\-\-hash \fIimage \fB\-\-cmdline \fI"" \fB\-\-image \fI/boot/initrd-2.6.18.8-xen.img vl.pol\fR
+.PP
+\fBtb_polgen \-\-del \-\-num \fI1 vl.pol\fR
+.PP
+\fBtb_polgen \-\-show \-\-verbose \fIvl.pol\fR
+.SS "Note1:"
+It is not necessary to specify a PCR for module 0, since this module's measurement will always be extended to PCR 18.  If a PCR is specified, then the measurement will be extended to that PCR in addition to PCR 18.
+.SS "Note2:"
+--unwrap is not implemented correctly. There should be a defined UUID for this and that should be checked before copying the data. There should be a wrap or similar command to generates an element file for a policy.
+.SH "SEE ALSO"
+.BR lcp_crtpol (8),
+.BR lcp_crtpol2 (8),
+.BR lcp_crtpolelt (8).

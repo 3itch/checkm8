@@ -1,0 +1,85 @@
+****************************************************************************
+***                                                                      ***
+***                    Launch Control Policy v1                          ***
+***                                                                      ***
+****************************************************************************
+
+This document describes Launch Control Policies for platforms produced before
+2009 (Weybridge, Montevina, McCreary).
+
+These are some example instructions for creating and provisioning both an
+Intel(R) TXT Launch Control Policy (LCP) and a Verified Launch policy.
+
+These steps assume that all referenced binaries have already been built and
+paths are relative to the lcptools/ directory:
+
+Create LCP policy:
+-----------------
+1.  lcptools/lcp_mlehash -c "the command line for tboot from grub.conf"
+    /boot/tboot.gz > mle_hash
+2.  lcptools/lcp_crtpol -t hashonly -m mle_hash -o lcp.pol
+
+Note:
+    The '-c' parameter to lcp_mlehash is used to specify tboot's
+    command line, as it would appear in grub.conf.  It can be omitted if no
+    command line parameters are specified in grub.conf (or it can be empty).
+    It should not include the module name (e.g. "/tboot.gz").
+
+
+Create Verified Launch policy:
+-----------------------------
+1.  tb_polgen/tb_polgen --create --type nonfatal vl.pol
+2.  tb_polgen/tb_polgen --add --num 0 --pcr none --hash image
+    --cmdline "the command line for xen from grub.conf"
+    --image /boot/xen.gz
+    vl.pol
+3.  tb_polgen/tb_polgen --add --num 1 --pcr 19 --hash image
+    --cmdline "the command line for dom0 from grub.conf"
+    --image /boot/vmlinuz-2.6.18.8-xen
+    vl.pol
+4.  tb_polgen/tb_polgen --add --num 2 --pcr 19 --hash image
+    --cmdline ""
+    --image /boot/initrd-2.6.18.8-xen.img
+    vl.pol
+
+Note:
+    The command lines should not include the module name (e.g. "/xen.gz").
+    This is a change from the previous version of policy support and was done
+    because a module's measurement should only depend on its content and not
+    on its location.
+Note 2:
+    It is not necessary to specify a PCR for module 0, since this module's
+    measurement will always be extended to PCR 18.  If a PCR is specified,
+    then the measurement will be extended to that PCR in addition to PCR 18.
+
+
+Take ownership of the TPM:
+-------------------------
+1.  modprobe tpm_tis   (you may need 'force=1 interrupts=0')
+2.  tcsd
+3.  tpm_takeownership -z
+    -  choose password for TPM
+
+Note:
+    When taking ownership of the TPM it is important to set the SRK auth to
+    all 0s so that tboot will be able to seal/unseal the measurements.  The
+    '-z' flag to tpm_takeownership will do this.
+
+
+Define tboot error TPM NV index:
+-------------------------------
+1.  lcptools/tpmnv_defindex -i 0x20000002 -s 8 -pv 0 -rl 0x07 -wl 0x07
+    -p TPM-password
+
+
+Define LCP and Verified Launch policy indices:
+---------------------------------------------
+1.  lcptools/tpmnv_defindex -i owner -p TPM-password-from-taking-ownership
+2.  lcptools/tpmnv_defindex -i 0x20000001 -s 256 -pv 0x02 -p TPM-password
+
+
+Write LCP and Verified Launch policies to TPM:
+---------------------------------------------
+(modprobe tpm_tis; tcsd;)
+1.  lcptools/lcp_writepol -i owner -f lcp.pol -p TPM-password
+2.  lcptools/lcp_writepol -i 0x20000001 -f vl.pol -p TPM-password

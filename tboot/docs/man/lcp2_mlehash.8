@@ -1,0 +1,54 @@
+.\"
+.TH LCP_MLEHASH 8 "2020-05-10" "tboot" "User Manuals"
+.SH NAME
+lcp2_mlehash \- generate a hash of a TXT MLE binary file and print it to STDOUT as text. 
+.SH SYNOPSIS
+.B lcp2_mlehash
+.RB [\| --create \|]
+.RB [\| --cmdline
+.IR cmdline \|]
+.RB [\| --alg
+.IR hashalg \|]
+.RB [\| --help \|]
+.RB [\| --verbose \|]
+.I mle-file
+.SH DESCRIPTION
+.B lcp2_mlehash
+is used to generate a hash of the portion of an executable file that contains
+the Intel(R) TXT measured launched environment (MLE).  In the MLE binary file, the 
+portion of the file to be used as the MLE is specified in the MLE header structure.  
+If verbose mode is not used, the output is suitable for use as the mle-file to the
+.B lcp2_crtpolelt
+command.
+.SH OPTIONS
+.TP
+.I mle-file
+File name of the MLE binary.  If it is a gzip file then it will be un-ziped before hashing.
+.TP
+.B --create
+Create a hash.
+.TP
+.BI --cmdline\  cmdline
+Specify quote-delimited command line. It is important to specify the command line that is used when launching the MLE or the hash will not match what is calculated by SINIT.
+.TP
+.BI --alg\  hashalg
+Specify the hash algorithm to use. Supported values are sha1, sha256, sha384 and sha512.
+.TP
+.B --help
+Print out the help message.
+.TP
+.B --verbose
+Verbose mode, display progress indications.
+
+.SH EXAMPLES
+.EX
+lcp2_mlehash --create --cmdline "logging=memory,serial,vga" --alg sha1 /boot/tboot.gz > mle-hash
+.EE
+.SH "SEE ALSO"
+.BR "Full documentation of MLE, Intel(R) TXT and LCP is available in Intel(R) TXT Measured 
+Launch Environment Deleveloper's Guide, available at: 
+http://www.intel.com/content/www/us/en/software-developers/intel-txt-software-development-guide.html
+
+.BR lcp2_crtpol (8),
+.BR lcp2_crtpolelt (8),
+.BR lcp2_crtpollist (8).

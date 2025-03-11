@@ -1,0 +1,145 @@
+.\"
+.TH LCP2_CRTPOLELT 8 "2020-05-10" "tboot" "User Manuals"
+.SH NAME
+lcp2_crtpolelt \- create an Intel(R) TXT policy element of specified type.
+.SH SYNOPSIS
+.B lcp2_crtpolelt
+.I COMMAND
+.RI "[ ELEMENT TYPE OPTIONS ]"
+.RI [ OPTION ]
+.SH DESCRIPTION
+.B lcp_crtpolelt
+is used to create an Intel(R) TXT policy element of specified type. Supports LCP 
+elements both in current and legacy formats: LCP_MLE_ELEMENT2, LCP_STM_ELEMENT2, 
+LCP_PCONF_ELEMENT2, LCP_PCONF_ELEMENT, LCP_MLE_ELEMENT and LCP_CUSTOM_ELEMENT.
+.SH COMMANDS
+.TP
+\fB--create \fB--type \fItype \fB--out \fIFILE \fR[\fB--ctrl \fIpol_elt_ctr1\fR]\fP
+create a policy element specified by the --type option.
+.RS
+.TP
+\fB--type \fItype\fP
+type of element. Must be first option. See below for type strings and their options
+.TP
+\fB--out \fIFILE\fP
+output file name
+.TP
+\fR[\fB--ctrl \fIvalue\fR]\fP
+PolEltControl field (hex or decimal)
+.RE
+.TP
+\fB--show \fIfile\fR [\fIFILE\fP]
+show a policy element
+.TP
+\fB--version\fP
+show tool version
+.TP
+\fB--verbose\fP
+enable verbose output; can be specified with any command
+.TP
+\fB--help\fP
+print out the help message
+.SH OPTIONS
+The \fB--create\fR command requires additional parameters depending on the element's type
+.TP
+\fBmle2 \fR[\fB--minver \fIver\fR] \fR[\fB--alg \fIalgorithm\fR] \fIfile\fR [\fIfile\fR...]\fP
+.RS
+.TP \w'\fB--alg\ \fI<sha1|sha256|sha386|sha512>\fP'u+1n
+\fB--minver \fIver\fP
+minimum version of SINIT (hex or decimal)
+.TP
+\fB--alg \fI<sha1|sha256|sha386|sha512>\fP
+hash algorithm
+.TP
+\fR\fIfile\fR [\fIfile\fR...]\fP
+one or more text files, each containing one or more MLE hashes (as text, one hash per line); 
+Hash files can be created with lcp2_mlehash.
+.RE
+.TP 
+\fBcustom \fR\fB--uuid \fIUUID \fR\fIfile\fR\fP
+.RS
+.TP \w'\fB--uuid\ \fIUUID\fP'u+1n
+\fB--uuid \fIUUID\fP
+UUID in format: {0xaabbccdd, 0xeeff, 0xgghh, 0xiijj, {0xkk 0xll, 0xmm, 0xnn, 0xoo, 0xpp}} or "--uuid tboot" to use default
+.TP
+\fIfile\fP
+file containing element data
+.RE
+.TP
+\fBsbios \fR[\fB--alg \fIalgorithm\fR] \fIfile\fR [\fIfile\fR...]\fP
+.RS
+.TP \w'\fB--alg\ \fI<sha1|sha256|sha386|sha512>\fP'u+1n
+\fB--alg \fI<sha1|sha256|sha386|sha512>\fP
+hash algorithm
+.TP
+\fR\fIfile\fR [\fIfile\fR...]\fP
+one or more files containing one or more BIOS hashes (as text, one hash per line); 
+the first hash in the first file will be the fallback hash
+.RE
+.TP
+\fBstm \fR[\fB--alg \fIalgorithm\fR] \fIfile\fR [\fIfile\fR...]\fP
+.RS
+.TP \w'\fB--alg\ \fI<sha1|sha256|sha386|sha512>\fP'u+1n
+\fB--alg \fI<sha1|sha256|sha386|sha512> \fP
+hash algorithm
+.TP
+\fIfile\fR [\fIfile\fR...]\fP
+one or more text files, each containing one or more STM hashes (as text, one hash per line);
+.RE
+.TP
+\fBpconf2 \fB--alg \fIalgorithm\fR [\fB--pcrN \fIhash_value\fR]\fP
+.RS
+.TP \w'\fB--alg\ \fI<sha1|sha256|sha386|sha512>\fP'u+1n
+\fB--alg \fI<sha1|sha256|sha386|sha512>\fR \fP
+PCR hash algorithm
+.TP
+\fB--pcrN \fIhash_value\fP
+PCR value for PCR #N, where 0 <= N <= 7.
+.RE
+.TP
+\fBmle \fR[\fB--minver \fIver\fR] \fIfile\fR [\fIfile\fR...]\fP
+.RS
+\fB--minver \fIver\fP
+minimum version of SINIT (hex or decimal)
+.TP
+\fR\fIfile\fR [\fIfile\fR...]\fP
+one or more text files, each containing one or more MLE SHA1 hashes (as text, one hash per line); 
+Hash files can be created with lcp2_mlehash.
+.RE
+.TP
+\fBpconf \fIfile\fR [\fIfile\fR...]\fP
+.RS
+one or more text files, each containing PCR information; Each file should have 
+the following structure: first line should be: 'locality:<value>' 
+followed by up  to  8 lines,  each  representing one PCR (0 to 7) 
+and its contents: e.g.  Locality represents TPM's locality at release. 
+It is a byte, of which bits 0 to 4 represent their respective locality 
+(bit0 - locality0 and so on). Bits 5-7 are reserved and must be 0. Value must be 
+at least 1 - locality0 selected, and at most 0x1F (all localities selected).
+.RE
+.SH EXAMPLES
+.P
+Create MLE element:
+.EX
+lcp2_crtpolelt --create --type mle --out mle.elt --ctrl 0x00 --alg sha256 --minver 0 mle_hash
+.EE
+.P
+Create PCONF2 element:
+.EX
+lcp2_crtpolelt --create --type pconf2 --out pconf2.elt --ctrl 0x00 --alg sha256 --pcr0 <PCR[0] hash> --pcr3 <PCR[3] hash> 
+.EE
+.P
+Create PCONF element:
+.EX
+lcp2_crtpolelt --create --type pconf pcrInfo1.txt pcrInfo2.txt --out pconf2.elt --ctrl 0x00
+.EE
+.SH "SEE ALSO"
+.BR "Full documentation of MLE, Intel(R) TXT and LCP is available in Intel(R) TXT Measured 
+Launch Environment Deleveloper's Guide, available at: 
+http://www.intel.com/content/www/us/en/software-developers/intel-txt-software-development-guide.html
+
+.BR lcp2_crtpol (8),
+.BR lcp2_mlehash (8),
+.BR lcp2_crtpollist (8),
+.BR uuidgen (1),
+.BR tb_polgen (8).

@@ -1,0 +1,582 @@
+20241011: v1.11.9
+		Restore call to configure_vtd.
+20241004: v1.11.8
+		Increase DIRECTMAP size from 64 MB to 128 MB. During the last TBOOT MLE
+		verification process for the Intel ARL-S (Arrowlake) CPUs, it was noticed
+		that MLE threw FATAL ERROR, because TBOOT pages exceeded the maximal
+		memory size, which can be mapped by the DIRECTMAP pages.
+20240925: v1.11.7
+		Workaround to make utils buildable.
+20240924: v1.11.6
+		Merge TXT Protected Range support branch.
+20240918: v1.11.5
+		Remove unncessary OPENSSL_free from lcputils.c and add a functionality 
+		to move ACM modules from the address range below TBOOT to above TBOOT,
+		to allow the usage of ACMs bigger than 256KB.
+20240405: v1.11.4
+		Increase the TBOOT log size from 32 KB to 64 KB. For some Intel server
+		platforms, it was noticed that TBOOT_SERIAL_LOG memory section was too
+		small to hold all of the print logs, produced by TBOOT. Due to this
+		reason TBOOT log section memory size had to be increase to 64KB.
+20240122: v1.11.3
+		Fix the hanging TBOOT issue, which appeared during the RLPs wakeup process
+		on the Intel's multisocket platform. This problem appeared during the AP
+		stacks allocations for these RLPs. TBOOT allocated memory for them depending
+		on the woken-up CPUs X2 APIC values. When some of them exceeded the NR_CPUS (1024),
+		then the RLP wakeup process execution halted. For the current moment,
+		the maximal X2 APID value was increased from 1024 to 8192. This kind of
+		solution fixed the given problem.
+20230616: v1.11.2
+		Fix the RAM memory allocation algorithm for the initrd.
+20230125: v1.11.1
+		Revert log memory range extension (caused memory overlaps and boot failures)
+20221223: v1.11.0
+		Fixed TPM handling to flush objects after integrity measurement (Intel PTT limitations)
+		Exteded low memory range for logs (HCC CPUs had issue with not enough memory)
+		"agile" removed from PCR Extend policy options (requested deprecation)
+		Added handling for flexible ACM Info Table format
+		lcptools: CPPFLAGS use by environment in build
+		lcptools: removed __DATE__ refs to make build reproducible
+		Only platform-matchin SINIT modules can be selected
+		txt-acminfo: Map TXT heap using mmap
+		Typo fix in man page
+20220304: v1.10.5
+		Fixed mlehash.c to bring back functionality and make it GCC12 compliant
+		Reverted change for replacing EFI memory to bring back Tboot in-memory logs
+20220224: v1.10.4
+		Fix hash printing for SHA384, SHA512 and SM3
+		Touch ups for GCC12
+		Set GDT to map CS and DS to 4GB before jumping to Linux
+		make efi_memmap_reserve handle gaps like e820_protect_region
+		Ensure that growth of Multiboot tags does not go beyond original area
+		Replace EFI memory map in Multiboot2 info
+		Fix endianness of pcr_info->pcr_selection.size_of_select
+		Don't ignore locality in PCR file
+		Fix composite hashing algorithm for PCONF elements to match lcptools-1
+20211210: v1.10.3
+		Add UNI-VGA license information
+		Remove poly1305 object files on clean
+		Support higher resolution monitors
+		Use SHA256 as default hashing algorithm in lcp2_mlehash and tb_polgen
+		Add OpenSSL 3.0.0 support in lcptools-v2
+		Increase number of supported CPUs to 1024 to accomodate for larger units
+20210614: v1.10.2
+        Fix ACM chipset/processor list validation
+        Check for client/server match when selecting SINIT
+        Fix issues when building with GCC11
+        Default to D/A mapping when TPM1.2 and CBnT platform
+20210330: v1.10.1
+        Indicate to SINIT that CBnT is supported by TBOOT
+        lcptools: Fix issues from static code analysis
+20201113: v1.10.0
+        Rename TXT related tools to have 'txt-' prefix
+        Clarify license issues
+        Fix issues reported by Coverity Scan
+        Ensure txt-acminfo does not print false information if msr is not loaded
+        Fix issue with multiboot(1) booting - infinite loop during boot
+        Fix issue with TPM1.2 - invalid default policy
+        Unmask NMI# after returning from SINIT
+        Update GRUB scripts to use multiboot2 only
+        Enable VGA logging for EFI platforms
+        Add warning when using SHA1 as hashing algorithm
+        Add Doxygen documentation
+        Replace VMAC with Poly1305
+        Validate TPM NV index attributes
+        Move old lcptool to deprecated folder and exclude from build
+        TrouSerS is not longer required to build
+        lcptools-v2: meet requirements from MLE DG rev16
+        lcptools-v2: Implement SM2 signing and SM2 signature verification
+        lcptools-v2: Set aux_hash_alg_mask to 0 when policy version != 0x300
+20200429: v1.9.12
+        Release localities in S3 flow for CRB interface
+        Config.mk, safestringlib/makefile : allow tool overrides
+        safestringlib: fix warnings with GCC 6.4.0
+        Strip executable file before generating tboot.gz
+        Add support for EFI memory map parse/modification
+        Add SHA384 and SHA512 digest algorithms
+        lcptools-v2: add pconf2 policy element support
+        tb_polgen: Add SHA384 and SHA512 support
+        Disable GCC9 address-of-packed-member warning
+        Fix warnings after "Avoid unsafe functions" scan
+        Use SHA256 as default hashing algorithm
+        Known issues:
+          - TBOOT hangs when booted with multiboot(1), use only multiboot2 as a workaround
+20191125: v1.9.11
+        tb_polgen: Add support for SHA256
+        Configure IOMMU before executing GETSEC[SENTER]
+        SINIT ACM can have padding, handle that when checking size
+20190410: v1.9.10
+        lcp-gen2: update with latest version (wxWidgets wildcard bugfix)
+        Print latest tag in logs
+        Add support for 64bit framebuffer address
+20181130: v1.9.9
+        tools: fix some dereference-NULL issues reported by klocwork
+        tools: replace banned mem/str fns with corresponding ones in safestringlib
+        Add safestringlib code to support replacement of banned mem/str fns
+        lcptools: remove tools supporting platforms before 2008
+        tboot: update string/memory fn name to differentiate from c lib
+        Fix a harmless overflow caused by wrong loop limits
+20181011: v1.9.8
+        Skip tboot launch error index read/write when ignore prev err option is true
+        s3-fix: fix a stack overflow caused by enlarged tb_hash_t union
+        S3 fix: revert the mis-changed type casting in changeset 522:8e881a07c059
+        S3-fix: Adding option save_vtd=true to opt-in the vtd table restore
+20180830: v1.9.7
+        Fix a lot of issues in tools reported by klocwork scan.
+        Fix a lot of issues in tboot module reported by klocwork scan.
+        Remove a redundant tboot option
+        Fix indent in heap.c
+        Fix 4 issues along with extpol=agile option
+        Mitigations for tpm interposer attacks
+        Add an option in tboot to force SINIT to use the legacy TPM2 log format.
+        Add support for appending to a TPM2 TCG style event log.
+        Ensure tboot log is available even when measured launch is skipped.
+        Add centos7 instructions for Use in EFI boot mode.
+        Fix memory leak and invalid reads and writes issues.
+        Fix TPM 1.2 locality selection issue.
+        Fix a null pointer dereference bug when Intel TXT is disabled.
+        Optimize tboot docs installation.
+        Fix security vulnerabilities rooted in tpm_if structure and g_tpm variable.
+        The size field of the MB2 tag is the size of the tag header + the size
+        Fix openssl-1.0.2 double frees
+        Make policy element stm_elt use unique type name
+        lcptools-v2 utilities fixes
+        port to openssl-1.1.0
+        Reset debug PCR16 to zero.
+        Fix a logical error in function bool evtlog_append(...).
+20170711: v1.9.6
+        GCC7 fix, adds generic FALLTHROUGH notations to avoid warnings appearing on GCC7
+        Ensure Tboot never overwrites modules in the process of moving them.
+        Add support to x2APIC, which uses 32 bit APIC ID.
+        Fix S3 secrets sealing/unsealing failures
+        Support OpenSSL 1.1.0+ for ECDSA signature verification.
+        Support OpenSSL 1.1.0+ for RSA key manipulation.
+        Adds additional checks to prevent the kernel image from being overwritten.
+        Added TCG TPM event log support.
+        Pass through the EFI memory map that's provided by grub2.
+        Fix a null pointer dereference bug when Intel TXT is disabled in BIOS.
+        Adjust KERNEL_CMDLINE_OFFSET from 0x9000 to 0x8D00.
+        Bounds checking on the kernel_cmdline string.
+20161216: v1.9.5
+        Add 2nd generation of LCP creation tool source codes for TPM 2.0 platforms.
+        Add user guide for 2nd generation LCP creation tool
+        Provide workaround for Intel PTT(Platform Trust Technology) & Linux PTT driver.
+        Add new fields in Linux kernel header struct to accommodate Linux kernel new capabilities.
+        Fix a pointer dereference regression in the tboot native Linux loader which manifests itself as a system reset.
+        Fix the issue of overwriting tboot when the loaded elf kernel is located below tboot.
+        Add support to release TPM localities when tboot exits to linux kernel.
+        Fix the evtlog dump function for tpm2 case.
+        Initiaize kernel header comdline buffer before copying kernel cmdline arguments to the buffer to avoid random 
+        data at end of the original cmdline contents.
+        Move tpm_detect() to an earlier stage so as to get tpm interface initialized before checking TXT platform capabilities.
+20160518: v1.9.4
+        Added TPM 2.0 CRB support
+        Increased BSP and AP stacks to avoid stack overflow 
+        Added an ACPI_RSDP structure g_rsdp in tboot to avoid potential memory overwritten issue on TPM 2.0 UEFI platforms
+        Added support to both Intel TPM nv index set and TCG TPM nv index set
+        grub2: tboot doesn't skip first argument any more
+        grub2: sanitize whitespace in command lines        
+        grub2: Allow addition of policy data in grub.cfg
+        grub2 support: allow the user to customize the command line
+        Mitigated S3 resume delay by adjusting LZ_MAX_OFFSET to 5000 in lz.c.        
+        Added SGX TPM  nv index support
+        Add 64 bit ELF object support
+        Gentoo Hardened, which uses the GRSecurity and PaX patch sets
+        Disable -fstack-check in CFLAG for compatibility with Gentoo Linux.
+        Enhanced tboot compatiblity running on non-Intel TXT platform with a fix of is_launched()
+        LCP documentation improvements
+20150506: v1.8.3
+        Added verified lanuch control policy user guide
+        Fixed a bug about var MTRR settings to follow the rule that each VAR MTRR base must be a multiple of that MTRR's size. 
+        Access tpm sts reg with 3-byte width in v1.2 case and 4-byte width in v2.0 case 
+        Bugfix: lcp2_mlehash get wrong hash if the cmdline string length > 7 
+        Optimized tboot log processing flow to avoid log buffer overflow by adopting lz Compress/Uncompress algorithms 
+        Added SGX support for Skylake platform 
+        tpm2: use the primary object in NULL Hierarchy instead of Platform Hierachy for seal/unseal usage 
+        Fixed a bug for lcp2_mlehash tool 
+        Fixed system hang issue casued by TXT disable, TPM disable or SINIT ACM not correctly provided in EFI booting mode 
+        Fixed bug for wrong assumption on the way how GRUB2 load modules 
+        Fixed MB2 tags mess issue caused by moving shorter module cmdline to head 
+        Fixed compile issue when debug=y 
+20140728: v1.8.2
+        Security Fix: TBOOT Argument Measurement Vulnerability for GRUB2 + ELF Kernels
+        fix werror in 32 bit build environment
+20140516: v1.8.1
+	Fix build error "may be used uninitialized"
+	Reset eventlog when S3
+	Make new Infenion TPM 2.0 module work
+	Update tboot version to 1.8.1 in grub title
+	Fix grub cfg file generation scripts for SLES12
+	Fix seal failure issue
+	tpm2 lcptools
+	Restore local apic base for AP
+	Fix typo in hash_alg_to_string()
+	Change to create primary object only once
+	Add prepare_tpm call in S3 path to ensure locality 0 was released before senter
+	Fix possible dead loop in print_bios_data when bios_data version==4
+	Fix possible null pointer dereference in loader.c
+	Fix possible null pointer dereference in tpm_12.c and tpm_20.c
+	Avoid buffer overrun when append tpm12 eventlog
+	Fix possible NULL pointer dereference
+	Fix one event log issue caused by wrong append and print operation
+	Fix error "unsupported hash alg" for agile extend policy
+	Fix warning "ACM info_table version mismatch"
+	Update the tpm family detection with a general way
+	Fix a lcp tools issue caused by redefining TB_HALG_SHA1 from 0 to 4
+	Assign g_tpm a value for no tpm case to avoid NULL checks
+	Fix crash when TPM is missing
+	Fix infinite loop in determine_multiboot_type()
+	Fix typo in tpm20_init() and remove unused variable
+	Allow the to-be-measured nv to be protected by AUTHWRITE
+	Check cpu vendor id to avoid unexpected behavior in non-intel cpu
+	Change to detect TPM family only once
+	Fix some typos caused by copy-paste
+20140130: v1.8.0
+	Update README for TPM2 support
+	tpm2 support
+	Adding sha256 algorithm implementation
+	Update README for TPM NV measuring
+	Update README for EFI support
+	Fix typo in tboot/Makefile
+	Increase the supported maximum number of cpus from 256 to 512
+	Extend tboot policy supporting measuring TPM NV
+	EFI support via multiboot2 changes
+	Fix typo in common/hash.c
+	Fix verification for extended data elements in txt heap
+
+20130705: v1.7.4
+	Fix possible empty submenu block in generated grub.cfg
+	Add a call_racm=check option for easy RACM launch result check
+	Fix type check for revocation ACM.
+
+20121228: v1.7.3
+	Update README with updated code repository url.
+	Fix grub2 scripts to be compatible with more distros.
+	Update README for RACM launch support
+	Add a new option "call_racm=true|false" for revocation acm(RACM) launch
+	Fix potential buffer overrun & memory leak in crtpconf.c
+	Fix a potential buffer overrun in lcptools/lock.c
+	Print cmdline in multi-lines
+	Optional print TXT.ERRORCODE under level error or info
+	Fix side effects of tboot log level macros in tools
+	Update readme for the new detail log level
+	Classify all logs into different log levels
+	Add detail log level and the macros defined for log level
+	Fix acmod_error_t type to correctly align all bits in 4bytes
+
+20120929: v1.7.2
+	Add Makefile for docs to install man pages.
+	Add man pages for tools
+	Add grub-mkconfig helper scripts for tboot case in GRUB2
+	Fix for deb build in ubuntu
+	Fix S3 issue brought by c/s 308
+	Fix a S4 hang issue and a potential shutdown reset issue
+	Fix build with new zlib 1.2.7.
+	Initialize event log when S3
+	Update README to change upstream repo url from bughost.org to sf.net.
+
+20120427: v1.7.1
+	Fix cmdline size in tb_polgen
+	Add description for option min_ram in README.
+	new tboot cmdline option "min_ram=0xXXXXXX"
+	Update test-patches/tpm-test.patch to fit in latest code.
+	
+20120115: v1.7.0
+	Print version number while changeset info unavailable
+	Document DA changes in README
+	Add event log for PCR extends in tboot
+	Follow details / authorities PCR mapping style in tboot
+	Support details / authorities PCR mapping
+	Support TPM event log
+	fix build issue for txt-stat in 64 bit environment.
+	update README for mwait AP wakeup mechanism
+	tboot: provide a new AP wakeup way for OS/VMM - mwait then memory write
+	Original txt-stat.c doesn't display TXT heap info by default. Add
+	    command line options to display help info and optionally enable
+	    displaying heap info.
+	Fix a shutdown issue on heavily throttled large server
+	Adjust mle_hdr.{mle|cmdline}_{start|end}_off according to CS285,286
+	    changes to give lcp_mlehash correct info to produce hash value.
+	Fix boot issue caused by including mle page table into tboot memory
+	Fix for possible overwritting to mle page table by GRUB2
+	Add PAGE_UP() fn that rounds things up/donw to a page.
+	Update get_mbi_mem_end() with a accurate, safer calculating way
+	ACPI fix and sanity check
+	Add some sanity check before using mods_count in a count-down loop
+	TPM: add waiting on expect==0 before issue tpmGo
+	txt-stat: Don't show heap info by default.
+	Exchange definitions for TBOOT_BASE_ADDR & TBOOT_START
+	Add const qualifier for suibable parms of all possible fns.
+	fix possible mbi overwrite issue for Linux with grub2
+	enhance print_mbi() to print more mbi info for debug purpose
+	Fix for GRUB2 loading elf image such as Xen.
+	Move apply_policy() call into txt_post_launch()
+	Don't zap s3_key in tboot shared page if sealing failed due to tpm
+	    unowned
+	Update the explanation of signed lists to make it clearer.
+	tboot: add a fall back for reboot via keyboard reset vector
+	tboot: revise README to explain how to configure GRUB2 config file for
+	    tboot
+	tboot: rewrite acpi reg access fns to refer to bit_width instead of
+	    access_width
+	tboot: change reboot mechanism to use keyboard reset vector
+	tboot: handle mis-programmed TXT config regs and TXT heap gracefully
+	tboot: add warning when TPM timeout values are wrong
+	all PM1_CNT accesses should be 16bit.
+	Enlarge NR_CPUS from 64 to 256
+	Add support for SBIOS policy element type (LCP_SBIOS_ELEMENT) to
+	    lcp_crtpolelt
+	Fix processor id list matching between platform and acmod
+	Make lcp_crtpollist support empty lists (i.e. with no elements)
+	print a bit more error reasons in txt-stat
+	Fix segmentation fault in txt-stat on some systems
+
+20110429: v1.5.0
+	Fix build errors under Fedora 15
+	Various cleanups to output and checks to make it more readable
+	Removed PAGE_SIZE/PAGE_SHIFT requirements from utils/*
+	Added definitions of PAGE_SIZE and PAGE_SHIFT to acminfo.c
+	Fix display of TXT.ERRORCODE values
+	Added Developer's Certificate of Origin 1.1 to README
+	Add support for TXT heap extended data elements and BiosData version 4
+	Removed some fields and changed names for some TXT configuration space
+	    registers
+	Add support for AC Module chipset info table version 4 (ProcessorIDList)
+	Separate AC Module subtype field from type field in ACM header
+	Fixed error in description of what is extended to PCRs 17, 18, and 19.
+	Fix tboot Makefile to make object files explicit in order to avoid
+	    incorrect ordering
+	Removed no_usb command line parameter and SMI disabling
+	Fixed bug with PCONF elements not displaying correctly
+	Support MAXPHYADDR > 36b
+	Reversed and rewrote c/s 225 for wrapping tboot policy in LCP custom
+	    element to store tb policy in the LCP PO index.
+	Added the log level support.
+	Clean up build
+	Trigger TB_ERR_S3_INTEGRITY and don't call verify_integrity() if a
+	    measured launch is not performed on S3 resume. Then the policy
+	    decides whether to continue unmeasured S3 launch or not.
+	verify_integrity() should be called after TXT is launched on S3 resume.
+	Continue to fix the error message "response size incorrect".
+	Add checking whether a given index exists by its public data in TPM NV,
+	    because the original "response size incorrect" is not clear to
+	    describe the error message.
+	Make default parameter values for command line parameters consistent
+	    with the default initialized values.
+	Fixed to support offsetof definition for gcc 3.X and below.
+	Moved utility binaries (lcptools/*, tb_polgen, utils/*) to /usr/sbin to
+	    conform to convention for non-critical system utilities
+	Re-licensing tboot/include/printk.h to BSD
+	Fixed a bug in txt-stat. In tboot_log_t, char *buf will occupy 4 bytes
+	    on 32bit system and 8 bytes on 64bit. Both sizeof(*log) and
+	    offsetof(tboot_log_t, buf) cannot get the accurate position of the
+	    log memory, which might cause some characters missing in the log
+	    printed by running "txt-stat".
+	Removed end-of-line CRs from README file
+	Moved definitions of tpm_pcrvalue_t and tpm_pcr_composite_t from lcp2.h
+	    back to pconf_elt.c, sinc they are only needed by pconf_elt.c
+	Fixed the bug in pconf creation.
+	Pause when transferring to VMM/kernel and SINIT by GETSEC[SENTER].
+	    Again, clean the code and fix to see the first few lines of tboot
+	    output and sync-up serial port output with vga output when pause.
+	Fix the compile error for c/s 225
+	Use LCP_POLELT_TYPE_CUSTOM to wrap tboot policy, so tboot policy is
+	    allowed to be stored in the LCP index and be signed, etc.
+	    Additionally tboot code unwraps the policy from the PO index.
+	Change to use time-based timeout instead of counter-based timeout for
+	    tpm_save_state().
+	Fixed option values in tb_polgen
+	Fix build error in lcptools on systems that don't support 'ehco -e'
+	Change serial command line option back to original format
+	Removed htobeXX() fns because not supported in older glibc
+	Fix build error (on some systems) in lcptools
+	Fix print_mbi() to have more useful and properly-formatted output
+	Disable legacy USB SMIs by default
+	Fixed bug in creation of LCP_PCONF_ELEMENT
+	Fix build errors with gcc v4.1.2
+	Add timeout ot comc_setup() and don't re-initialize serial on shutdown
+	Added additional compiler warnings and cleaned up code to build cleanly
+	Merge
+	Fixes support for PCI serial cards
+	Fixed buffer overrun errors in lcptools/ and compilation error on some
+	    systems in utils/
+	Fix build error
+	Improve efficiency of div64()
+	All non-BSD compatible files rmeoved and functionality replaced by BSD
+	    compatible code
+	Fix bug where some e820 configurations would case recent USB-related
+	    fix code to reserve too much memory
+	Fix S3 resume path to not call copy_e820_table()
+	Remove SINITs and LCP policy data files from module list before modules
+	    are verified and measured
+	Fix issue where tboot would appear to hang after SENTER on some BIOSes
+	    (due to DMA protecting legacy USB buffers)
+	Fixed build inconsistencies
+	Always extend PCRs on S3 integrity creation/verification
+	Added support for 'vga_delay' command line option
+	Fix bug in TXT.VER.EMIF/FSBIF handling
+	Fixed debug chipset detection
+	Fix for changed defn. of is_acmod()
+	Add support for choosing correct SINIT ACM from multiple loaded modules
+	This patch is to clean up the code by clearing all blank spaces at the
+	    end of
+	This patch changes VMAC_NHBYTES from the standard 128 to 4K in order to
+	    improve the performance of MACing.
+	This patch adds pae paging support into tboot for tboot to access >4GB
+	    memory during S3 MACing.
+	Walkaround for pvops to read public config registers.
+	Explicitly link lcp_mlehash with libz
+	Don't write to tboot's launch error index if it doesn't exist
+	Merge TPM timeout workaround
+	Workaround for TPMs with incorrect timeout values
+	This patch reimplements memory reading by lseek()/read() in order to
+	    fix mmap() issue which causes dom0 hangs under pvops.
+	Added dependency to give "friendly" error if trousers is not installed
+	Fix build error
+	Add support for LCP v2, as defined in December 2009 MLE Developers
+	    Guide chapt. 3 and Appendix E
+	Moved acminfo and txt-stat from txt-test to (new) utils directory and
+	    added parse_err utility
+	Removed trousers sub-project
+	Update for latest TXT data structures and GETSEC[PARAMETERS] type
+	Handle case where BSP does not have APIC ID 0
+	Support TPMs that return TPM_RETRY for TPM_SaveState command
+	Fix one more '&' to '&&' ocurrence.
+	Fix bug with '&' instead of '&&'.
+	Fixed a timeout bug in 163
+	Added text that repo chnages are sent to
+	    tboot-changelog@lists.sourceforge.net mailing list.
+	Updated README about e820 table memory types used.
+	Updated README with the fact that TXT support is now part of the 2.6.32
+	    kernel.
+	add gzip lib to fix build errors
+	Fixed "Handle page table addr in ECX", some SINITs are not fully ready
+	    for this.
+	Fixed overflow check in folder txt-test.
+	Add MSEG verification.
+	Continue to fix build warning on ubuntu 4.3.2
+	Fix the build warning with gcc 4.3.2 on ubuntu 4.3.2
+	Check the return values from some functions.
+	Check overflow for uint32_t, and some other types.
+	Before checking bios data, check TXT supported
+	Read real TIMEOUT values from TPM and set timeout
+	Handle page table addr in ECX
+	Fix the potential segmentation fault in find_mle_hdr,
+	Changed mechanism for initializing VMCS controls; changed license to BSD
+	Copy LCP owner policy data (if present) to buffer in os_mle_data
+	Create common fn to determine end addr of tboot; don't set
+	    boot_params->tboot_shared_addr if launching Linux w/o TXT
+	Fix locking for AP wakeup and WFS
+	If APIC ID of AP exceeds NR_CPUS, put AP into hlt loop
+	Increase NR_CPUS to allow for discontiguous APIC IDs on some systems
+	Update spinlock.h with latest Xen code
+	Reserved tboot's memory as E820_RESERVED if launching Linux; fix tboot
+	    image size
+	Clear key from memory even when seal/unseal fails
+	Fix bug in tpm_write_cmd_fifo() when tracing TPM data
+	Ensure that memory region chosen for initrd is large enough
+	Changed passing of shared page for Linux to use new field in boot_params
+	This is a test.
+	Fix bug with calling verify_modules() on S3 resume patch
+	Added -Wformat-security to Config.mk to catch additional errors and
+	    fixed resulting warnings; also fixed some warnings that are
+	    generated by gcc v4.4
+	Fixed bug in tpm_seal() with setting of localityAtCreation and added
+	    fallback for tpm_get_random()
+	Remove SINIT and LCP data modules from mbi structure when not doing
+	    measured launch
+	Do TPM_SaveState as last TPM command
+20090330:
+	Added s3_key and num_in_wfs fields to tboot_shared_t and rev'ed
+	    version to 5
+	Use VMAC as S3 integrity MAC algo
+	Changed tboot load/start addr to 0x800000 (8MB)
+	Fixed support for newer Linux kernels
+	Support TB_SHUTDONW_WFS shutdown type for APs
+	Misc. fixes
+
+20090130:
+	Fixed build issues with newer versions of gcc (e.g. in Fedora 9)
+	Increased CPU/core/thread support to 32 CPUs/cores/threads
+	Simpified tboot build process to be that of standard ELF binary
+	Enhanced logging support (see README)
+	Include tboot command line in its hash; support for including command
+            line in hash added to lcp_mlehash
+	Always extend measurement of module 0 to PCR 18
+	Added verification of memory layout on launch
+	Set VT-d PMR protections to cover all usable RAM
+	Misc. fixes
+
+20081008:
+	Fixed build error in lcptools/
+
+20081007:
+	Updated README and doc/* files
+	Fixed support for in-memory serial log
+	Fixes and enhancements to txt-stat
+	Changed policy format (see doc/policy.txt for new command syntax)
+	Added support for launching Linux kernels >= 2.6.20 (Linux kernel
+	    patches will be available on LKML)
+	Fixed build errors under gcc v4.3.0+
+
+20080609:
+	Removed support for Technology Enabling Platform (TEP)
+	Removed support for SINIT AC module versions <16 (i.e. <= 20070910)
+	Updated per changes in May 2008 Intel(R) TXT MLE Developer's Manual:
+	    Updated to MLE (header) version 2.0
+	    Updated OsSinitData, SinitMleData structs
+	    Updated AC module InfoTable struct
+	    Support Capabilities fields
+	    Support MONITOR-based RLP wakeup
+	Added acminfo app to parse and display AC module information
+	Updated for v3 of BiosData struct
+	Reduced TPM-related serial output
+	Fixed sealing of hashes for restoring PCRs after S3 resume
+	Misc. fixes and code cleanup
+
+20080523:
+	Updated TrouSerS version to 0.3.1 and to download it from its SF site
+	Fixed several items regarding TPM:
+	      call TPM_SaveState in case launching kernel that does not, so
+	          that S3 resume will restore SRTM PCRs
+	      support for TPMs with an Idle state
+	      fixed timeout values per TCG spec
+	      enforce that TPM is activated and enabled (or fail launch)
+	      misc. fixes
+	Fixed failure paths to apply policy
+	Enhancements to and cleanup of policy support
+	Cap PCRs on exit
+	Added txt-stat app to display TXT config registers and status info
+	S3 fixes
+	Added 'loglvl' command line option to control serial output
+	Handle unordered and overlapping e820 tables
+	Misc. fixes and code cleanup
+
+20071128:
+	Added '-f' command line option to lcptools/tpmnv_getcap to display the
+	    TPM_PERMANENT_FLAGS and TPM_STCLEAR_FLAGS contents
+	Revised the docs/policy.txt steps
+	Code and build re-factoring and cleanup (default target is now 'build')
+	Make memory logging build-time optional and disable by default
+	Support >2 cores/threads
+	Move tboot to load and execute at 16MB (this also now protects it from
+	    dom0 access since it's memory type can be E820_UNUSABLE now)
+	    *** this requires a patch to Xen ***
+	The Xen command line shoudl have 'no-real-mode' removed and 'vtd=1'
+	    added (as indicated in the updated docs/tboot-info.txt)
+	    setting 'vtd=1' is optional but some systems fail to boot dom0
+	    otherwise
+	    *** setting 'vtd=1' will cause S3 resume to fail ***
+	Updated trousers sub-directory to download 0.3.1 version from TrouSerS
+	    SourceForge site and build it
+
+20071029:
+	Moved build_tools target into top-level Makefile
+	Put 'tboot=0x1234' (where 1234 is the addr of the tboot_shared data)
+	    on VMM/kernel command line, per latest Xen feedback
+	Changed TB_LAUNCH_ERR_IDX to 0x20000002
+	Made TPM detailed debug output conditional
+	Changes TBOOT_S3_WAKEUP_ADDR to 0x8a000 to ensure no conflicts
+
+20071026:
+	Initial version.

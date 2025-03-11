@@ -1,0 +1,20 @@
+.\"
+.TH TXT-STAT 8 "2011-12-31" "tboot" "User Manuals"
+.SH NAME
+txt-stat \- display the status of TXT
+.SH SYNOPSIS
+.B txt-stat
+.RB [\| \-\-heap \|]
+.RB [\| \-h \|]
+.SH DESCRIPTION
+.B txt-stat
+is used to display various information about the status of Intel(R) TXT. It will display the TXT configuration registers status and TBOOT log by default.
+.SH OPTIONS
+.TP
+.B \-\-heap
+Print out the BiosData structure from the TXT heap.
+.TP
+\fB\-h\fR, \fB\-\-help
+Print out this help message.
+.SH EXAMPLES
+\fBtxt-stat \-\-heap

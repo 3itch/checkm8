@@ -1,0 +1,26 @@
+.\"
+.TH TPMNV_RELINDEX 8 "2020-05-10" "tboot" "User Manuals"
+.SH NAME
+tpmnv_relindex \- release an index in TPM NV storage
+.SH SYNOPSIS
+.B tpmnv_relindex
+.RB \| -i \|
+.IR index \|
+.RB [\| -p
+.IR password \|]
+.RB [\| -h \|]
+.SH DESCRIPTION
+.B tpmnv_relindex
+can be used to release an index defined in TPM NV storage.
+.SH OPTIONS
+.TP
+.BI -i\  index
+NV index to use. You can specify an integer or use the following symbolic names: default (0x50000001), owner (0x40000001) or aux (0x50000002).
+.TP
+.BI -p\  password
+Owner password for the index.
+.TP
+.BI -h\ 
+Print the help text.
+.SH "SEE ALSO"
+.BR tpm_nvrelease (8)

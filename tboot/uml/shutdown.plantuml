@@ -1,0 +1,27 @@
+@startuml Shutdown
+
+start
+if (CPU is AP?) then (true)
+    :catch CPU in VMX;
+    stop
+else (false)
+    :wait until all APs in VMX/
+    :release locality 0 and 1;
+    :request locality 2;
+    if (S3 enter flow?) then (yes)
+        :restore DMAR table;
+        :seal state into TPM;
+    endif
+    :cap PCRs;
+    :force APs to exit VMX;
+    :prepare & call GETSEC[SEXIT];
+    if (S3 enter flow?) then (yes)
+        :set resume entry;
+        :enter S3;
+        stop;
+    else (no)
+        :shutdown;
+        stop
+    endif
+endif
+@enduml

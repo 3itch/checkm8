@@ -1,0 +1,78 @@
+These are some example instructions for creating an Intel(R) TXT Launch
+Control Policy (LCP) using the new LCP tools (i.e. for platforms produced
+after 2008).
+
+These steps assume that all referenced binaries have already been built and
+paths are relative to the tboot/lcptools-v2/ directory:
+
+Create policy element(s):
+========================
+
+Create an MLE element:
+---------------------
+1.  lcp2_mlehash --create --cmdline "the command line for tboot from grub.conf"
+    --alg sha1 /boot/tboot.gz > mle_hash
+2.  lcp2_crtpolelt --create --type mle --ctrl 0x00 --minver 17 --alg sha1
+    --out mle.elt mle_hash
+
+Note: Since GRUB2 does not pass the file name in the command line field of the
+multiboot entry, the command line to be included in creation of MLE element
+should exclude the first file name in the command line field of multiboot entry.
+
+Create an SBIOS element:
+-----------------------
+1.  Create hash file containing BIOS hash(es), e.g. named sbios_hash
+2.  lcp2_crtpolelt --create --type sbios --alg sha1 --out sbios.elt sbios_hash
+
+Create a CUSTOM element:
+-----------------------
+1.  Create or determine the UUID that will identify this data format (e.g.
+    using 'uuidgen')
+2.  Create the data the will be placed in this element.  E.g. the policy file
+    from tb_polgen.
+2.  lcp2_crtpolelt --create --type custom --out custom.elt --uuid <uuid value>
+    <data file>
+
+
+Create policy list(s):
+=====================
+
+Combine the elements into an unsigned list:
+------------------------------------------
+1.  lcp2_crtpollist --create --out list_unsig.lst mle.elt pconf.elt
+
+The two blocks below are intended to be mutually exclusive.  The openssl
+signing is supported for cases where the signing environment is separate
+from the policy creation environment and the software allowed to run there
+is strictly controlled and already supports openssl.
+
+Use lcp2_crtpollist to sign the list (sigalg=rsa):
+-----------------------------------
+1.  openssl genrsa -out privkey.pem 2048
+2.  openssl rsa -pubout -in privkey.pem -out pubkey.pem
+3.  cp list_unsig.lst list_sig.lst
+4.  lcp2_crtpollist --sign --sigalg rsassa --pub pubkey.pem --priv privkey.pem
+    --out list_sig.lst
+
+Use lcp2_crtpollist to sign the list (sigalg=ecdsa):
+-----------------------------------
+1.  cp list_unsig.lst list_sig.lst
+2.  lcp2_crtpollist --sign --sigalg ecdsa --out list_sig.lst
+
+Use openssl to sign the list:
+----------------------------
+1.  openssl rsa -pubout -in privkey.pem -out pubkey.pem
+2.  cp list_unsig.lst list_sig.lst
+3.  lcp2_crtpollist --sign --sigalg rsassa --pub pubkey.pem --nosig
+    --out list_sig.lst
+4.  openssl genrsa -out privkey.pem 2048
+5.  openssl dgst -sha1 -sign privkey.pem -out list.sig list_sig.lst
+6.  lcp2_crtpollist --addsig --sig list.sig --out list_sig.lst
+
+Create policy and policy data files:
+===================================
+1.  lcp2_crtpol2 --create --alg sha1 --type list --pol list.pol --data list.data
+    list_{unsig,sig}.lst
+
+LCP Policy Data file is allowed to be mixing of LCP_POLICY_LIST and
+LCP_POLICY_LIST2 lists.

@@ -1,0 +1,51 @@
+.\"
+.TH TPMNV_DEFINDEX 8 "2020-05-10" "tboot" "User Manuals"
+.SH NAME
+tpmnv_defindex \- define an index in TPM NV storage
+.SH SYNOPSIS
+.B tpmnv_defindex
+.RB \| -i \|
+.IR index \|
+.RB [\| -s
+.IR size \|]
+.RB [\| -pv
+.IR permission_value \|]
+.RB [\| -p
+.IR password \|]
+.RB [\| -av
+.IR authentication_value \|]
+.RB [\| -wl
+.IR write_locality \|]
+.RB [\| -rl
+.IR read_locality \|]
+.RB [\| -h \|]
+.SH DESCRIPTION
+.B tpmnv_defindex
+is used to define an index in TPM NV storage. You can use this to store data in the TPM so that it can be only accessed when certain conditions are met.
+.SH OPTIONS
+.TP
+.BI -i\  index
+NV index to use. You can specify an integer or use the following symbolic names: default (0x50000001), owner (0x40000001) or aux (0x50000002).
+.TP
+.BI -s\  size
+Size of the NV storage in bytes.
+.TP
+.BI -pv\  permission_value
+Permission value to use for the storage. This is mandatory unless you specify an index that has a default value: default (0x00002000), owner (0x00000002) or aux (0x00000000).
+.TP
+.BI -p\  password
+Owner password for the index.
+.TP
+.BI -av\  authentication_value
+Authentication value for the index. Used as a password with AUTHREAD/AUTHWRITE.
+.TP
+.BI -wl\  write_locality
+Write locality value. There are 5 localities: 0-4. For example the locality value is 0x18 if you want to allow localities 3 or 4.
+.TP
+.BI -rl\  read_locality
+Read locality value. There are 5 localities: 0-4. For example the locality value is 0x18 if you want to allow localities 3 or 4.
+.TP
+.BI -h\ 
+Print the help text.
+.SH "SEE ALSO"
+.BR tpm_nvdefine (8)

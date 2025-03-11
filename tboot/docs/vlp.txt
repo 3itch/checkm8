@@ -1,0 +1,58 @@
+****************************************************************************
+***                                                                      ***
+***                   Verified Launch control Policy                     ***
+***                                                                      ***
+****************************************************************************
+After entering a trusted environment, Tboot will extend verification from 
+MLE to OS/VMM and dom0, called Verified Launch, using policies similar to 
+the LCP and also store the policy in TPM NV. 
+
+Verified Launch control Policy (VLP) is defined by platform owner/user for 
+OS/VMM verified Launch purpose on Intel TXT platforms. 
+
+VLP can be created and managed by tb_polgen tool in tb_polgen/ directory 
+and provisioned into TPM NV using the lcptools in lcptools/ or lcptools-v2/ 
+directory in tboot package. 
+
+Unlike Launch Control Policy, VLP is tboot specific and mainly consumed by 
+tboot itself to verify if OS/VMM to be launched match the VLP.
+
+VLP related data structures and policy enforcement engine are defined and 
+implemented in tboot, more details can be found in tboot VLP related source 
+codes.
+
+Currently TPM nv index 0x20000001 is specifically defined to store VLP crreated 
+by tb_polgen tool and consumed by tboot to verify OS/VMM during a verified 
+launch process.
+
+For how to create TPM nv index, please refer to  Linux_LCP_Tools_User_Manual in
+lcptools/ directory.
+
+Create Verified Launch control Policy:
+-----------------------------
+1.  tb_polgen/tb_polgen --create --type nonfatal vl.pol
+
+2.  tb_polgen/tb_polgen --add --num 0 --pcr none --hash image
+    --cmdline "the command line for xen from grub.conf"
+    --image /boot/xen.gz vl.pol
+
+3.  tb_polgen/tb_polgen --add --num 1 --pcr 19 --hash image
+    --cmdline "the command line for dom0 from grub.conf"
+    --image /boot/vmlinuz-2.6.18.8-xen vl.pol
+
+4.  tb_polgen/tb_polgen --add --num 2 --pcr 19 --hash image
+    --cmdline "" --image /boot/initrd-2.6.18.8-xen.img vl.pol
+
+Note:
+    The command lines should not include the module name (e.g. "/xen.gz").
+    This is a change from the previous version of policy support and was done
+    because a module's measurement should only depend on its content and not
+    on its location.
+Note 2:
+    It is not mandatory to specify a PCR for module 0, since this module's
+    Measurement will always be extended to PCR 18.  If a PCR is specified,
+    then the measurement will be extended to that PCR in addition to PCR 18.
+
+
+ 
+

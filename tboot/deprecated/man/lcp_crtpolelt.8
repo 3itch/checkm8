@@ -1,0 +1,107 @@
+.\"
+.TH LCP_CRTPOLELT 8 "2011-12-31" "tboot" "User Manuals"
+.SH NAME
+lcp_crtpolelt \- create an Intel(R) TXT policy element of specified type.
+.SH SYNOPSIS
+.B lcp_crtpolelt
+.I COMMAND
+.RI [ OPTION ]
+.SH DESCRIPTION
+.B lcp_crtpolelt
+is used to create an Intel(R) TXT policy element of specified type.
+.SH OPTIONS
+.TP
+\fB\-\-create
+create an policy element
+.RS
+.TP \w'\fR[\fB\-\-ctrl\ \fIpol-elt-ctr1\fR]'u+1n
+\fB\-\-type\ \fItype\fP
+type of element; must be first option; see below for type strings and their options
+.TP
+\fB\-\-out\ \fIfile\fP
+output file name
+.TP
+\fR[\fB\-\-ctrl\ \fIpol-elt-ctr1\fR]\fP
+PolEltControl field (hex or decimal)
+.RE
+.TP
+\fB\-\-show\ \fIfile\fP
+show policy element
+.TP
+\fB\-\-verbose\fP
+enable verbose output; can be specified with any command
+.TP
+\fB\-\-help\fP
+print out the help message
+.SS "Available type options:"
+.TP
+\fBmle\ \fR[\fB\-\-minver\ \fIver\fR]\fP
+minimum version of SINIT
+.TP
+\fBmle\ \fR[\fIfile1\fR][\fIfile2\fR]...\fP
+one or more files containing MLE hash(es); each file can contain multiple hashes
+.TP
+\fBpconf\ \fR[\fIfile1\fR][\fIfile2\fR]...\fP
+one or more files containing PCR numbers and the desired digest of each; each file will be a PCONF
+.TP
+\fBcustom\ \fR[\fB\-\-uuid\ \fIUUID\fR]\fP
+UUID in format: {0xaabbccdd, 0xeeff, 0xgghh, 0xiijj, {0xkk 0xll, 0xmm, 0xnn, 0xoo, 0xpp}} or "--uuid tboot" to use default
+.TP
+\fBcustom\ \fR[\fIfile\fR]\fP
+file containing element data
+.SH EXAMPLES
+.SS "Create an MLE element:
+.TS
+tab (@);
+l lx.
+1@T{
+\fBlcp_mlehash \-c \fI"logging=serial,vga,memory" /boot/tboot.gz \fR> \fImle-hash
+T}
+2@T{
+\fBlcp_crtpolelt \fB\-\-create \-\-type \fImle \fB\-\-ctrl \fI0x00 \fB\-\-minver \fI17 \fB\-\-out \fImle.elt mle-hash
+T}
+.TE
+.SS "Create a PCONF element:
+.TS
+tab (@);
+l lx.
+1@T{
+\fBcat \fI/sys/devices/platform/tpm_tis/pcrs \fR| \fBgrep \-e \fIPCR-00 \fB\-e \fIPCR-01 \fR> \fIpcrs
+T}
+2@T{
+\fBlcp_crtpolelt \-\-create \-\-type \fIpconf \fB\-\-out \fIpconf.elt pcrs
+T}
+.TE
+.SS "Create an SBIOS element:
+.TS
+tab (@);
+l lx.
+1@T{
+Create hash file containing BIOS hash(es), e.g. named \fIsbios-hash
+T}
+2@T{
+\fBlcp_crtpolelt \-\-create \-\-type \fIsbios \fB\-\-out \fIsbios.elt sbios-hash
+T}
+.TE
+.SS "Create a CUSTOM element:
+.TS
+tab (@);
+l lx.
+1@T{
+Create or determine the UUID that will identify this data format (e.g. using 
+\fBuuidgen\fR(1)).
+T}
+2@T{
+Create the data file that will be placed in this element (e.g. the policy file
+from \fBtb_polgen\fR(8)).
+T}
+3@T{
+\fBlcp_crtpolelt \-\-create \-\-type \fIcustom \fB\-\-out \fIcustom.elt \fB\-\-uuid \fIuuid-value data-file
+T}
+.TE
+.SH "SEE ALSO"
+.BR lcp_crtpol2 (8),
+.BR lcp_mlehash (8),
+.BR lcp_crtpollist (8),
+.BR uuidgen (1),
+.BR tb_polgen (8).

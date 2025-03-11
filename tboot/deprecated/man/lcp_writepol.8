@@ -1,0 +1,54 @@
+.\"
+.TH LCP_WRITEPOL 8 "2011-12-31" "tboot" "User Manuals"
+.SH NAME
+lcp_writepol \- write LCP policy into a TPM NV index
+.SH SYNOPSIS
+.B lcp_writepol
+.B \-i
+.I index-value
+.RB [\| \-f
+.IR policy-file
+.RB |\  \-e \|]
+.RB [\| \-p
+.IR passwd \|]
+.RB [\| \-h \|]
+.SH DESCRIPTION
+.B lcp_writepol
+is used to write LCP policy into a (previously-defined) TPM NV index. It also 
+supports writing arbitrary data into a specified index.
+.SH OPTIONS
+.TP
+.BI \-i\  index-value
+Designate the index for writing. Index can be UINT32 or string. 3 strings
+are supported for the reserved LCP indices. Strings and default index 
+values for each string are:
+.RS
+.IP default
+0x50000001(INDEX_LCP_DEF)
+.IP owner
+0x40000001(INDEX_LCP_OWN)
+.IP aux
+0x50000002(INDEX_LCP_AUX)
+.RE
+.TP
+.BI \-f\   policy-file
+File name where the policy data is stored.
+.TP
+.BI \-e
+Write 0 length data to the index. This is useful for special indices, such as those
+permission is WRITEDFINE.
+.TP
+.BI \-p\  password
+The TPM owner password
+.TP
+.B \-h
+Print out the help message
+.SH EXAMPLES
+\fBlcp_writepol \-i \fIdefault \fB \-f \fIpolicy-file
+.PP
+\fBlcp_writepol \-i \fI0x00011101 \fB \-e
+.PP
+\fBlcp_writepol \-i \fI0x00011101 \fB \-f \fIpolicy-file \fB \-p \fI123456
+.SH "SEE ALSO"
+.BR lcp_readpol (8),
+.BR lcp_crtpol (8).

@@ -1,0 +1,247 @@
+#This is a UserGuide for LCP v3 Creator
+
+LCP v3 Creation Tool User Guide
+
+1. Introduction
+
+   This document describes how to install and use the 2nd generation of Launch Control Policy creation tool 
+   for creating Intel® TXT launch control policies for use with TPM 2.0 family devices.
+   This LCP tool can be used to build one or more Policy Definition (PDEF) files and, using a PDEF file,
+   can create policy files for use with Intel TXT. Intel TXT launch control policy consists of NV Policy Data
+   stored in the TPM NVRAM and a Policy List Structure file that is stored either in the BIOS flash ROM (for 
+   Platform Supplier policy) or in the boot directory of the target platform (for Platform Owner policy). 
+   This tool creates/edits a Policy Definition File (PDEF). The PDEF identifies files that contain the data for 
+   building the NV Policy Data and Data List Structure. All source data files must be in the working directory. 
+   The GUI updates the PDEF structure and when the user selects “BUILD”, the tool creates the policy files based 
+   on the information in the PDEF file.
+
+   The tool allows the user to:
+   
+   - Open an existing PDEF file or create a new one.
+   - Save the open definition to a new file name.
+   - Build the NV Policy Data and Policy List Structure based on the open PDEF.
+
+   The output files are:
+
+   - *.txt – TPM NV Policy data in readable text format (for DOS provisioning tools)
+   - *.pol – TPM NV Policy data in raw format for provisioning tools that take unformatted data.
+   - *.dat – file that contains the associated Policy List Structure
+
+2. Installation
+
+   This tool is written in Python, so Python 2.7.x installation is needed to run the tool.
+   Besides Python 2.7, following Python packages installation are required as well:
+   - python-wxpython28
+   - M2Crypto 
+   - PyAsn1
+
+3. Running the tool
+
+   The tool provides a Graphical User Interface (GUI) to edit and create the launch control policies.
+   The tool can be started by typing following command in a termainal from tool's working directory:
+   ./TxtPolicyGen2.py
+
+4. LCP Creation
+
+4.1 Menu Bar
+   
+    The menu bar of the tool provides the 3 dropdown menus: File, Build, and Help
+
+4.1.1 File Menu
+
+      The FILE menu provides standard file operations of New; Open; Save; Save As; Print; Close.
+        • New: Resets policy to the default policy and if the current policy had been modified, it prompts
+          to save it to a file.
+        • Open: allows you to open a previously created PDEF file to modify and/or build.
+        • Save & Save As: allows you to save the PDEF file to the existing or a new file name respectively.
+        • Print: Creates an ASCII printable file of the PDEF content that can be printed. Note that this
+          command does NOT send the file to a printer.
+        • Close: Exits the program and, if there were changes, prompts to save the PDEF file.
+
+4.1.2 Build Menu
+
+      The BUILD menu allows you to build the NV Policy Data file, the Policy List Structure file, or both. Note
+      that a policy list structure file will not be built when PDEF Policy Type is ANY.
+
+4.1.3 Help Menu
+
+      The HELP menu provides information about the tool, key generation, command line options, and allows
+      you to open this user guide.
+
+4.2 Main Screen
+
+      This screen edits the data that is to be placed in the TPM NV policy data. This tool does not write to 
+      the TPM, but it does create the data to be written to it. Other utilities, such as the TPM2 Provisioning 
+      tool can take this output and write the TPM NV index.
+
+4.2.1 Selecting Rules
+
+      The user selects either PS Policy Rules (for Platform Supplier – OEM) or PO Policy Rules (for platform
+      Owner – OS/Datacenter). Various information and allowed actions will be updated based on this selection.
+      Selecting the appropriate rules should be done first since it affects what can be selected and/or changed 
+      in policy definition.
+
+4.2.2 Min SINIT Version
+
+      This box allows the user to specify the minimum allowed version for the SINT ACM that will be allowed to 
+      perform a measured launch.
+
+4.2.3 ACM Revocation Limits
+      
+      These values allow the user to limit ACM self-revocation for the BIOS ACM and SINIT ACM. These values 
+      specify the maximum version level that can be revoked. A value of 5 means that ACM versions up to 4 
+      can be revoked, however versions 5 and above cannot be revoked. Thus, a value of zero prohibits ACM 
+      revocation and a value of 255 allows all revocations. These fields are only valid for PO Policy.
+
+4.2.4 Control Options
+
+      These check boxes allow the user to select various control options. Certain options will not be available 
+      depending on the rules selected.
+
+4.2.5 Policy Type
+
+      User selects if policy is ANY or LIST. When LIST is selected, the screen displays list information and
+      allows the user to create up to 8 lists. Additionally, when LIST is selected, the build command will create
+      a policy list structure. Note that for PS policy, the policy list structure needs to be included as part of 
+      the flash image and for PO policy, the policy list structure needs to be copied to the boot directory of the
+      target platform(s).
+
+4.2.6 Hash Algorithm
+
+      Use this box to select the hash algorithm that will protect the policy list structure. This value is only used
+      if Policy Type is LIST. It is recommended that this be the strongest algorithm supported by the tool.
+
+4.2.7 Algorithm for Auto-Promotion
+
+      Allows you to specify which hash algorithm the BIOS ACM uses for calculating the auto-promotion measurement. 
+      You must select one – even when Signed SBIOS Policy is used instead of Auto-Promotion. When there are both PS 
+      and PO policies, the selection in the PO policy takes precedence.
+
+4.2.8 Algorithms Allowed for Launch Control Policy
+
+      These check boxes allow you to select various hash algorithms that may be evaluated when the SINIT ACM processes 
+      LCP policy list structures. If an algorithm is not selected, then any element in the list using that element will 
+      be ignored.
+
+4.2.9 Allowed Signature Schemes
+
+      These check boxes allow you to select various signing schemes that will be allowed when the ACM processes policy 
+      list structures. If an algorithm is not selected, then measurements in any list signed using that scheme will be 
+      ignored.
+
+4.2.10 Adding and Removing a List
+
+      Before you can add a list, you must select Policy Type = LIST and then click the Add List button. If this is the 
+      first list, the window will expand to include the List dialogue. A policy may have up to 8 lists. The Number of 
+      Lists box indicates the total number of lists. 
+      When there is more than one list, select the list number you wish to view/edit via the View List box.
+      To delete a list, select the list via the View List box and click the Delete List button. 
+
+4.2.10.1 Signing a List
+
+      Each list may be signed or unsigned. For an unsigned list, set Signing Algorithm to “None”. Otherwise select the 
+      desired Signing Algorithm, specify the Key Size, and then the file names for the Public and Private Keys. Changing 
+      key size clears the key file names. Click HELP: Key Generation for information on how to generate signing keys.
+
+4.2.10.2 List Revocation
+
+      This only applies to signed lists. The tool automatically increments the Revocation Count field each time the list 
+      is successfully built (and there were changes). The Allowed box specifies the minimum Revocation Count that is 
+      allowed (to protect against unauthorized list roll-back) and its value is populated in the corresponding TPM NV 
+      Policy Revocation Counter array. When the Sync box is checked, the Allowed box will automatically track the Revocation 
+      Count. The RESET button will reset the Revocation Count to 0. This should only be used for pre-production testing.
+
+4.2.11 Adding and Deleting an Element
+
+      To add an element to the current list, click on the Add Element button. A dropdown menu appears and allows you to 
+      select the element type and hash algorithm. Only one of each combination is allowed in a list. That is, a policy 
+      may have at most one of each combination of Element Type-HashAlg. The Number of Elements box indicates the total 
+      number of elements in the selected list. Select the element you wish to view/edit via the View Element box.
+      To delete an element, select the element via the View Element box and click the Delete Element button.
+
+4.2.11.1 SBIOS Element
+
+      This is an element that provides a list of valid measurements for the Stat-up BIOS Code. That is, the code that 
+      must be trusted to clear memory when there is a Reset Attack. 
+      This element is only valid in the PS Policy and typically it is only found in signed lists. The exception is when 
+      the element specifies only a Fallback Hash. You must specify a Fallback Hash, and if you don’t support BIOS fallback, 
+      then specify a null hash of the appropriate size to match the hash algorithm. There is only one Fallback Hash 
+      measurement and may be multiple SBIOS hash measurements. 
+      The Hash File List box allows you to add or remove known good SBIOS measurements by specifying the filename of the 
+      file containing the hash. Each time you build the PDEF, the tool will open the specified files and use their current 
+      content to build the policy list structure.
+
+      If there are no SBIOS elements or if none of the SBIOS elements contain any SBIOS measurements (other than the fallback 
+      hash) then the BIOS ACM uses auto-promotion. When there is at least one SBIOS Element with at least one hash file listed, 
+      then the BIOS ACM does not use auto-promotion.
+
+4.2.11.2 PCONF Element
+
+      This is an element that provides a list of valid platform configuration measurements. Each PCONF measurement is a list 
+      of selected PCRs and their composite hash (in a structure referred to as a PCRINFO). You will need to use a tool such 
+      as PCRDump2 to create PCR dump files from the target platform(s). Each PCR dump file contains the PCR values for all 24 
+      of the PCRs (for the bank specified by its hashing algorithm). However, the tool only allows selection of the first 8 
+      (PCR0-7). 
+      A PO Policy has the option to override the PS Policy. When the Override PS Policy box is checked in the PO Policy, the 
+      SINIT ACM will not process any PCONF elements in the PS Policy and rely solely on PCONF elements in the PO Policy. 
+
+      The PCR File box allows you to add or remove known good PCONF measurements (i.e., PCRINFOs) by specifying the filename 
+      of the PCR Dump file and selecting the PCRs to include. The PCR Selection boxes allow you to specify which PCRs are 
+      evaluated. Click Add button to add a PCRINFO and select the PCR Dump filename. Next check the PCR Selection boxes for 
+      the PCR numbers you wish to include and then click Apply PCR Selection. To add another PCRINFO, repeat this procedure. 
+      Note that the information in the PCR File box indicates the selected PCRs and the PCR Dump filename. The tool allows 
+      each PCRINFO to have a different set of selected PCRs. To remove a PCONF PCRINFO from the element, you first select i
+      the entry from the PCR File dropdown box and then click on Remove. When you build the PDEF, for each entry in the PCR 
+      File list, the tool will open the specified file, generate a composite hash using the selected PCRs, and build the 
+      PCRINFO including it in the policy list structure. 
+      Note: If there are no PCONF elements in the PO Policy, then the SINIT ACM allows any platform configuration. 
+      Typically, PCRINFOs in the PS Policy only specify PCR0.
+
+4.2.11.3 MLE Element
+      This is an element that provides a list of valid OS/VMM measurements. The OSV or VMV should provide a list of known good 
+      MLE measurements. 
+      A PO Policy has the option to override the PS Policy. When the Override PS Policy box is checked in the PO Policy, the 
+      SINIT ACM will not process any MLE elements in the PS Policy and rely solely on MLE elements in the PO Policy. The Hash 
+      File List box allows you to add or remove known good MLE measurements. Click Add to add a measurement by selecting the 
+      filename of the file containing the hash. Repeat to add additional measurements. To remove an MLE measurement from the 
+      element, select the filename from the Hash File List box and click Remove. Each time you build the PDEF, the tool will 
+      open the specified files and use their current content to build the policy list structure. 
+      If there are no MLE elements in the PO Policy, then the SINIT ACM allows any OS to perform the measured launch. 
+
+4.2.11.4 STM Element
+
+      This is an element that provides a list of valid SMM Transfer monitor (STM) measurements. The platform vendor should 
+      provide a list of known good STM measurements. Note that this element is not used on servers and high end workstations.
+      A PO Policy has the option to override the PS Policy. When this box is checked, the SINIT ACM will not process any STM 
+      elements in the PS Policy and rely solely on STM elements in the PO Policy. 
+      The Hash File List box allows you to add or remove known good STM measurements. Click Add to add a measurement and select 
+      the filename of the file containing the hash. Each time you build the PDEF, the tool will open the specified files and use 
+      their current content to build the policy list structure. 
+      To remove an STM measurement from the element, select the filename in the Hash File List box and click on Remove.
+
+4.2.12 Saving the Definition File
+
+      You can save the PDEF file using the FILE tab on the menu bar. Specify an appropriate filename and the tool saves the file 
+      with a file extension of *.pdef in your tool working directory.
+
+4.2.13 Opening a Definition File
+
+      You can open a saved PDEF file using the FILE tab on the menu bar. Click OPEN and select the filename.
+
+4.2.14 Generating Policy files
+     
+      First open the desired PDEF file and, from the BUILD tab on the menu bar, select if you want to build either the NV 
+      Policy, the Policy Data File, or both. The tool will generate the NV Policy data in 2 different formats (for various 
+      provisioning tools - <filename>.dat & <filename>.txt) and builds the policy list structure as <filename>.dat.
+
+Troubleshooting
+
+- The tool can only be run from its working directory
+- It is preferred to run the tool as a non-root user
+- Create a new PDEF before editing the policy in tool's GUI
+
+
+
+
+
+
