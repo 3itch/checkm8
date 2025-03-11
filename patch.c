@@ -73,7 +73,7 @@ void* tboot_load() {
   for (i = 0; i < tboot_size; i++) {
     dest[i] = ((uint8_t*)tboot_addr)[i];
   }
-  return (void*)TBOOT_LOAD_ADDR
+  return (void*)TBOOT_LOAD_ADDR;
 }
 
 void shim_main() {
