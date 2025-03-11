@@ -2,19 +2,18 @@
 // Created by witch on 3/11/25.
 //
 
+#ifndef CBFS_LOAD_H
+#define CBFS_LOAD_H
+
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
 #include "com.h"
 
-#ifndef CBFS_LOAD_H
-#define CBFS_LOAD_H
-
-#endif //CBFS_LOAD_H
-
-#define CBFS_MASTER_HEAD_MAGIC     0x4F524243        //  orbc
-#define CBFS_FILE_MAGIC            0x4C494E48        //  link
-#define CBFS_BASE_ADDR   ((void *)0xFF000000)
+#define CBFS_MASTER_HEAD_MAGIC     0x4F524243        // orbc
+#define CBFS_FILE_MAGIC            0x4C494E48        // link
 
 struct cbfs_master_header {
   uint32_t magic;
