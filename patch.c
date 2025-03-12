@@ -119,6 +119,8 @@ void mpb_setup(void *tboot_entry, size_t tboot_size) {
   memcpy(mpb_base, &mpb, sizeof(mpb));
 }
 
+//   TODO:  calc mpb size based on loaded segments | maybe search for tboot_verify
+//           integrity function offset when loaded (????) idfk
 //extern void* __cbfs_load(const char* name, size_t* size);
 void *load_elf(void *data, size_t size) {
   Elf32_Ehdr *ehdr = (Elf32_Ehdr *)data;
