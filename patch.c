@@ -23,7 +23,7 @@
 #include "cbfs_load.h"
 #include "coreboot_table.h"
 
-#define VERIFY_INTEGRITY_OFFSET     0x80af10
+#define VERIFY_INTEGRITY_OFFSET     0x80af10     //    verify_integrity()
 #define CBFS_MASTER_HEADER_MAGIC  0x4F524243     //    orbc
 
 struct mle_param_block {
